@@ -1,4 +1,4 @@
-import java.io.*
+import java.io.File
 import java.time.LocalDateTime
 
 fun log(msg: String) {
@@ -8,104 +8,107 @@ fun log(msg: String) {
 fun runCommand(vararg command: String): String {
     log("Running: ${command.joinToString(" ")}")
     val process = ProcessBuilder(*command)
-        .redirectErrorStream(true)
+        .redirectErrorStream(true) // Combine stdout and stderr
         .start()
 
+    // Capture both stdout and stderr and print them to the terminal
     val output = process.inputStream.bufferedReader().readText()
     process.waitFor()
-    log(output)
-    return output
+    log(output.trim())  // Output to terminal
+    return output.trim()
 }
 
 fun isWindows(): Boolean = System.getProperty("os.name").lowercase().contains("win")
 fun isLinux(): Boolean = System.getProperty("os.name").lowercase().contains("linux")
 
-fun dockerExists(): Boolean {
-    return try {
-        runCommand("docker", "--version").contains("Docker version")
-    } catch (e: Exception) {
-        false
-    }
+fun fileExists(path: String): Boolean = File(path).exists()
+
+fun runCommandAsAdminWindows(command: String): String {
+    log("Running as admin: $command")
+    val process = ProcessBuilder("runas", "/user:Administrator", command)
+        .redirectErrorStream(true)
+        .start()
+
+    val output = process.inputStream.bufferedReader().readText()
+    process.waitFor()
+    log(output.trim())  // Print the output to terminal
+    return output.trim()
 }
-
-fun installDockerOnLinux(password: String) {
-    runCommand("sudo", "-S", "apt", "update")
-    runCommand("sudo", "-S", "apt", "install", "-y", "ca-certificates", "curl", "gnupg", "lsb-release")
-
-    val keyringDir = "/etc/apt/keyrings"
-    File(keyringDir).mkdirs()
-
-    runCommand(
-        "bash", "-c", """
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | 
-        gpg --dearmor -o $keyringDir/docker.gpg
-        """.trimIndent()
-    )
-
-    runCommand(
-        "bash", "-c", """
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=$keyringDir/docker.gpg] \
-        https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        """.trimIndent()
-    )
-
-    runCommand("sudo", "-S", "apt", "update")
-    runCommand("sudo", "-S", "apt", "install", "-y", "docker-ce", "docker-ce-cli", "containerd.io")
-
-    log("Starting Docker...")
-    runCommand("sudo", "systemctl", "start", "docker")
-    runCommand("sudo", "systemctl", "enable", "docker")
-}
-
-fun elevateWindows(): Boolean {
-    val script = """
-        $'currentIdentity' = [Security.Principal.WindowsIdentity]::GetCurrent()
-        $'principal' = New-Object Security.Principal.WindowsPrincipal($'currentIdentity')
-        if ($'principal'.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-            # Running as Administrator, proceed with Docker installation
-            exit
-        } else {
-            # Not an administrator, prompt to restart with elevated permissions
-            Start-Process -Verb RunAs -FilePath "java" -ArgumentList "-cp", ".", "InstallDockerKt"
-            exit
-        }
-    """.trimIndent()
-
-    val tempScript = File.createTempFile("elevate", ".ps1")
-    tempScript.writeText(script)
-    runCommand("powershell", "-ExecutionPolicy", "Bypass", "-File", tempScript.absolutePath)
-    return true
-}
-
 
 fun installDockerOnWindows() {
-    val installerUrl = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
-    val installerPath = File(System.getProperty("java.io.tmpdir"), "DockerInstaller.exe").absolutePath
+    val installerUrl = "https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe"
+    val installerPath = File(System.getProperty("java.io.tmpdir"), "docker-installer.exe").absolutePath
 
-    log("Downloading Docker installer...")
-    runCommand("powershell", "-Command", "Invoke-WebRequest -Uri '$installerUrl' -OutFile '$installerPath'")
+    log("Downloading Docker installer for Windows...")
+    runCommand("powershell", "-Command", "Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath")
 
-    log("Running installer silently...")
-    runCommand("powershell", "-Command", "Start-Process -FilePath '$installerPath' -ArgumentList '/quiet' -Wait")
+    log("Installing Docker...")
+    runCommandAsAdminWindows("cmd /c start $installerPath")
+
+    log("Docker installation complete.")
+}
+
+fun installDockerOnLinux() {
+    log("Updating package list...")
+    runCommand("sudo", "apt", "update")
+
+    log("Installing required packages for Docker...")
+    runCommand("sudo", "apt", "install", "-y", "apt-transport-https", "ca-certificates", "curl", "gnupg", "lsb-release")
+
+    log("Adding Docker's official GPG key...")
+    runCommand("curl", "-fsSL", "https://download.docker.com/linux/ubuntu/gpg", "|", "sudo", "apt-key", "add", "-")
+
+    log("Setting up stable repository...")
+    runCommand("sudo", "add-apt-repository", "\"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"")
+
+    log("Updating package list again...")
+    runCommand("sudo", "apt", "update")
+
+    log("Installing Docker...")
+    runCommand("sudo", "apt", "install", "-y", "docker-ce", "docker-ce-cli", "containerd.io")
+
+    log("Starting Docker service...")
+    runCommand("sudo", "systemctl", "start", "docker")
+
+    log("Enabling Docker to start on boot...")
+    runCommand("sudo", "systemctl", "enable", "docker")
+
+    log("Docker installation complete.")
+}
+
+fun installMongoDBInDocker() {
+    log("Pulling MongoDB Docker image...")
+    runCommand("docker", "pull", "mongo")
+
+    log("Running MongoDB container on port 20000 with no authentication...")
+    runCommand("docker", "run", "-d", "-p", "20000:27017", "--name", "mongodb", "mongo", "--noauth")
+
+    log("MongoDB is running in Docker on port 20000 with no authentication.")
 }
 
 fun main() {
-    log("Checking if Docker is installed...")
-    if (dockerExists()) {
-        log("Docker is already installed.")
-        return
+    log("Starting Docker and MongoDB installation...")
+
+    if (isWindows()) {
+        // Check if Docker is installed
+        val dockerInstalled = runCommand("docker", "--version").contains("Docker version")
+        if (!dockerInstalled) {
+            installDockerOnWindows()
+        } else {
+            log("Docker is already installed.")
+        }
+    } else if (isLinux()) {
+        // Check if Docker is installed
+        val dockerInstalled = runCommand("docker", "--version").contains("Docker version")
+        if (!dockerInstalled) {
+            installDockerOnLinux()
+        } else {
+            log("Docker is already installed.")
+        }
     }
 
-    if (isLinux()) {
-        val console = System.console()
-        val password = console?.readPassword("Enter sudo password: ")?.joinToString("") ?: ""
-        installDockerOnLinux(password)
-    } else if (isWindows()) {
-        elevateWindows() // Will re-launch with admin rights if not elevated
-        installDockerOnWindows()
-    } else {
-        log("Unsupported OS.")
-    }
+    // Once Docker is installed, run MongoDB in Docker
+    installMongoDBInDocker()
 
-    log("Docker installation complete.")
+    log("Docker and MongoDB installation complete.")
 }
