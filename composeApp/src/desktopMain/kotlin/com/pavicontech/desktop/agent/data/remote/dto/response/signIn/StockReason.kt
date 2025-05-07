@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.data.remote.dto.response
+package com.pavicontech.desktop.agent.data.remote.dto.response.signIn
 
 data class StockReason(
     val code: String,

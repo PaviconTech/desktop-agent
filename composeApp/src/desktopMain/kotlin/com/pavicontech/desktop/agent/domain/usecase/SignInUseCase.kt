@@ -9,6 +9,7 @@ import com.pavicontech.desktop.agent.domain.model.SavedUserCredentials
 import com.pavicontech.desktop.agent.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.time.Duration.Companion.days
 
 class SignInUseCase(
     private val repository: UserRepository,
@@ -32,6 +33,9 @@ class SignInUseCase(
             )
             if (response.status) {
                 keyValueStorage.set(Constants.AUTH_TOKEN, response.accessToken)
+                keyValueStorage.set(Constants.AUTH_TOKEN_EXPIRY,
+                    (System.currentTimeMillis() + 30.days.inWholeMilliseconds).toString()
+                )
                 keyValueStorage.set(
                     Constants.SAVED_USER_CREDENTIALS,
                     SavedUserCredentials(username = username, kraPin = kraPin).toJson()

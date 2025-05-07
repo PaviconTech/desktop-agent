@@ -19,16 +19,9 @@ fun SignInScreen(
     onNavigateToDashboard: () -> Unit,
 ) {
 
-
-
     val viewModel: SignInScreenViewModel = koinViewModel()
 
 
-    LaunchedEffect(viewModel.signInState){
-        if (viewModel.signInState.isSuccessful){
-            onNavigateToDashboard()
-        }
-    }
 
     Surface(
         color = MaterialTheme.colors.primary
@@ -46,7 +39,9 @@ fun SignInScreen(
                             viewModel.username.isNotBlank() &&
                             viewModel.password.isNotBlank()
                         ) {
-                            viewModel.signIn()
+                            viewModel.signIn(
+                                onSuccess = {onNavigateToDashboard()}
+                            )
                             true
                         } else false
                     } else false
@@ -119,7 +114,10 @@ fun SignInScreen(
                         AnimatedVisibility(!viewModel.signInState.isLoading) {
                             Button(
                                 onClick = {
-                                    viewModel.signIn()
+                                    println("Button Click")
+                                    viewModel.signIn(
+                                        onSuccess = {onNavigateToDashboard()}
+                                    )
                                 },
                                 enabled = viewModel.kraPin.isNotBlank()
                                         && viewModel.username.isNotBlank()

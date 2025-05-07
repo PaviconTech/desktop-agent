@@ -38,8 +38,10 @@ class SignInScreenViewModel(
         private set
 
 
-    fun signIn(){
+    fun signIn(onSuccess :() -> Unit){
+        println("clicked outside viewmodel")
         viewModelScope.launch {
+            println("clicked")
             signInUseCase(kraPin, username, password).collect{result->
                 println("Message: ${result.message}  data: ${result.data}")
                 signInState =when(result){
@@ -47,6 +49,7 @@ class SignInScreenViewModel(
                         SignInState(isLoading = true)
                     }
                     is Resource.Success -> {
+                        onSuccess()
                         SnackbarController.sendEvent(
                             event = SnackbarEvent(
                                 message = "Sign In Success"

@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.unit.dp
+import com.pavicontech.desktop.agent.domain.usecase.GetUserSessionStatus
 import kotlinx.coroutines.delay
+import org.koin.compose.koinInject
 
 @Composable
 fun SplashScreen(
@@ -20,10 +22,13 @@ fun SplashScreen(
     onNavigateToSignIn:()->Unit
 ) {
 
+    val session: GetUserSessionStatus = koinInject()
 
     LaunchedEffect(true) {
-        delay(1000)
-        onNavigateToSignIn()
+        //delay(1000)
+        val result = session()
+        if (result) onNavigateToDashBoard() else onNavigateToSignIn()
+        println("is session active: $result")
 
     }
 

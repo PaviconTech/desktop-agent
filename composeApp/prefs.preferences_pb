@@ -1,8 +1,10 @@
 
 Õ
 
-auth_tokenÆ*ÃeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImJ1c2luZXNzSWQiOjEsInVzZXJuYW1lIjoic3RhbkB0ZXN0LmNvbSIsImlhdCI6MTc0NjUyMDk4OCwiZXhwIjoxNzc2NTIwOTg4fQ.5a-7CHKqoEVWFCfmFSWA0VQOONouQf2kccMlOOuMzm0
-–
-business_informationý*ú{"id":1,"name":"Demo TaxPoint","branchId":"02","branchName":"Branch Mombasa","districtName":"Dstr Mombasa","kraPin":"P000000000D","provinceName":"Mombasa","sectorName":"Sctr Mombasa","sdcId":"KRACU0400000026","taxpayerName":"TaxPoint DEMO - Mombasa"}
+auth_tokenÆ*ÃeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImJ1c2luZXNzSWQiOjEsInVzZXJuYW1lIjoic3RhbkB0ZXN0LmNvbSIsImlhdCI6MTc0NjY0NjExNCwiZXhwIjoxNzc2NjQ2MTE0fQ.0FAqERjNxoKWdwSd0-FLG32jVw51cIEsRkLuJnkKiAw
+$
+auth_token_expiry*1749238114801
 F
 saved_user_credentials,**{"kraPin":"P000000000D","username":"demo"}
+–
+business_informationý*ú{"id":1,"name":"Demo TaxPoint","branchId":"02","branchName":"Branch Mombasa","districtName":"Dstr Mombasa","kraPin":"P000000000D","provinceName":"Mombasa","sectorName":"Sctr Mombasa","sdcId":"KRACU0400000026","taxpayerName":"TaxPoint DEMO - Mombasa"}

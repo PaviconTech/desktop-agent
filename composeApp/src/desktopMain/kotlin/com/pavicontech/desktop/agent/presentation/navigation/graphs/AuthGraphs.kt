@@ -9,17 +9,18 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.pavicontech.desktop.agent.presentation.navigation.screens.AuthScreens
 import com.pavicontech.desktop.agent.presentation.navigation.screens.Graphs
 import com.pavicontech.desktop.agent.presentation.navigation.screens.OnboardingScreens
 import com.pavicontech.desktop.agent.presentation.screens.signIn.components.SignInScreen
-import com.pavicontech.desktop.agent.presentation.screens.splashScreen.SplashScreen
 
-fun NavGraphBuilder.onboardingGraph(navController: NavHostController) {
-    navigation<Graphs.OnboardingGraph>(
-        startDestination = OnboardingScreens.Splash,
+
+fun NavGraphBuilder.authGraphs(navController: NavHostController) {
+    navigation<Graphs.AuthGraph>(
+        startDestination = AuthScreens.SignIn,
     ) {
 
-        composable<OnboardingScreens.Splash>(
+        composable<AuthScreens.SignIn>(
             enterTransition = {
                 slideInVertically(
                     initialOffsetY = { it },
@@ -33,19 +34,15 @@ fun NavGraphBuilder.onboardingGraph(navController: NavHostController) {
                 )
             }
         ) {
-            SplashScreen(
-                onNavigateToDashBoard = {
-                    navController.navigate(Graphs.DashboardGraph){
-                        navController.popBackStack()
-                    }
+            SignInScreen(
+                onNavigateToPasswordReset = {
+
                 },
-                onNavigateToSignIn = {
-                    navController.navigate(Graphs.AuthGraph){
-                        navController.popBackStack()
-                    }
+                onNavigateToDashboard = {
+                    navController.navigate(Graphs.DashboardGraph)
+                    navController.clearBackStack<Graphs.AuthGraph>()
                 }
             )
         }
-
     }
 }

@@ -2,6 +2,7 @@ package com.pavicontech.desktop.agent.data.local
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,12 @@ class KeyValueStorageImpl(
 
         println("result $result")
         return@withContext result
+    }
+
+    override suspend fun clear(): Unit  = withContext(Dispatchers.IO){
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
     }
 
     override suspend fun observe(key: String): Flow<String?> {

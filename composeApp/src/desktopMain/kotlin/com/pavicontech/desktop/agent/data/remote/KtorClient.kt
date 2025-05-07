@@ -32,28 +32,22 @@ object KtorClient {
 
             install(Auth) {
                 bearer {
-                    loadTokens {
+                  /*  loadTokens {
                         val token = storage.get(Constants.AUTH_TOKEN) ?: return@loadTokens null
                         BearerTokens(token, "")
                     }
+                    sendWithoutRequest { true } */// <--- Add this line
                 }
             }
 
             install(Logging) {
                 logger = Logger.DEFAULT
-                level = LogLevel.HEADERS
-                sanitizeHeader { it == HttpHeaders.Authorization }
+                level = LogLevel.ALL
+                //sanitizeHeader { it == HttpHeaders.Authorization }
             }
 
             engine {
                 requestTimeout = 3.minutes.inWholeMilliseconds
-                https {
-                    trustManager = object : X509TrustManager {
-                        override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-                        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-                        override fun getAcceptedIssuers(): Array<X509Certificate>? = null
-                    }
-                }
             }
 
             defaultRequest {

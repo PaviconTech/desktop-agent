@@ -7,4 +7,6 @@ sealed class Graphs() {
     data object OnboardingGraph : Graphs()
     @Serializable
     data object DashboardGraph : Graphs()
+    @Serializable
+    data object AuthGraph : Graphs()
 }

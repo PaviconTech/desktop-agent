@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.data.remote.dto.response
+package com.pavicontech.desktop.agent.data.remote.dto.response.signIn
 
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import kotlinx.serialization.SerialName

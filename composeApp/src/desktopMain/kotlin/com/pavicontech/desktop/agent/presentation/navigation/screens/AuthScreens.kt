@@ -2,7 +2,7 @@ package com.pavicontech.desktop.agent.presentation.navigation.screens
 
 import kotlinx.serialization.Serializable
 
-sealed class OnboardingScreens {
+sealed class AuthScreens {
     @Serializable
-    data object Splash : OnboardingScreens()
+    data object SignIn : AuthScreens()
 }

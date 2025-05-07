@@ -2,7 +2,7 @@ package com.pavicontech.desktop.agent.data.repository
 
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.data.remote.dto.request.SignInReq
-import com.pavicontech.desktop.agent.data.remote.dto.response.SignInRes
+import com.pavicontech.desktop.agent.data.remote.dto.response.signIn.SignInRes
 import com.pavicontech.desktop.agent.domain.repository.UserRepository
 import io.ktor.client.*
 import io.ktor.client.call.*

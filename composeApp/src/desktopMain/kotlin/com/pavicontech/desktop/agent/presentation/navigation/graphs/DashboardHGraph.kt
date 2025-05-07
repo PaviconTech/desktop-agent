@@ -9,10 +9,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
+import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardScreens
 import com.pavicontech.desktop.agent.presentation.navigation.screens.Graphs
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.ProfileScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.home.HomeScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.SettingsScreen
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.components.BussinessInformation
 
 
 fun NavGraphBuilder.dashboardGraph(navController: NavHostController) {
@@ -51,5 +55,26 @@ fun NavGraphBuilder.dashboardGraph(navController: NavHostController) {
                 )
             }
         ) { SettingsScreen() }
+
+        composable<DashboardScreens.ProfileScreen>(
+                        enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(600, easing = FastOutSlowInEasing)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { -it },
+                    animationSpec = tween(600, easing = LinearOutSlowInEasing)
+                )
+            }
+        ) {
+            ProfileScreen(
+                onBack = {
+                    navController.navigate(DashboardScreens.HomeScreen) { navController.popBackStack() }
+                }
+            )
+        }
     }
 }
