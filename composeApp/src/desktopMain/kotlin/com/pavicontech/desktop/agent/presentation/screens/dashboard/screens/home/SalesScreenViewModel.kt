@@ -3,18 +3,20 @@ package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.hom
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import cafe.adriel.voyager.core.model.ScreenModel
 import com.pavicontech.desktop.agent.common.Resource
 import com.pavicontech.desktop.agent.domain.usecase.GetSalesUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class HomeScreenViewModel(
+class SalesScreenViewModel(
     private val getSalesUseCase: GetSalesUseCase
-):ViewModel() {
+): ScreenModel {
 
+    private val viewModelScope = CoroutineScope(Dispatchers.Main.immediate)
     var getSalesState by mutableStateOf(GetSalesState())
         private set
 
@@ -61,7 +63,7 @@ class HomeScreenViewModel(
     fun backgroundSync(){
         viewModelScope.launch {
             while (true){
-                delay(10000)
+                delay(1000)
                 getSalesUseCase().collect{ result->
                     println("${result.message}: ${result.data}")
                     when(result){
@@ -91,8 +93,8 @@ class HomeScreenViewModel(
     }
 
     init {
-        getSales()
-        backgroundSync()
+        //getSales()
+        //backgroundSync()
     }
 
 

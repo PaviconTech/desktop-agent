@@ -9,4 +9,5 @@ object Constants {
     const val AUTH_TOKEN_EXPIRY = "auth_token_expiry"
     const val SAVED_USER_CREDENTIALS = "saved_user_credentials"
     const val BUSINESS_INFORMATION = "business_information"
+    const val LOCAL_MONGODB_URL = "local_mongodb_url"
 }

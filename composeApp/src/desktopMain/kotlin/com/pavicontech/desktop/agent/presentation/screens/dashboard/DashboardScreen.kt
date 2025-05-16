@@ -3,12 +3,14 @@ package com.pavicontech.desktop.agent.presentation.screens.dashboard
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pavicontech.desktop.agent.presentation.navigation.graphs.dashboardGraph
 import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardScreens
@@ -24,6 +26,24 @@ fun DashboardScreen(
     onNavigateToAuth: () -> Unit
 ) {
     val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+
+    val currentRoute by remember {
+        derivedStateOf {
+            when (currentBackStackEntry?.destination?.route) {
+                DashboardScreens.Sales::class.qualifiedName -> DashboardScreens.Sales
+                DashboardScreens.Items::class.qualifiedName -> DashboardScreens.Items
+                DashboardScreens.CreditNotes::class.qualifiedName -> DashboardScreens.CreditNotes
+                DashboardScreens.Customers::class.qualifiedName ->DashboardScreens.Customers
+                DashboardScreens.Purchases::class.qualifiedName -> DashboardScreens.Purchases
+                DashboardScreens.Imports::class.qualifiedName -> DashboardScreens.Imports
+                DashboardScreens.Insurance::class.qualifiedName -> DashboardScreens.Insurance
+                DashboardScreens.Reports::class.qualifiedName -> DashboardScreens.Reports
+                DashboardScreens.SettingsScreen::class.qualifiedName -> DashboardScreens.SettingsScreen
+                else -> DashboardScreens.Sales
+            }
+        }
+    }
 
     val viewModel: DashboardViewModel = koinInject()
     var isBusinessDialogOpen by remember { mutableStateOf(false) }
@@ -69,7 +89,15 @@ fun DashboardScreen(
         },
         sidePanel = {
             SidePanel(
-                onNavigateToHome = { navController.navigate(DashboardScreens.HomeScreen) { navController.popBackStack() } },
+                currentRoute = currentRoute,
+                onNavigateToHome = { navController.navigate(DashboardScreens.Sales) { navController.popBackStack() } },
+                onNavigateToItems = { navController.navigate(DashboardScreens.Items) { navController.popBackStack() } },
+                onNavigateToCreditNotes = { navController.navigate(DashboardScreens.CreditNotes) { navController.popBackStack() } },
+                onNavigateToCustomers = { navController.navigate(DashboardScreens.Customers) { navController.popBackStack() } },
+                onNavigateToPurchases = { navController.navigate(DashboardScreens.Purchases) { navController.popBackStack() } },
+                onNavigateToImports = { navController.navigate(DashboardScreens.Imports) { navController.popBackStack() } },
+                onNavigateToInsurance = { navController.navigate(DashboardScreens.Insurance) { navController.popBackStack() } },
+                onNavigateToReports = { navController.navigate(DashboardScreens.Reports) { navController.popBackStack() } },
                 onNavigateToSettings = { navController.navigate(DashboardScreens.SettingsScreen) { navController.popBackStack() } },
                 onLogOut = {
                     viewModel.logout()

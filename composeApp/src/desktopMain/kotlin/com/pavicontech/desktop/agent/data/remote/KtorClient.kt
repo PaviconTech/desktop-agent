@@ -1,7 +1,6 @@
 package com.pavicontech.desktop.agent.data.remote
 
-import com.pavicontech.desktop.agent.common.Constants
-import com.pavicontech.desktop.agent.data.local.KeyValueStorage
+import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -13,10 +12,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import org.koin.compose.koinInject
-import java.security.cert.X509Certificate
-import javax.net.ssl.X509TrustManager
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 
 object KtorClient {

@@ -2,17 +2,17 @@ package com.pavicontech.desktop.agent.domain.usecase
 
 import com.pavicontech.desktop.agent.common.Resource
 import com.pavicontech.desktop.agent.domain.model.Invoice
-import com.pavicontech.desktop.agent.domain.repository.InvoiceRepository
+import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class GetSalesUseCase(
-    private val invoiceRepository: InvoiceRepository
+    private val PDFExtractorRepository: PDFExtractorRepository
 ) {
     operator fun invoke(): Flow<Resource<List<Invoice>>> = flow {
         try {
             emit(Resource.Loading())
-            val invoices = invoiceRepository.getAllSales()
+            val invoices = PDFExtractorRepository.getAllSales()
             if (invoices.status){
                 emit(Resource.Success(data = invoices.toInvoices(), message = invoices.message))
             }else{

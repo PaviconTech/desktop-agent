@@ -2,7 +2,7 @@ package com.pavicontech.desktop.agent.domain.usecase
 
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.Resource
-import com.pavicontech.desktop.agent.data.local.KeyValueStorage
+import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.data.remote.dto.request.SignInReq
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.domain.model.SavedUserCredentials

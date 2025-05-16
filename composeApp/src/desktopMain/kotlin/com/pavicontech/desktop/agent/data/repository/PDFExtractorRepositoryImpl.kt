@@ -1,9 +1,12 @@
 package com.pavicontech.desktop.agent.data.repository
 
 import com.pavicontech.desktop.agent.common.Constants
+import com.pavicontech.desktop.agent.common.utils.Type
+import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
+import com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.ExtractInvoiceRes
 import com.pavicontech.desktop.agent.data.remote.dto.response.getInvoices.GetInvoicesRes
-import com.pavicontech.desktop.agent.domain.repository.InvoiceRepository
+import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -20,11 +23,12 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.append
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
-class InvoiceRepositoryImpl(
+class PDFExtractorRepositoryImpl(
     private val api: HttpClient
-) : InvoiceRepository {
-    override suspend fun sale(body: InvoiceReq, token: String) {
+) : PDFExtractorRepository {
+    override suspend fun extractInvoiceData(body: InvoiceReq, token: String): ExtractInvoiceRes {
         val result = api.post("${Constants.ETIMS_AI_BACKEND}/sales/bulk") {
             headers {
                 append(HttpHeaders.ContentType, ContentType.MultiPart.FormData)
@@ -54,9 +58,8 @@ class InvoiceRepositoryImpl(
                 }
             )
             setBody(multiPartFormData)
-        }.bodyAsText()
-
-        println(result)
+        }.body<ExtractInvoiceRes>()
+        return result
 
     }
 

@@ -31,7 +31,7 @@ import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import com.pavicontech.desktop.agent.common.Constants
-import com.pavicontech.desktop.agent.data.local.KeyValueStorage
+import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject

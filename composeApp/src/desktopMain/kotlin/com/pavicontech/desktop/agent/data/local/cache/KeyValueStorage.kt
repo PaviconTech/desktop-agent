@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.data.local
+package com.pavicontech.desktop.agent.data.local.cache
 
 import kotlinx.coroutines.flow.Flow
 

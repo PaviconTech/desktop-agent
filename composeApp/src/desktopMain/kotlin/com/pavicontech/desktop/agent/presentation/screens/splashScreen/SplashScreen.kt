@@ -25,10 +25,8 @@ fun SplashScreen(
     val session: GetUserSessionStatus = koinInject()
 
     LaunchedEffect(true) {
-        //delay(1000)
         val result = session()
         if (result) onNavigateToDashBoard() else onNavigateToSignIn()
-        println("is session active: $result")
 
     }
 

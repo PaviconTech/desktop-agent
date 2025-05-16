@@ -14,6 +14,7 @@ kotlin {
         val desktopMain by getting
         
         commonMain.dependencies {
+            val voyagerVersion = "1.1.0-beta02"
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
@@ -26,6 +27,8 @@ kotlin {
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
+            implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
+            implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
             implementation(libs.filekit.core)
             implementation(libs.filekit.dialogs)
             implementation(libs.filekit.dialogs.compose)
@@ -44,7 +47,8 @@ kotlin {
             api(libs.datastore.preferences)
             implementation(libs.navigation.compose)
             runtimeOnly(libs.material3.extended)
-            implementation("dev.kotbase:couchbase-lite:3.1.9-1.1.1")
+            implementation(libs.mongodb.core)
+            implementation(libs.mongodb.serializer)
 
 
         }

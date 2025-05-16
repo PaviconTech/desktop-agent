@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.Resource
-import com.pavicontech.desktop.agent.data.local.KeyValueStorage
+import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.domain.model.SavedUserCredentials
 import com.pavicontech.desktop.agent.domain.usecase.SignInUseCase
 import com.pavicontech.desktop.agent.presentation.helper.SnackbarController

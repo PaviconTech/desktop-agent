@@ -6,7 +6,21 @@ import kotlinx.serialization.Serializable
 
 sealed class DashboardScreens {
     @Serializable
-    data object HomeScreen : DashboardScreens()
+    data object Sales : DashboardScreens()
+    @Serializable
+    data object Items : DashboardScreens()
+    @Serializable
+    data object CreditNotes : DashboardScreens()
+    @Serializable
+    data object Customers : DashboardScreens()
+    @Serializable
+    data object Purchases : DashboardScreens()
+    @Serializable
+    data object Imports : DashboardScreens()
+    @Serializable
+    data object Insurance : DashboardScreens()
+    @Serializable
+    data object Reports : DashboardScreens()
     @Serializable
     data object SettingsScreen : DashboardScreens()
     @Serializable

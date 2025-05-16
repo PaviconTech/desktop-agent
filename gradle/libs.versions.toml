@@ -13,7 +13,7 @@ voyager-version = "1.1.0-beta02"
 datastore = "1.1.1"
 navigationCompose = "2.8.0-alpha08"
 material3-extended = "1.7.3"
-
+mongodb-ktor = "5.1.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -51,7 +51,9 @@ navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-co
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin-compose-multiplatform" }
 #Material3-extended icons
 material3-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-extended"}
-
+#MongoDB
+mongodb-core = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodb-ktor" }
+mongodb-serializer = { module = "org.mongodb:bson-kotlinx", version.ref = "mongodb-ktor" }
 
 [plugins]
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

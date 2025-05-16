@@ -1,7 +1,7 @@
 package com.pavicontech.desktop.agent.domain.usecase
 
 import com.pavicontech.desktop.agent.common.Constants
-import com.pavicontech.desktop.agent.data.local.KeyValueStorage
+import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

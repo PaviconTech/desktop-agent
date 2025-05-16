@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.data.local
+package com.pavicontech.desktop.agent.data.local.cache
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
