@@ -43,10 +43,7 @@ fun NavBar(
                 color = MaterialTheme.colors.onBackground
             )
         }
-        NavBarProfile(
-            profileName = profileName,
-            onProfile = onViewProfile
-        )
+
     }
 }
 

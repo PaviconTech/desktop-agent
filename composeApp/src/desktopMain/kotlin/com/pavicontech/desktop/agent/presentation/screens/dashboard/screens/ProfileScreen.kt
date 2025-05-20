@@ -54,6 +54,7 @@ fun ProfileScreen(
     var provinceName by remember { mutableStateOf("") }
     var sectorName by remember { mutableStateOf("") }
     var sdcId by remember { mutableStateOf("") }
+    var businessLogo by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         keyStorage.get(Constants.BUSINESS_INFORMATION)?.let {
@@ -68,6 +69,7 @@ fun ProfileScreen(
             provinceName = loaded.provinceName
             sectorName = loaded.sectorName
             sdcId = loaded.sdcId
+            businessLogo = loaded.businessLogo ?: ""
         }
     }
 
@@ -135,6 +137,7 @@ fun ProfileScreen(
                                     EditableRow("Branch Name", branchName) { branchName = it }
                                     EditableRow("District", districtName) { districtName = it }
                                     EditableRow("Sector", sectorName) { sectorName = it }
+                                    EditableRow("Business Logo", businessLogo) { businessLogo = it }
                                 }
                             }
                         }
@@ -159,7 +162,8 @@ fun ProfileScreen(
                                     districtName = districtName,
                                     provinceName = provinceName,
                                     sectorName = sectorName,
-                                    sdcId = sdcId
+                                    sdcId = sdcId,
+                                    businessLogo = businessLogo
                                 )
                                 scope.launch {
                                     keyStorage.set(Constants.BUSINESS_INFORMATION, updated.toJsonString())

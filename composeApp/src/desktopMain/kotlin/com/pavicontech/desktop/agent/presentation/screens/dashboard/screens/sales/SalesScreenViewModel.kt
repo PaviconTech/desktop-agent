@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.home
+package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

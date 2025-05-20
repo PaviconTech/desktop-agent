@@ -13,10 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardScreens
 import desktopagent.composeapp.generated.resources.Res
 import desktopagent.composeapp.generated.resources.logout
+import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -32,75 +35,108 @@ fun SidePanel(
     onNavigateToReports: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onLogOut: () -> Unit,
-    currentRoute: DashboardScreens?
+    currentRoute: DashboardScreens?,
+    profileName: String,
+    onViewProfile: () -> Unit
+
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().background(
-            color = MaterialTheme.colors.primary,
+        modifier = Modifier.fillMaxWidth().background(
+            color = MaterialTheme.colors.background,
         )
     ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-                ) {
-                    Text(
-                        text = "Etims",
-                        style = MaterialTheme.typography.h1,
-                        color = MaterialTheme.colors.onPrimary
-                    )
-                    Text(
-                        text = "Sync",
-                        style = MaterialTheme.typography.h1,
-                        color = MaterialTheme.colors.secondary
-                    )
-                }
-                SidePanelItem(isSelected = currentRoute == DashboardScreens.Sales, name = "Sales", icon1 = Icons.Default.ShoppingCart, onClick = onNavigateToHome)
-                SidePanelItem(isSelected = currentRoute == DashboardScreens.Items, name = "Items", icon1 = Icons.Default.ShoppingCart, onClick = onNavigateToItems)
-                SidePanelItem(isSelected = currentRoute == DashboardScreens.CreditNotes, name = "Credit Notes", icon1 = Icons.Default.ShoppingCart, onClick = onNavigateToCreditNotes)
-                SidePanelItem(isSelected = currentRoute == DashboardScreens.Customers, name = "Customers", icon1 = Icons.Default.ShoppingCart, onClick = onNavigateToCustomers)
-                SidePanelItem(isSelected = currentRoute == DashboardScreens.Purchases, name = "Purchases", icon1 = Icons.Default.ShoppingCart, onClick = onNavigateToPurchases)
-                SidePanelItem(isSelected = currentRoute == DashboardScreens.Imports, name = "Imports", icon1 = Icons.Default.ShoppingCart, onClick = onNavigateToImports)
-                SidePanelItem(isSelected = currentRoute == DashboardScreens.Reports, name = "Reports", icon1 = Icons.Default.ShoppingCart, onClick = onNavigateToReports)
-                SidePanelItem(isSelected = currentRoute == DashboardScreens.SettingsScreen, name = "Settings", icon1 = Icons.Default.Settings, onClick = onNavigateToSettings)
-            }
 
-            Surface(
-                color = Color.Transparent,
-                contentColor = Color.White,
-                onClick = {
-                    onLogOut()
-                }
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                Text(
+                    text = "Etims",
+                    style = MaterialTheme.typography.h1,
+                    color = MaterialTheme.colors.primary
+                )
+                Text(
+                    text = "Sync",
+                    style = MaterialTheme.typography.h1,
+                    color = MaterialTheme.colors.secondary
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth().padding(8.dp)
-
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        Text(
-                            text = "Logout",
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(
-                            painter = painterResource(Res.drawable.logout),
-                            contentDescription = "logout",
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.Sales,
+                        name = "Sales",
+                        onClick = onNavigateToHome
+                    )
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.Items,
+                        name = "Items",
+                        onClick = onNavigateToItems
+                    )
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.CreditNotes,
+                        name = "Credit Notes",
+                        onClick = onNavigateToCreditNotes
+                    )
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.Customers,
+                        name = "Customers",
+                        onClick = onNavigateToCustomers
+                    )
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.Purchases,
+                        name = "Purchases",
+                        onClick = onNavigateToPurchases
+                    )
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.Imports,
+                        name = "Imports",
+                        onClick = onNavigateToImports
+                    )
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.Reports,
+                        name = "Reports",
+                        onClick = onNavigateToReports
+                    )
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.SettingsScreen,
+                        name = "Settings",
+                        onClick = onNavigateToSettings
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    NavBarProfile(
+                        profileName = profileName,
+                        onProfile = onViewProfile
+                    )
                 }
             }
 
+            Divider(
+                color = MaterialTheme.colors.primary.copy(0.1f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(top = 8.dp)
+
+            )
         }
+
+
+
+
     }
 }
 
@@ -109,46 +145,32 @@ fun SidePanel(
 @Composable
 fun SidePanelItem(
     isSelected: Boolean,
-    name: String, icon1: ImageVector? = null, icon2: Painter? = null, onClick: () -> Unit
+    name: String,
+    onClick: () -> Unit
 ) {
     Surface(
-        contentColor = if (isSelected) Color.White else  MaterialTheme.colors.onPrimary,
+        contentColor = if (isSelected) Color.White else MaterialTheme.colors.onPrimary,
         shape = MaterialTheme.shapes.small,
-        color = if (isSelected) MaterialTheme.colors.secondary else Color.Transparent,
+        color =  Color.Transparent,
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 8.dp)
 
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(8.dp)
+            modifier = Modifier.padding(8.dp)
 
         ) {
             Text(
+                textDecoration =  if (isSelected) TextDecoration.Underline else TextDecoration.None,
                 text = name,
-                style = if (isSelected) MaterialTheme.typography.h6 else MaterialTheme.typography.body1
+                style = MaterialTheme.typography.body1,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                color = MaterialTheme.colors.primary
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            if (icon1 != null && icon2 != null) {
-                Icon(imageVector = icon1, contentDescription = name)
-            }
-            when {
-                icon1 == null -> icon2?.let {
-                    Icon(
-                        painter = it,
-                        contentDescription = name,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                icon2 == null -> Icon(
-                    imageVector = icon1,
-                    contentDescription = name,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
         }
     }
 }

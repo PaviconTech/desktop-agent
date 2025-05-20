@@ -57,36 +57,6 @@ fun DashboardScreen(
     )
 
     DashboardLayout(
-        navBar = {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.secondary.copy(0.1f)
-            ) {
-                NavBar(
-                    profileName = viewModel.businessProfile?.taxpayerName ?: "Avatar",
-                    branch = viewModel.businessProfile?.branchName ?: "Branch",
-                    kraPin = viewModel.businessProfile?.kraPin ?: "",
-                    onViewProfile = {
-                        navController.navigate(
-                            DashboardScreens.ProfileScreen(
-                                id = viewModel.businessProfile?.id ?: 0,
-                                name = viewModel.businessProfile?.name ?: "",
-                                branchId = viewModel.businessProfile?.branchId ?: "",
-                                branchName = viewModel.businessProfile?.branchName ?: "",
-                                districtName = viewModel.businessProfile?.districtName ?: "",
-                                kraPin = viewModel.businessProfile?.kraPin ?: "",
-                                provinceName = viewModel.businessProfile?.provinceName ?: "",
-                                sectorName = viewModel.businessProfile?.sectorName ?: "",
-                                sdcId = viewModel.businessProfile?.sdcId ?: "",
-                                taxpayerName = viewModel.businessProfile?.taxpayerName ?: ""
-                            )
-                        ){
-                            navController.popBackStack()
-                        }
-                    }
-                )
-            }
-        },
         sidePanel = {
             SidePanel(
                 currentRoute = currentRoute,
@@ -102,6 +72,10 @@ fun DashboardScreen(
                 onLogOut = {
                     viewModel.logout()
                     onNavigateToAuth()
+                },
+                profileName = viewModel.businessProfile?.name ?: "KRA",
+                onViewProfile = {
+                    navController.navigate(DashboardScreens.ProfileScreen()){navController.popBackStack()}
                 }
             )
         },

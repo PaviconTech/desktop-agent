@@ -1,15 +1,14 @@
-package com.pavicontech.desktop.agent.domain.usecase
+package com.pavicontech.desktop.agent.domain.usecase.fileSysteme
 
 import com.pavicontech.desktop.agent.common.Resource
-import com.pavicontech.desktop.agent.data.fileSystem.DirectoryWatcherRepository
-
+import com.pavicontech.desktop.agent.data.fileSystem.FilesystemRepository
 
 class FilePathWatcherUseCase(
-    private val directoryWatcherRepository: DirectoryWatcherRepository,
+    private val filesystemRepository: FilesystemRepository,
 ) {
 
     suspend operator fun invoke() {
-        directoryWatcherRepository.watchDirectory(
+        filesystemRepository.watchDirectory(
             path = "/home/dev-pasaka/Desktop",
             onDelete = { dir ->
 

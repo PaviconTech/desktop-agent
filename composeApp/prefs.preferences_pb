@@ -6,5 +6,13 @@ $
 auth_token_expiry*1749907094483
 F
 saved_user_credentials,**{"kraPin":"P000000000D","username":"demo"}
-–
-business_informationý*ú{"id":1,"name":"Demo TaxPoint","branchId":"02","branchName":"Branch Mombasa","districtName":"Dstr Mombasa","kraPin":"P000000000D","provinceName":"Mombasa","sectorName":"Sctr Mombasa","sdcId":"KRACU0400000026","taxpayerName":"TaxPoint DEMO - Mombasa"}
+À
+business_information§*¤{"id":1,"name":"Demo TaxPoint","branchId":"02","branchName":"Branch Mombasa","districtName":"Dstr Mombasa","kraPin":"P000000000D","provinceName":"Mombasa","sectorName":"Sctr Mombasa","sdcId":"KRACU0400000026","taxpayerName":"TaxPoint DEMO - Mombasa","businessLogo":"https://firebasestorage.googleapis.com/v0/b/shorty-bcf73.appspot.com/o/desktop-agent%2Flogo-img.png?alt=media&token=fecd2bc5-8260-479f-9c54-51536995696a"}
+#
+print_out_options*custom_print
+e
+qr_code_coordinatesN*L{"name":"qrCodeBox","startX":274.0,"startY":558.0,"endX":549.0,"endY":731.0}
+g
+kra_info_coordinatesO*M{"name":"kraInfoBox","startX":278.0,"startY":400.0,"endX":456.0,"endY":545.0}
+}
+last_selected_printout_invoice[*Y/home/dev-pasaka/Downloads/UFLS Kenya-Invoice INV-1210-Mombasa Maize Millers-UFLS1212.pdf

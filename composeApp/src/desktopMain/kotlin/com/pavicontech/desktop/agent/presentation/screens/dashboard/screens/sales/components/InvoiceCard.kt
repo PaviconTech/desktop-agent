@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.home.components
+package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.pavicontech.desktop.agent.domain.model.Invoice
 import java.time.format.DateTimeFormatter
 

@@ -49,12 +49,17 @@ kotlin {
             runtimeOnly(libs.material3.extended)
             implementation(libs.mongodb.core)
             implementation(libs.mongodb.serializer)
+            implementation(libs.ktor.qr.code.gen)
+            implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
+            implementation("org.openjfx:javafx-controls:21")
+            implementation("org.openjfx:javafx-web:21")
 
 
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+
         }
     }
 }

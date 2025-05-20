@@ -13,7 +13,7 @@ import androidx.navigation.navigation
 import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardScreens
 import com.pavicontech.desktop.agent.presentation.navigation.screens.Graphs
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.ProfileScreen
-import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.home.SalesScreen
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.SalesScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.SettingsScreen
 
 

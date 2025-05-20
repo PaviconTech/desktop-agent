@@ -14,6 +14,7 @@ datastore = "1.1.1"
 navigationCompose = "2.8.0-alpha08"
 material3-extended = "1.7.3"
 mongodb-ktor = "5.1.2"
+ktor-qr-code-gen = "4.1.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -54,6 +55,8 @@ material3-extended = { module = "org.jetbrains.compose.material:material-icons-e
 #MongoDB
 mongodb-core = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodb-ktor" }
 mongodb-serializer = { module = "org.mongodb:bson-kotlinx", version.ref = "mongodb-ktor" }
+#QR-CODE
+ktor-qr-code-gen  = { module = "io.github.g0dkar:qrcode-kotlin", version.ref = "ktor-qr-code-gen"}
 
 [plugins]
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

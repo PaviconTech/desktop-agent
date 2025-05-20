@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.home
+package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales
 
 import com.pavicontech.desktop.agent.domain.model.Invoice
 

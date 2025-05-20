@@ -44,7 +44,7 @@ class KeyValueStorageImpl(
         }
     }
 
-    override suspend fun observe(key: String): Flow<String?> {
+    override  fun observe(key: String): Flow<String?> {
         return dataStore.data.map { preferences ->
             preferences[stringPreferencesKey(key)]
         }

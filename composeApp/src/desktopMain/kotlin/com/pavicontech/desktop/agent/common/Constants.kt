@@ -10,4 +10,8 @@ object Constants {
     const val SAVED_USER_CREDENTIALS = "saved_user_credentials"
     const val BUSINESS_INFORMATION = "business_information"
     const val LOCAL_MONGODB_URL = "local_mongodb_url"
+    const val PRINT_OUT_OPTIONS = "print_out_options"
+    const val LAST_SELECTED_PRINTOUT_INVOICE = "last_selected_printout_invoice"
+    const val QR_CODE_COORDINATES = "qr_code_coordinates"
+    const val KRA_INFO_COORDINATES = "kra_info_coordinates"
 }
