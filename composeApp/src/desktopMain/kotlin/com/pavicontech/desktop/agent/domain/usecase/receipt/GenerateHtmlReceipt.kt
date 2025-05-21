@@ -21,7 +21,12 @@ class GenerateHtmlReceipt(
         val userHome = System.getProperty("user.home")
         val qrPath = Paths.get(userHome, "Documents", "Receipts", "qr-code.png")
 
-        val qrImagePath = generateQrCode.invoke(randomData.toString(), path = qrPath).toURI().toString()
+        val qrImagePath = generateQrCode.invoke(
+            randomData = randomData.toString(),
+            path = qrPath,
+            width = 10,
+            height = 10
+        ).toURI().toString()
         val logoUrl = escapeHtml(businessInfo.businessLogo ?: "")
         return """
         <!DOCTYPE html>

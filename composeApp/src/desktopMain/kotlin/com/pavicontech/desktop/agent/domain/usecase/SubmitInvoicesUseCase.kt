@@ -209,27 +209,28 @@ class SubmitInvoicesUseCase(
                 Paths.get(userHome, "Documents", "DesktopAgent", "FiscalizedReceipts").toFile().mkdirs()
                 generateQrCodeAndKraInfoUseCase(
                     fileNamePrefix = fileName,
-                    internalReferenceNumber = "Test1234567",
-                    receiptSignature = "Receipt12345",
-                    vsdcDate = Instant.now().toString(),
-                    mrcNumber = "MRC1235678",
-                    onSuccess = { qrCode, kraInfo ->
+                    onSuccess = { qrCode ->
                         filePath.logger(Type.DEBUG)
                         val inPutPdf = Path(filePath).toFile()
+                        val receiptText = """
+                            INTRLDATA: Test1234567
+                            RCPTSIGN: Receipt12345
+                            VSDC DATE: ${Instant.now().toString()}
+                            MRCNO: MRC1235678
+                            """.trimIndent()
                         insertQrCodeToInvoiceUseCase.invoke(
+                            kraInfoText = receiptText,
                             inputPdf = inPutPdf,
                             outPutPdf = path.toFile(),
                             qrCodeImage = qrCode,
-                            kraInfoImage = kraInfo,
                             coordinates = listOf(kraInfoCoordinates, qrCodeCoordinates),
                             onSuccess = {
                                 qrCode.delete()
-                                kraInfo.delete()
                             }
                         )
 
                     },
-                    onCleanUp = {_,_ ->
+                    onCleanUp = { _, ->
 
                     }
                 )

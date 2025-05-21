@@ -11,8 +11,8 @@ F
 #
 print_out_options*custom_print
 e
-qr_code_coordinatesN*L{"name":"qrCodeBox","startX":274.0,"startY":558.0,"endX":549.0,"endY":731.0}
-g
-kra_info_coordinatesO*M{"name":"kraInfoBox","startX":278.0,"startY":400.0,"endX":456.0,"endY":545.0}
-}
-last_selected_printout_invoice[*Y/home/dev-pasaka/Downloads/UFLS Kenya-Invoice INV-1210-Mombasa Maize Millers-UFLS1212.pdf
+qr_code_coordinatesN*L{"name":"qrCodeBox","startX":209.0,"startY":652.0,"endX":335.0,"endY":670.0}
+f
+kra_info_coordinatesN*L{"name":"kraInfoBox","startX":74.0,"startY":614.0,"endX":199.0,"endY":726.0}
+„
+last_selected_printout_invoiceb*`/home/dev-pasaka/Desktop/UFLS Kenya-Invoice INV-1210-Mombasa Maize Millers-UFLS1212 (Copy 4).pdf

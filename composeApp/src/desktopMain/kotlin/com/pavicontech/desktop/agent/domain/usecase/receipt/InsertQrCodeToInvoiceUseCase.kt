@@ -6,29 +6,30 @@ import kotlinx.coroutines.withContext
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.common.PDRectangle
+import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-class InsertQrCodeToInvoiceUseCase() {
+class InsertQrCodeToInvoiceUseCase {
     suspend operator fun invoke(
         inputPdf: File,
         outPutPdf: File,
         qrCodeImage: File,
-        kraInfoImage: File,
+        kraInfoText: String,
         coordinates: List<BoxCoordinates>,
         onSuccess: () -> Unit
     ): Unit = withContext(Dispatchers.IO) {
         val document = PDDocument.load(inputPdf)
         val page: PDPage = document.getPage(0)
         val mediaBox: PDRectangle = page.mediaBox
+        val pageWidth = mediaBox.width
+        val pageHeight = mediaBox.height
 
         val image1Buffered: BufferedImage = ImageIO.read(qrCodeImage)
-        val image2Buffered: BufferedImage = ImageIO.read(kraInfoImage)
 
         val pdImage1 = LosslessFactory.createFromImage(document, image1Buffered)
-        val pdImage2 = LosslessFactory.createFromImage(document, image2Buffered)
 
         val contentStream = org.apache.pdfbox.pdmodel.PDPageContentStream(
             document,
@@ -38,14 +39,29 @@ class InsertQrCodeToInvoiceUseCase() {
             true
         )
 
-        coordinates.forEachIndexed { index, coord ->
-            val x = coord.startX
-            val y = mediaBox.height - coord.endY // PDF y=0 is at bottom, so we flip it
-            val width = coord.endX-coord.startX
-            val height = coord.endY - coord.startY
+        val scaleX = pageWidth / 595f
+        val scaleY = pageHeight / 842f
 
-            val image = if (index == 0) pdImage1 else pdImage2
-            contentStream.drawImage(image, x, y, width, height)
+        coordinates.forEachIndexed { index, coord ->
+            val x = coord.startX * scaleX
+            val y = (842 - coord.endY) * scaleY  // Flip Y from top-left to bottom-left
+            val width = (coord.endX - coord.startX) * scaleX
+            val height = (coord.endY - coord.startY) * scaleY
+
+            if (index == 0) {
+                contentStream.drawImage(pdImage1, x, y, width, height)
+            } else {
+
+                // Text insertion
+                contentStream.beginText()
+                contentStream.setFont(PDType1Font.HELVETICA, 12f) // adjust size as needed
+                contentStream.newLineAtOffset(x, y + height - 12f) // adjust Y so it starts from top
+                kraInfoText.split("\n").forEach { line ->
+                    contentStream.showText(line)
+                    contentStream.newLineAtOffset(0f, -10f) // line spacing
+                }
+                contentStream.endText()
+            }
         }
 
         contentStream.close()
