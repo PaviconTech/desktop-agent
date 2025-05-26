@@ -11,21 +11,23 @@ class GenerateHtmlReceipt(
 ) {
     private val currencyFormatter: (Double) -> String = { "%,.2f".format(it) }
     private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss")
-    val randomData = (1000..100000).random()
 
 
     operator fun invoke(
         data: ExtractedInvoiceData,
+        businessPin:String,
+        bhfId:String,
+        rcptSign:String,
         businessInfo: BusinessInformation
     ): String {
         val userHome = System.getProperty("user.home")
         val qrPath = Paths.get(userHome, "Documents", "Receipts", "qr-code.png")
 
         val qrImagePath = generateQrCode.invoke(
-            randomData = randomData.toString(),
             path = qrPath,
-            width = 10,
-            height = 10
+            businessPin = businessPin,
+            bhfId = bhfId,
+            rcptSign = rcptSign
         ).toURI().toString()
         val logoUrl = escapeHtml(businessInfo.businessLogo ?: "")
         return """

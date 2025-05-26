@@ -1,6 +1,7 @@
 package com.pavicontech.desktop.agent.data.remote.dto.response.getSales
 
 
+import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -43,7 +44,7 @@ data class Sale(
     @SerialName("invcNo")
     val invcNo: Int,
     @SerialName("items")
-    val items: List<Item>,
+    val items: List<CreateSaleItem>,
     @SerialName("long_url")
     val longUrl: String? = null,
     @SerialName("orgInvcNo")

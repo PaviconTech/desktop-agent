@@ -7,6 +7,5 @@ import kotlinx.serialization.Serializable
 data class SignInRes(
     @SerialName("access_token")
     val accessToken: String,
-    val business: Business,
     val status: Boolean,
 )

@@ -3,6 +3,7 @@ package com.pavicontech.desktop.agent.data.repository
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.logger
+
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
 import com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.ExtractInvoiceRes
 import com.pavicontech.desktop.agent.data.remote.dto.response.getInvoices.GetInvoicesRes
@@ -28,25 +29,14 @@ import kotlinx.serialization.json.Json
 class PDFExtractorRepositoryImpl(
     private val api: HttpClient
 ) : PDFExtractorRepository {
-    override suspend fun extractInvoiceData(body: InvoiceReq, token: String): ExtractInvoiceRes {
+    override suspend fun extractInvoiceData(body: InvoiceReq): ExtractInvoiceRes {
         val result = api.post("${Constants.ETIMS_AI_BACKEND}/sales/bulk") {
             headers {
                 append(HttpHeaders.ContentType, ContentType.MultiPart.FormData)
             }
-            headers { header("token",token) }
             val multiPartFormData = MultiPartFormDataContent(
                 formData {
-                    append("id", body.id)
-                    append("name", body.name)
-                    append("branchId", body.branchId)
-                    append("branchName", body.branchName)
-                    append("districtName", body.districtName)
-                    append("kraPin", body.kraPin)
-                    append("provinceName", body.provinceName)
-                    append("sectorName", body.sectorName)
-                    append("sdcId", body.sdcId)
                     append("fileName", body.fileName)
-                    append("taxpayerName", body.taxpayerName)
                     body.file?.let {
                         append(
                             key = "file",
@@ -58,7 +48,10 @@ class PDFExtractorRepositoryImpl(
                 }
             )
             setBody(multiPartFormData)
-        }.body<ExtractInvoiceRes>()
+        }.bodyAsText().let {
+            it.logger(Type.INFO)
+            Json.decodeFromString<ExtractInvoiceRes>(it)
+        }
         return result
 
     }

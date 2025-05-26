@@ -3,7 +3,7 @@ package com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice
 
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
 import com.pavicontech.desktop.agent.domain.model.ExtractedInvoiceData
-import com.pavicontech.desktop.agent.domain.model.Item
+import com.pavicontech.desktop.agent.domain.model.ExtractedItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,17 +18,16 @@ data class ExtractInvoiceRes(
 ){
     fun toInvoice() = Invoice(
         fileName = data?.fileName ?: "",
-        kraPin = data?.kraPin ?: "",
         items = data?.items?.map { it.toItem() } ?: emptyList(),
         totals = data?.totals?.toTotals()
     )
 
     fun toExtractedData(): ExtractedInvoiceData{
         return ExtractedInvoiceData(
-            name = data?.name ?: "",
             fileName = data?.fileName ?: "",
             items = data?.items?.map {
-                Item(
+                ExtractedItem(
+                    name = it.itemDescription,
                     amount = it.amount,
                     itemDescription = it.itemDescription,
                     quantity = it.quantity,

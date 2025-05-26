@@ -13,5 +13,7 @@ interface FilesystemRepository {
     ): Flow<Resource<Directory>>
 
     suspend fun openFolder():Resource<File>
+    suspend fun selectFile():Resource<File>
+
 
 }

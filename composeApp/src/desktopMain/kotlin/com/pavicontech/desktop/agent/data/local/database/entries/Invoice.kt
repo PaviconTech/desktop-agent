@@ -7,7 +7,6 @@ import java.time.Instant
 data class Invoice(
     val id: String = ObjectId().toString(),
     val fileName: String,
-    val kraPin: String,
     val extractionStatus: ExtractionStatus = ExtractionStatus.PENDING,
     val etimsStatus: EtimsStatus = EtimsStatus.PENDING,
     val items: List<Item> = emptyList(),
@@ -27,7 +26,6 @@ data class Item(
 
 
 data class Totals(
-    val otherAmounts: OtherAmounts,
     val subTotal: Double,
     val totalAmount: Double,
     val totalVat: Double

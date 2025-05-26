@@ -20,13 +20,6 @@ class InvoiceRepositoryImpl(
         return invoiceCollection.insertOne(invoice).wasAcknowledged()
     }
 
-    override suspend fun getInvoices(): List<Invoice> {
-        return invoiceCollection.find(Filters.eq(Invoice::kraPin.name, db.pin)).toList()
-    }
-
-    override suspend fun getInvoiceById(id: String): Invoice? {
-        return invoiceCollection.find(Filters.eq(Invoice::id.name, id)).firstOrNull()
-    }
 
     override suspend fun updateInvoice(fileName:String, invoice: Invoice): Boolean {
         val result =  invoiceCollection.findOneAndUpdate(

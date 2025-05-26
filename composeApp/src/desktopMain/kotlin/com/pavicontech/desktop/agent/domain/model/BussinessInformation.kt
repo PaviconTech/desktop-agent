@@ -24,18 +24,6 @@ data class BusinessInformation(
     companion object {
         fun fromJsonString(value: String) = Json.decodeFromString<BusinessInformation>(value)
     }
-    fun toInvoiceReq() = InvoiceReq(
-        id = id,
-        name = name,
-        branchId = branchId,
-        branchName = branchName,
-        districtName = districtName,
-        kraPin = kraPin,
-        provinceName = provinceName,
-        sectorName = sectorName,
-        sdcId = sdcId,
-        taxpayerName = taxpayerName
-    )
 
 }
 

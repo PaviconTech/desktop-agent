@@ -47,6 +47,7 @@ import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
+import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFileUseCase
 import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFolderUseCase
 import desktopagent.composeapp.generated.resources.Res
 import desktopagent.composeapp.generated.resources.save
@@ -77,7 +78,7 @@ fun PDFCoordinateMapper(isVisible: Boolean) {
 
     var qrCodeBox: BoxCoordinates? by remember { mutableStateOf(null) }
     var kraInfoBox: BoxCoordinates? by remember { mutableStateOf(null) }
-    val openPdfFile: SelectFolderUseCase = koinInject()
+    val openPdfFile: SelectFileUseCase = koinInject()
     val scope = rememberCoroutineScope()
     var pdfFile: File? by remember { mutableStateOf(null) }
     val keyValueStorage: KeyValueStorage = koinInject()

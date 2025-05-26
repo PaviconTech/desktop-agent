@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.withContext
+import org.apache.pdfbox.util.filetypedetector.FileType
 import java.io.File
 
 class FilesystemRepositoryIml:FilesystemRepository {
@@ -62,6 +63,18 @@ class FilesystemRepositoryIml:FilesystemRepository {
     }
 
     override suspend fun openFolder():Resource<File> = withContext(Dispatchers.IO){
+        val directory = FileKit.openDirectoryPicker()
+        try {
+            directory?.file?.let {
+                return@withContext Resource.Success(message = "Directory found", data = it)
+            } ?: return@withContext Resource.Error(message = "Directory not found")
+        }catch (e:Exception){
+            e.printStackTrace()
+            return@withContext Resource.Error(message = e.message)
+        }
+    }
+
+    override suspend fun selectFile(): Resource<File> = withContext(Dispatchers.IO) {
         val directory = FileKit.openFilePicker()
         try {
             directory?.file?.let {

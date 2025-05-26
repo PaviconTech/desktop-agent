@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Totals(
     @SerialName("otherAmounts")
-    val otherAmounts: OtherAmounts,
+    val otherAmounts: Map<String, Double>? = null,
     @SerialName("subTotal")
     val subTotal: Double,
     @SerialName("totalAmount")
@@ -16,7 +16,6 @@ data class Totals(
     val totalVat: Double? = null
 ){
     fun toTotals() = com.pavicontech.desktop.agent.data.local.database.entries.Totals(
-        otherAmounts = otherAmounts,
         subTotal = subTotal,
         totalAmount = totalAmount,
         totalVat = totalVat ?: 0.0

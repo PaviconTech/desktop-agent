@@ -5,6 +5,6 @@ import com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Ext
 import com.pavicontech.desktop.agent.data.remote.dto.response.getInvoices.GetInvoicesRes
 
 interface PDFExtractorRepository {
-    suspend fun extractInvoiceData(body: InvoiceReq, token:String): ExtractInvoiceRes
+    suspend fun extractInvoiceData(body: InvoiceReq): ExtractInvoiceRes
     suspend fun getAllSales(): GetInvoicesRes
 }

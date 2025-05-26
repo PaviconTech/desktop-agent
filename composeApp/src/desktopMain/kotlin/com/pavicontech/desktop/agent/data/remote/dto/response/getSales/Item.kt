@@ -1,6 +1,6 @@
-package com.pavicontech.desktop.agent.data.remote.dto.response.getSales
 
 
+import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -58,4 +58,31 @@ data class Item(
     val totAmt: String,
     @SerialName("updatedAt")
     val updatedAt: String
-)
+){
+  /*  fun toCreateSaleItem(): CreateSaleItem{
+        return CreateSaleItem(
+            itemSeq = itemSeq,
+            itemCd = itemCd,
+            itemClsCd = itemClsCd,
+            itemNm = itemNm,
+            bcd = bcd,
+            pkgUnitCd = pkgUnitCd,
+            pkg = pkg.toIntOrNull()  ?: 0,
+            qtyUnitCd = qtyUnitCd,
+            qty = qty.toIntOrNull() ?: 0    ,
+            prc = prc.toIntOrNull() ?: 0,
+            splyAmt = splyAmt.toIntOrNull() ?: 0,
+            dcRt = dcRt.toIntOrNull() ?: 0,
+            dcAmt = dcAmt.toIntOrNull() ?:0 ,
+            isrCcCd = null,
+            isrcRt = null,
+            isrcAmt = null,
+            isrccCd = null,
+            isrccNm = null,
+            taxTyCd = taxTyCd,
+            taxblAmt = taxblAmt.toIntOrNull() ?:0,
+            taxAmt = taxAmt.toIntOrNull() ?: 0,
+            totAmt = totAmt.toIntOrNull() ?: 0,
+        )
+    }*/
+}

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,11 +17,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardScreens
 import desktopagent.composeapp.generated.resources.Res
 import desktopagent.composeapp.generated.resources.logout
+import desktopagent.composeapp.generated.resources.sic
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -31,15 +36,16 @@ fun SidePanel(
     onNavigateToCustomers: () -> Unit,
     onNavigateToPurchases: () -> Unit,
     onNavigateToImports: () -> Unit,
-    onNavigateToInsurance: () -> Unit,
     onNavigateToReports: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onLogOut: () -> Unit,
     currentRoute: DashboardScreens?,
     profileName: String,
-    onViewProfile: () -> Unit
+    onViewProfile: () -> Unit,
+    onLogOut: () -> Unit
 
 ) {
+    val getItems:GetItemsUseCase = koinInject()
+    val scope   = rememberCoroutineScope()
     Box(
         modifier = Modifier.fillMaxWidth().background(
             color = MaterialTheme.colors.background,
@@ -48,21 +54,49 @@ fun SidePanel(
 
         Column {
             Row(
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(
-                    text = "Etims",
-                    style = MaterialTheme.typography.h1,
-                    color = MaterialTheme.colors.primary
-                )
-                Text(
-                    text = "Sync",
-                    style = MaterialTheme.typography.h1,
-                    color = MaterialTheme.colors.secondary
-                )
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                ) {
+                    Text(
+                        text = "Etims",
+                        style = MaterialTheme.typography.h1,
+                        color = MaterialTheme.colors.primary
+                    )
+                    Text(
+                        text = "Sync",
+                        style = MaterialTheme.typography.h1,
+                        color = MaterialTheme.colors.secondary
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                ) {
+                    Text("Logout")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = {
+                            onLogOut()
+                        },
+                        ){
+                        Icon(
+                            painter = painterResource(Res.drawable.logout),
+                            contentDescription = "logout",
+                            tint = MaterialTheme.colors.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -119,6 +153,23 @@ fun SidePanel(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
+                    IconButton(
+                        onClick = {
+                            scope.launch{
+                                getItems.invoke()
+
+                            }
+                        },
+                    ){
+                        Icon(
+                            painter = painterResource(Res.drawable.sic),
+                            contentDescription = "sync",
+                            tint = MaterialTheme.colors.primary,
+                            modifier = Modifier.size(24.dp)
+
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
                     NavBarProfile(
                         profileName = profileName,
                         onProfile = onViewProfile

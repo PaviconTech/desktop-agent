@@ -18,29 +18,22 @@ import kotlin.time.Duration.Companion.seconds
 
 object KtorClient {
 
-    fun create(storage: KeyValueStorage): HttpClient {
+    fun create(): HttpClient {
         return HttpClient(CIO) {
             install(ContentNegotiation) {
-                json(Json {
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                })
-            }
-
-            install(Auth) {
-                bearer {
-                  /*  loadTokens {
-                        val token = storage.get(Constants.AUTH_TOKEN) ?: return@loadTokens null
-                        BearerTokens(token, "")
+                json(
+                    Json {
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                        this.prettyPrint = true
+                        this.explicitNulls = true
                     }
-                    sendWithoutRequest { true } */// <--- Add this line
-                }
+                )
             }
 
             install(Logging) {
-                logger = Logger.DEFAULT
+                logger = Logger.SIMPLE
                 level = LogLevel.ALL
-                //sanitizeHeader { it == HttpHeaders.Authorization }
             }
 
             engine {

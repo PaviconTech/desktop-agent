@@ -9,19 +9,25 @@ import com.pavicontech.desktop.agent.data.local.database.entries.ExtractionStatu
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
 import com.pavicontech.desktop.agent.data.local.database.repository.InvoiceRepository
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
+import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
+import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.KraResult
+import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.Result
 import com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.ExtractInvoiceRes
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
+import com.pavicontech.desktop.agent.domain.model.ExtractedItem
 import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeAndKraInfoUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.InsertQrCodeToInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintReceiptUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.RenderAndSavePdfUseCase
+import com.pavicontech.desktop.agent.domain.usecase.sales.CreateSaleUseCase
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.components.BoxCoordinates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import java.nio.file.Paths
 import java.time.Instant
@@ -31,66 +37,86 @@ import kotlin.io.path.pathString
 class SubmitInvoicesUseCase(
     private val pdfExtractorRepository: PDFExtractorRepository,
     private val filesystemRepository: FilesystemRepository,
-    private val invoiceRepository: InvoiceRepository,
     private val keyValueStorage: KeyValueStorage,
     private val renderAndSavePdfUseCase: RenderAndSavePdfUseCase,
     private val generateHtmlReceipt: GenerateHtmlReceipt,
     private val printReceiptUseCase: PrintReceiptUseCase,
     private val generateQrCodeAndKraInfoUseCase: GenerateQrCodeAndKraInfoUseCase,
-    private val insertQrCodeToInvoiceUseCase: InsertQrCodeToInvoiceUseCase
+    private val insertQrCodeToInvoiceUseCase: InsertQrCodeToInvoiceUseCase,
+    private val createSaleUseCase: CreateSaleUseCase
 ) {
 
     suspend operator fun invoke(): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
         try {
             val token = keyValueStorage.get(Constants.AUTH_TOKEN) ?: ""
-            val bussinessInfo = try {
-                val json = keyValueStorage.get(Constants.BUSINESS_INFORMATION) ?: ""
-                Json.decodeFromString<BusinessInformation>(json)
-            } catch (e: Exception) {
-                null
-            }
-            filesystemRepository.watchDirectory(path = "/home/dev-pasaka/Desktop", onDelete = { dir ->
+
+            val userHome = System.getProperty("user.home")
+            val path = Paths.get(userHome, "Documents")
+            val watchDir = keyValueStorage.get(Constants.WATCH_FOLDER) ?: path.pathString
+
+            val bussinessInfo =BusinessInformation(
+                id = 23456,
+                branchId = "12345678",
+                branchName = "Demo12",
+                districtName = "Kasarani",
+                kraPin = "P000000000D",
+                name = "John Doe",
+                provinceName = "Kasarani",
+                sectorName = "Agritech",
+                sdcId = "123456",
+                taxpayerName = "John Doe",
+                businessLogo = "P00000000D",
+                )
+            filesystemRepository.watchDirectory(path = watchDir, onDelete = { dir ->
 
             }, onModify = { dir ->
                 bussinessInfo?.let {
                     pdfExtractorRepository.extractInvoiceData(
-                        body = it.toInvoiceReq().copy(
-                            file = dir.fullDirectory.fileToByteArray(), fileName = dir.fileName
-                        ), token = token
+                        body = InvoiceReq(
+                            file = dir.fullDirectory.fileToByteArray(),
+                            fileName = dir.fileName
+                        ),
                     )
                 }
             }
 
             ).collect { event ->
+                event.toString().logger(Type.INFO)
                 when (event) {
                     is Resource.Loading -> {
                         "Event: ${event.message}  ${event.data} \n" logger (Type.INFO)
                     }
 
                     is Resource.Success -> {
-                        //  "Event: ${event.message}  ${event.data} \n" logger (Type.INFO)
+                        "Event: ${event.message}  ${event.data} \n" logger (Type.INFO)
                         launch {
-                            bussinessInfo?.let {
-                                createInvoice(
-                                    token = token,
-                                    filePath = event.data?.fullDirectory ?: "",
-                                    fileName = event.data?.fileName ?: "",
-                                    kraPin = bussinessInfo.kraPin,
-                                    businessInfo = bussinessInfo,
-                                    onSuccess = { extractedDataRes ->
-                                        launch {
-                                            val htmlContent = generateHtmlReceipt.invoke(
-                                                data = extractedDataRes.toExtractedData(), businessInfo = bussinessInfo
-                                            )
-                                            printOutOption(
-                                                htmlContent = htmlContent,
-                                                fileName = event.data?.fileName ?: "",
-                                                filePath = event.data?.fullDirectory ?: ""
-                                            )
-                                        }
+                            extractInvoice(
+                                filePath = event.data?.fullDirectory ?: "",
+                                fileName = event.data?.fileName ?: "",
+                                onSuccess = { extractedDataRes, items, taxableAmount ->
+                                    launch {
+                                        val result = createSaleUseCase.invoke(
+                                            items = items,
+                                            taxableAmount = taxableAmount
+                                        )
+                                        val htmlContent = generateHtmlReceipt.invoke(
+                                            data = extractedDataRes.toExtractedData(),
+                                            businessInfo = bussinessInfo,
+                                            businessPin = "P051901215P",
+                                            bhfId = "00",
+                                            rcptSign = result.kraResult.result.rcptSign
+                                        )
 
-                                    })
-                            }
+                                        printOutOption(
+                                            kraResult = result.kraResult.result,
+                                            htmlContent = htmlContent,
+                                            fileName = event.data?.fileName ?: "",
+                                            filePath = event.data?.fullDirectory ?: ""
+                                        )
+                                    }
+
+                                },
+                            )
                         }
                     }
 
@@ -105,54 +131,18 @@ class SubmitInvoicesUseCase(
         }
     }
 
-    private suspend fun createInvoice(
-        token: String,
-        businessInfo: BusinessInformation,
-        filePath: String,
-        fileName: String,
-        kraPin: String,
-        onSuccess: suspend (ExtractInvoiceRes) -> Unit
-    ) = withContext(Dispatchers.IO) {
-        val result = invoiceRepository.insertInvoice(
-            invoice = Invoice(
-                fileName = fileName, kraPin = kraPin
-            )
-        )
-
-        if (result) {
-            "$fileName created successfully" logger (Type.INFO)
-            extractInvoice(
-                token = token,
-                filePath = filePath,
-                fileName = fileName,
-                businessInfo = businessInfo,
-                onSuccess = onSuccess
-            )
-        } else "$fileName creation failed"
-    }
 
     private suspend fun extractInvoice(
-        token: String,
         filePath: String,
         fileName: String,
-        businessInfo: BusinessInformation,
-        onSuccess: suspend (ExtractInvoiceRes) -> Unit
+        onSuccess: suspend (ExtractInvoiceRes,List<CreateSaleItem>, taxableAmount:Int) -> Unit,
     ): Unit = withContext(Dispatchers.IO) {
         try {
             val result = pdfExtractorRepository.extractInvoiceData(
                 body = InvoiceReq(
-                    id = businessInfo.id,
-                    name = businessInfo.name,
-                    branchId = businessInfo.branchId,
-                    branchName = businessInfo.branchName,
-                    districtName = businessInfo.districtName,
-                    kraPin = businessInfo.kraPin,
-                    provinceName = businessInfo.provinceName,
-                    sectorName = businessInfo.sectorName,
-                    sdcId = businessInfo.sdcId,
-                    taxpayerName = businessInfo.taxpayerName,
+                    fileName = fileName,
                     file = filePath.fileToByteArray()
-                ), token = token
+                )
             )
             """
         --------------------------------------------------------------------------------------------------------------------------        
@@ -161,22 +151,15 @@ class SubmitInvoicesUseCase(
                 Amounts: ${result.data?.totals}
         -------------------------------------------------------------------------------------------------------------------------
             """.trimIndent().logger(Type.TRACE)
-            if (result.status) {
-                invoiceRepository.updateInvoice(
-                    fileName = fileName, invoice = result.toInvoice().copy(
-                        extractionStatus = ExtractionStatus.SUCCESSFUL, updatedAt = Instant.now().toString()
-                    )
+            if (result.status){
+
+                onSuccess(
+                    result,
+                    filterItems(extractedItems = result.data?.items ?: emptyList()),
+                    result.data?.totals?.subTotal?.toInt() ?: 0
                 )
-                onSuccess(result)
-                //"$fileName extracted successfully" logger (Type.INFO)
-            } else {
-                invoiceRepository.updateInvoice(
-                    fileName = fileName, invoice = result.toInvoice().copy(
-                        extractionStatus = ExtractionStatus.SUCCESSFUL, updatedAt = Instant.now().toString()
-                    )
-                )
-                "$fileName extraction failed" logger (Type.INFO)
             }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -185,7 +168,8 @@ class SubmitInvoicesUseCase(
     private suspend fun printOutOption(
         htmlContent: String,
         fileName: String,
-        filePath: String
+        filePath: String,
+        kraResult: Result
     ) {
         val option = keyValueStorage.get(Constants.PRINT_OUT_OPTIONS) ?: "default"
         val qrCodeCoordinates = BoxCoordinates.fromJson(
@@ -209,14 +193,17 @@ class SubmitInvoicesUseCase(
                 Paths.get(userHome, "Documents", "DesktopAgent", "FiscalizedReceipts").toFile().mkdirs()
                 generateQrCodeAndKraInfoUseCase(
                     fileNamePrefix = fileName,
+                    businessPin = "P051901215P",
+                    bhfId = "00",
+                    rcptSign = kraResult.rcptSign,
                     onSuccess = { qrCode ->
                         filePath.logger(Type.DEBUG)
                         val inPutPdf = Path(filePath).toFile()
                         val receiptText = """
-                            INTRLDATA: Test1234567
-                            RCPTSIGN: Receipt12345
-                            VSDC DATE: ${Instant.now().toString()}
-                            MRCNO: MRC1235678
+                            INTRLDATA: ${kraResult.intrlData}
+                            RCPTSIGN: ${kraResult.rcptSign}
+                            VSDC DATE: ${kraResult.vsdcRcptPbctDate}
+                            MRCNO: ${kraResult.mrcNo},
                             """.trimIndent()
                         insertQrCodeToInvoiceUseCase.invoke(
                             kraInfoText = receiptText,
@@ -230,7 +217,7 @@ class SubmitInvoicesUseCase(
                         )
 
                     },
-                    onCleanUp = { _, ->
+                    onCleanUp = { _ ->
 
                     }
                 )
@@ -239,6 +226,35 @@ class SubmitInvoicesUseCase(
         }
 
     }
+
+
+    suspend fun filterItems(
+        extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
+    ): List<CreateSaleItem> {
+        val storedItems = keyValueStorage.get(Constants.ITEM_LIST)?.let {
+            Json.decodeFromString<List<com.pavicontech.desktop.agent.data.remote.dto.response.getItems.Item>>(it)
+        } ?: emptyList()
+
+        return extractedItems.mapNotNull { extracted ->
+            val matchedStoredItem = storedItems.find {
+                it.itemName.trim().equals(extracted.itemDescription.trim(), ignoreCase = true)
+            }
+
+            matchedStoredItem?.toCreateSaleItem(
+                qty = extracted.quantity.toInt() ?: 1,
+                prc = extracted.amount.toInt() ?: 0,
+                dcRt =  0,
+                dcAmt = 0,
+                splyAmt = extracted.amount.toInt() ,
+                taxblAmt = extracted.amount.toInt(),
+                taxAmt = extracted.taxAmount?.toInt() ?: 0,
+                totAmt = extracted.amount.toInt()
+            )
+        }
+    }
+
+
+
 
 
 }

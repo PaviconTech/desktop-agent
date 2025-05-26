@@ -16,10 +16,10 @@ import javax.imageio.ImageIO
 class GenerateQrCodeUseCase {
 
     operator fun invoke(
-        randomData: String,
         path:Path,
-        width: Int,
-        height:Int
+        businessPin: String,
+        bhfId: String,
+        rcptSign:String
     ): File {
         val logoPath = "/logo-img.png"
 
@@ -27,7 +27,7 @@ class GenerateQrCodeUseCase {
             .ofRoundedSquares()
             .withColor(0xFF000000.toInt())
             .withSize(25)
-            .build("https://etims.pavicontech.com/sales/$randomData")
+            .build("https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data=$businessPin$bhfId$rcptSign")
 
         val pngBytes = qrCode
             .render()

@@ -5,13 +5,16 @@ import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.FilePathWatcherU
 import com.pavicontech.desktop.agent.domain.usecase.GetSalesUseCase
 import com.pavicontech.desktop.agent.domain.usecase.GetUserSessionStatus
 import com.pavicontech.desktop.agent.domain.usecase.SignInUseCase
+import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFileUseCase
 import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFolderUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeAndKraInfoUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.InsertQrCodeToInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintReceiptUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.RenderAndSavePdfUseCase
+import com.pavicontech.desktop.agent.domain.usecase.sales.CreateSaleUseCase
 import org.koin.dsl.module
 
 
@@ -28,6 +31,11 @@ val useCaseModules = module {
     single { PrintReceiptUseCase() }
 
     single { SelectFolderUseCase(get()) }
+    single { SelectFileUseCase(get()) }
     single { InsertQrCodeToInvoiceUseCase() }
     single { GenerateQrCodeAndKraInfoUseCase(get(), get()) }
+
+
+    single { GetItemsUseCase(get(), get()) }
+    single { CreateSaleUseCase(get(), get()) }
 }

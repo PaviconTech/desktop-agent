@@ -66,7 +66,6 @@ fun DashboardScreen(
                 onNavigateToCustomers = { navController.navigate(DashboardScreens.Customers) { navController.popBackStack() } },
                 onNavigateToPurchases = { navController.navigate(DashboardScreens.Purchases) { navController.popBackStack() } },
                 onNavigateToImports = { navController.navigate(DashboardScreens.Imports) { navController.popBackStack() } },
-                onNavigateToInsurance = { navController.navigate(DashboardScreens.Insurance) { navController.popBackStack() } },
                 onNavigateToReports = { navController.navigate(DashboardScreens.Reports) { navController.popBackStack() } },
                 onNavigateToSettings = { navController.navigate(DashboardScreens.SettingsScreen) { navController.popBackStack() } },
                 onLogOut = {

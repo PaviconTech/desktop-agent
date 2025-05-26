@@ -14,7 +14,7 @@ val configModules = module{
         }
     }
     single<HttpClient> {
-        KtorClient.create(get())
+        KtorClient.create()
     }
 
     single { MongoDBConfig(get()) }

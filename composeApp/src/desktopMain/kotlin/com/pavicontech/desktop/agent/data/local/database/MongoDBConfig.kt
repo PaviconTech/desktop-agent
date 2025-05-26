@@ -2,6 +2,8 @@ package com.pavicontech.desktop.agent.data.local.database
 
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.pavicontech.desktop.agent.common.Constants
+import com.pavicontech.desktop.agent.common.utils.Type
+import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import kotlinx.coroutines.runBlocking
@@ -26,12 +28,19 @@ class MongoDBConfig(private val keyValueStorage: KeyValueStorage) {
         val password = businessInfo?.kraPin ?: ""
         pin = businessInfo?.kraPin ?: ""
         databaseName = "${password.uppercase()}_${businessInfo?.branchId ?: "00"}"
+        databaseName.logger(Type.INFO)
 
-        return keyValueStorage.get(Constants.LOCAL_MONGODB_URL)
+
+
+        val result =  keyValueStorage.get(Constants.LOCAL_MONGODB_URL)
             ?: if (username.isNotBlank() && password.isNotBlank())
                 "mongodb+srv://$username:$password@etimsdesktopagent.gy6zpwc.mongodb.net/"
             else
                 "mongodb://localhost:27017"
+
+        result.logger(Type.INFO)
+
+        return result
     }
 
     fun getDatabaseName(): String = databaseName
