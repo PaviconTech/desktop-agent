@@ -9,6 +9,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.pavicontech.desktop.agent.di.initKoin
 import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
+import com.pavicontech.desktop.agent.domain.usecase.receipt.GetAvailablePrintersUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +20,9 @@ fun main() = application {
 
     val invoices: SubmitInvoicesUseCase = koinInject()
     val items : GetItemsUseCase = koinInject()
+    val printers:GetAvailablePrintersUseCase = koinInject()
     CoroutineScope(Dispatchers.IO).launch{
+      //  printers.invoke().forEach { println(it.name) }
         invoices()
     }
     CoroutineScope(Dispatchers.IO).launch{

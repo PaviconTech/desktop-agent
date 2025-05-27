@@ -11,6 +11,7 @@ import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeAndKraInfoUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeUseCase
+import com.pavicontech.desktop.agent.domain.usecase.receipt.GetAvailablePrintersUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.InsertQrCodeToInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintReceiptUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.RenderAndSavePdfUseCase
@@ -22,13 +23,13 @@ val useCaseModules = module {
     single { SignInUseCase(get(), get()) }
     single { FilePathWatcherUseCase(get()) }
     single{ GetUserSessionStatus(get()) }
-    single{ SubmitInvoicesUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    single{ SubmitInvoicesUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory{ GetSalesUseCase(get()) }
 
     single { GenerateHtmlReceipt(get()) }
     single { GenerateQrCodeUseCase() }
     single { RenderAndSavePdfUseCase() }
-    single { PrintReceiptUseCase() }
+    single { PrintReceiptUseCase(get()) }
 
     single { SelectFolderUseCase(get()) }
     single { SelectFileUseCase(get()) }
@@ -38,4 +39,5 @@ val useCaseModules = module {
 
     single { GetItemsUseCase(get(), get()) }
     single { CreateSaleUseCase(get(), get()) }
+    single { GetAvailablePrintersUseCase() }
 }

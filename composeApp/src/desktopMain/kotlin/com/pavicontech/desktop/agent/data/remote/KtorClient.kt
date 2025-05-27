@@ -33,7 +33,7 @@ object KtorClient {
 
             install(Logging) {
                 logger = Logger.SIMPLE
-                level = LogLevel.ALL
+                level = LogLevel.HEADERS
             }
 
             engine {

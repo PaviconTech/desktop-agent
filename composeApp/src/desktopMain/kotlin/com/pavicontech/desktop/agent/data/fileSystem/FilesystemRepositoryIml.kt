@@ -8,6 +8,7 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.openDirectoryPicker
 import io.github.vinceglb.filekit.dialogs.openFilePicker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.withContext
@@ -27,6 +28,7 @@ class FilesystemRepositoryIml:FilesystemRepository {
             watcher.onEventFlow.collect{event: KfsDirectoryWatcherEvent ->
                 when(event.event){
                     KfsEvent.Create -> {
+                        delay(500)
                         send(
                             Resource.Success(
                                 data = Directory(

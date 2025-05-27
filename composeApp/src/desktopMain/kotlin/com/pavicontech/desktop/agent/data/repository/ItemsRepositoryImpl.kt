@@ -22,8 +22,12 @@ class ItemsRepositoryImpl(private val api: HttpClient) : ItemsRepository {
                 header("Authorization", "Bearer $token")
             }
         }.bodyAsText().let {
-            it.logger(Type.DEBUG)
-            Json.decodeFromString<GetItemsRes>(it)
+            try {
+                Json.decodeFromString<GetItemsRes>(it)
+            }catch (e:Exception){
+                it.logger(Type.INFO)
+                throw e
+            }
         }
     }
 }

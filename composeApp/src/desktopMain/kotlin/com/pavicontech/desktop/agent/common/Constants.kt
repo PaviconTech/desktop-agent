@@ -19,4 +19,5 @@ object Constants {
 
     const val  ITEM_LIST = "item_list"
     const val  WATCH_FOLDER = "watch_folder"
+    const val SELECTED_PRINTER = "selected_printer"
 }

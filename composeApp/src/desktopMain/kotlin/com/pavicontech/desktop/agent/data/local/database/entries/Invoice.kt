@@ -1,9 +1,11 @@
 package com.pavicontech.desktop.agent.data.local.database.entries
 
-import com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.OtherAmounts
+
+import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
 import java.time.Instant
 
+@Serializable
 data class Invoice(
     val id: String = ObjectId().toString(),
     val fileName: String,
@@ -15,6 +17,7 @@ data class Invoice(
     val updatedAt: String? = null
 )
 
+@Serializable
 data class Item(
     val amount: Double,
     val itemDescription: String,
@@ -25,6 +28,7 @@ data class Item(
 )
 
 
+@Serializable
 data class Totals(
     val subTotal: Double,
     val totalAmount: Double,

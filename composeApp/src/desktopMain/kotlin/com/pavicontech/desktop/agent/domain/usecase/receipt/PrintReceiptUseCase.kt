@@ -1,7 +1,9 @@
 package com.pavicontech.desktop.agent.domain.usecase.receipt
 
+import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.logger
+import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -14,32 +16,31 @@ import javax.print.SimpleDoc
 import javax.print.attribute.HashPrintRequestAttributeSet
 import javax.print.attribute.standard.Copies
 
-class PrintReceiptUseCase() {
-    suspend operator fun invoke(filePath: String): Pair<String, Boolean?> = withContext(Dispatchers.IO) {
+class PrintReceiptUseCase(
+    private val keyValueStorage: KeyValueStorage
+) {
+    suspend operator fun invoke(filePath: String): Pair<String, Boolean?> =
+        withContext(Dispatchers.IO) {
+            val selectedPrinterName = keyValueStorage.get(Constants.SELECTED_PRINTER)
             val file = File(filePath)
             if (!file.exists()) {
-                return@withContext (Pair("File not found: $filePath", false))
-
+                return@withContext Pair("File not found: $filePath", false)
             }
+
+            val printServices = PrintServiceLookup.lookupPrintServices(null, null)
+            val printService = printServices.find { it.name == selectedPrinterName }
+                ?: return@withContext Pair("Printer '$selectedPrinterName' not found.", false)
+
+            val docPrintJob = printService.createPrintJob()
+            val flavor = DocFlavor.INPUT_STREAM.PNG
+            val doc: Doc = SimpleDoc(file.inputStream(), flavor, null)
 
             val printRequestAttributeSet = HashPrintRequestAttributeSet().apply {
                 add(Copies(1))
             }
 
-            val printService = PrintServiceLookup.lookupDefaultPrintService() ?: run {
-                return@withContext Pair("No default printer found.", false)
-
-            }
-
-
-            val docPrintJob: DocPrintJob = printService.createPrintJob()
-
-            val flavor = DocFlavor.INPUT_STREAM.PNG
-            val doc: Doc = SimpleDoc(file.inputStream(), flavor, null)
-
             try {
                 docPrintJob.print(doc, printRequestAttributeSet)
-                "Printing started $filePath".logger(Type.INFO)
                 return@withContext Pair("Printing completed successfully.", true)
             } catch (e: PrintException) {
                 e.printStackTrace()
@@ -47,5 +48,5 @@ class PrintReceiptUseCase() {
             }
         }
 
-    }
+}
 

@@ -39,86 +39,14 @@ fun SettingsList(
     content: @Composable () -> Unit
 ) {
     var isPrintOutConfigExpanded by remember { mutableStateOf(false) }
-    var isWatchFolderExpanded by remember { mutableStateOf(false) }
 
-    var keyValueStorage: KeyValueStorage = koinInject()
-    val observeWatchFolder by keyValueStorage.observe(Constants.WATCH_FOLDER).collectAsState("")
-    val selectFolder:SelectFolderUseCase = koinInject()
-    val scope = rememberCoroutineScope()
     Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Text(
-                text = "1. Print Out Configurations",
-                color = MaterialTheme.colors.primary,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.body1
-            )
-            IconButton(
-                onClick = { isPrintOutConfigExpanded = !isPrintOutConfigExpanded }) {
-                Icon(
-                    imageVector = if (isPrintOutConfigExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Expand or collapse"
-                )
-            }
-        }
-        AnimatedVisibility(isPrintOutConfigExpanded) {
-            content()
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Text(
-                text = "2. Select Watch Folder",
-                color = MaterialTheme.colors.primary,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.body1
-            )
-            IconButton(
-                onClick = { isWatchFolderExpanded = !isWatchFolderExpanded }) {
-                Icon(
-                    imageVector = if (isWatchFolderExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Expand or collapse"
-                )
-            }
-        }
-        AnimatedVisibility(isWatchFolderExpanded) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                (if (observeWatchFolder?.isEmpty() == true) "Select Watch Folder" else observeWatchFolder)?.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier.width(150.dp)
-
-                    )
-                }
-
-                OutlinedButton(
-                    onClick = {
-                        scope.launch {
-                            selectFolder.invoke()?.let {
-                                keyValueStorage.set(
-                                    Constants.WATCH_FOLDER,
-                                    it.path
-                                )
-                                it.path.logger(Type.TRACE)
-                            }
-
-                        }
-                    }
-                ){
-                    Text("Select Folder")
-                }
-            }
-        }
+        PrinterOutConfiguration(
+            isPrintOutConfigExpanded = isPrintOutConfigExpanded,
+            onExpandClick = {isPrintOutConfigExpanded = it},
+            content = {content()}
+        )
+        SelectWatchFolderSetting()
+        SelectPrinter()
     }
 }

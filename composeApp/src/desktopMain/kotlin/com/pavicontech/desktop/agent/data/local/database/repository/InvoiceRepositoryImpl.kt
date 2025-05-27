@@ -1,41 +1,107 @@
 package com.pavicontech.desktop.agent.data.local.database.repository
 
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Updates
-import com.pavicontech.desktop.agent.common.utils.Type
-import com.pavicontech.desktop.agent.common.utils.logger
-import com.pavicontech.desktop.agent.data.local.database.MongoDBConfig
+import com.pavicontech.desktop.agent.data.local.database.DatabaseConfig
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import java.sql.ResultSet
 
-class InvoiceRepositoryImpl(
-    private val db: MongoDBConfig
-): InvoiceRepository {
+class InvoiceRepositoryImpl() : InvoiceRepository {
+
     init {
-        db.getDatabaseName() logger(Type.INFO)
-    }
-    private val invoiceCollection = db.mongoClient.getDatabase(db.getDatabaseName()).getCollection<Invoice>("invoice")
-    override suspend fun insertInvoice(invoice: Invoice): Boolean {
-        return invoiceCollection.insertOne(invoice).wasAcknowledged()
+        DatabaseConfig.init()
     }
 
+    override suspend fun insertInvoice(invoice: Invoice) {
+        val sql = """
+            INSERT INTO Invoice (id, fileName, extractionStatus, etimsStatus, items, totals, createdAt, updatedAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """.trimIndent()
 
-    override suspend fun updateInvoice(fileName:String, invoice: Invoice): Boolean {
-        val result =  invoiceCollection.findOneAndUpdate(
-            filter = Filters.eq(Invoice::fileName.name, fileName),
-            Updates.combine(
-                Updates.set(Invoice::extractionStatus.name, invoice.extractionStatus),
-                Updates.set(Invoice::items.name, invoice.items),
-                Updates.set(Invoice::totals.name, invoice.totals),
-                Updates.set(Invoice::updatedAt.name, invoice.updatedAt)
-            )
+        DatabaseConfig.getConnection().use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, invoice.id)
+                stmt.setString(2, invoice.fileName)
+                stmt.setString(3, invoice.extractionStatus.name)
+                stmt.setString(4, invoice.etimsStatus.name)
+                stmt.setString(5, Json.encodeToString(invoice.items))
+                stmt.setString(6, Json.encodeToString(invoice.totals))
+                stmt.setString(7, invoice.createdAt)
+                stmt.setString(8, invoice.updatedAt)
+                stmt.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun updateInvoice(fileName: String, invoice: Invoice) {
+        val sql = """
+            UPDATE Invoice SET
+                extractionStatus = ?, etimsStatus = ?, items = ?, totals = ?, updatedAt = ?
+            WHERE fileName = ?
+        """.trimIndent()
+
+        DatabaseConfig.getConnection().use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, invoice.extractionStatus.name)
+                stmt.setString(2, invoice.etimsStatus.name)
+                stmt.setString(3, Json.encodeToString(invoice.items))
+                stmt.setString(4, Json.encodeToString(invoice.totals))
+                stmt.setString(5, invoice.updatedAt)
+                stmt.setString(6, fileName)
+                stmt.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun deleteInvoice(id: String) {
+        val sql = "DELETE FROM Invoice WHERE id = ?"
+
+        DatabaseConfig.getConnection().use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, id)
+                stmt.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun getInvoiceById(id: String): Invoice? {
+        val sql = "SELECT * FROM Invoice WHERE id = ?"
+
+        DatabaseConfig.getConnection().use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, id)
+                val rs = stmt.executeQuery()
+                return if (rs.next()) rsToInvoice(rs) else null
+            }
+        }
+    }
+
+    override suspend fun getAllInvoices(): List<Invoice> {
+        val sql = "SELECT * FROM Invoice"
+
+        return DatabaseConfig.getConnection().use { conn ->
+            conn.createStatement().use { stmt ->
+                val rs = stmt.executeQuery(sql)
+                val invoices = mutableListOf<Invoice>()
+                while (rs.next()) {
+                    invoices.add(rsToInvoice(rs))
+                }
+                invoices
+            }
+        }
+    }
+
+    private fun rsToInvoice(rs: ResultSet): Invoice {
+        return Invoice(
+            id = rs.getString("id"),
+            fileName = rs.getString("fileName"),
+            extractionStatus = enumValueOf(rs.getString("extractionStatus")),
+            etimsStatus = enumValueOf(rs.getString("etimsStatus")),
+            items = Json.decodeFromString(rs.getString("items")),
+            totals = Json.decodeFromString(rs.getString("totals")),
+            createdAt = rs.getString("createdAt"),
+            updatedAt = rs.getString("updatedAt")
         )
-
-        return result  != null
-    }
-
-    override suspend fun deleteInvoice(id: String): Boolean {
-        return invoiceCollection.deleteOne(Filters.eq(Invoice::id.name, id)).wasAcknowledged()
     }
 }

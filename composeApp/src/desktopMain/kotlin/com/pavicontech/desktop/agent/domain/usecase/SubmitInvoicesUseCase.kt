@@ -5,8 +5,10 @@ import com.pavicontech.desktop.agent.common.utils.fileToByteArray
 import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.fileSystem.FilesystemRepository
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
+import com.pavicontech.desktop.agent.data.local.database.entries.EtimsStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.ExtractionStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
+import com.pavicontech.desktop.agent.data.local.database.entries.Item
 import com.pavicontech.desktop.agent.data.local.database.repository.InvoiceRepository
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
@@ -43,7 +45,8 @@ class SubmitInvoicesUseCase(
     private val printReceiptUseCase: PrintReceiptUseCase,
     private val generateQrCodeAndKraInfoUseCase: GenerateQrCodeAndKraInfoUseCase,
     private val insertQrCodeToInvoiceUseCase: InsertQrCodeToInvoiceUseCase,
-    private val createSaleUseCase: CreateSaleUseCase
+    private val createSaleUseCase: CreateSaleUseCase,
+    private val invoiceRepository: InvoiceRepository
 ) {
 
     suspend operator fun invoke(): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
@@ -90,29 +93,63 @@ class SubmitInvoicesUseCase(
                     is Resource.Success -> {
                         "Event: ${event.message}  ${event.data} \n" logger (Type.INFO)
                         launch {
+                            invoiceRepository.insertInvoice(
+                                Invoice(
+                                    id = Instant.now().toEpochMilli().toString(),
+                                    fileName = event.data?.fileName ?: "",
+                                    extractionStatus = ExtractionStatus.PENDING,
+                                    etimsStatus = EtimsStatus.PENDING,
+                                )
+                            )
                             extractInvoice(
                                 filePath = event.data?.fullDirectory ?: "",
                                 fileName = event.data?.fileName ?: "",
-                                onSuccess = { extractedDataRes, items, taxableAmount ->
+                                onSuccess = { extractedDataRes, items, taxableAmount, fileName, invoiceItems ->
                                     launch {
                                         val result = createSaleUseCase.invoke(
                                             items = items,
                                             taxableAmount = taxableAmount
-                                        )
-                                        val htmlContent = generateHtmlReceipt.invoke(
-                                            data = extractedDataRes.toExtractedData(),
-                                            businessInfo = bussinessInfo,
-                                            businessPin = "P051901215P",
-                                            bhfId = "00",
-                                            rcptSign = result.kraResult.result.rcptSign
-                                        )
+                                        ).also {
+                                            if (it.status) {
+                                                invoiceRepository.updateInvoice(
+                                                    fileName = fileName,
+                                                    invoice = Invoice(
+                                                        id = Instant.now().toEpochMilli().toString(),
+                                                        fileName = fileName,
+                                                        extractionStatus = ExtractionStatus.SUCCESSFUL,
+                                                        etimsStatus = EtimsStatus.SUCCESSFUL,
+                                                        items = invoiceItems
+                                                    )
+                                                )
+                                            }else{
+                                                invoiceRepository.updateInvoice(
+                                                    fileName = fileName,
+                                                    invoice = Invoice(
+                                                        id = Instant.now().toEpochMilli().toString(),
+                                                        fileName = fileName,
+                                                        extractionStatus = ExtractionStatus.SUCCESSFUL,
+                                                        etimsStatus = EtimsStatus.FAILED,
+                                                        items = invoiceItems
+                                                    )
+                                                )
+                                            }
+                                        }
+                                        if (result.status){
+                                            val htmlContent = generateHtmlReceipt.invoke(
+                                                data = extractedDataRes.toExtractedData(),
+                                                businessInfo = bussinessInfo,
+                                                businessPin = "P051901215P",
+                                                bhfId = "00",
+                                                rcptSign = result.kraResult.result.rcptSign
+                                            )
 
-                                        printOutOption(
-                                            kraResult = result.kraResult.result,
-                                            htmlContent = htmlContent,
-                                            fileName = event.data?.fileName ?: "",
-                                            filePath = event.data?.fullDirectory ?: ""
-                                        )
+                                            printOutOption(
+                                                kraResult = result.kraResult.result,
+                                                htmlContent = htmlContent,
+                                                fileName = event.data?.fileName ?: "",
+                                                filePath = event.data?.fullDirectory ?: ""
+                                            )
+                                        }
                                     }
 
                                 },
@@ -135,7 +172,7 @@ class SubmitInvoicesUseCase(
     private suspend fun extractInvoice(
         filePath: String,
         fileName: String,
-        onSuccess: suspend (ExtractInvoiceRes,List<CreateSaleItem>, taxableAmount:Int) -> Unit,
+        onSuccess: suspend (ExtractInvoiceRes,List<CreateSaleItem>, taxableAmount:Int, fileName:String, invoiceItems:List<Item>) -> Unit,
     ): Unit = withContext(Dispatchers.IO) {
         try {
             val result = pdfExtractorRepository.extractInvoiceData(
@@ -152,11 +189,35 @@ class SubmitInvoicesUseCase(
         -------------------------------------------------------------------------------------------------------------------------
             """.trimIndent().logger(Type.TRACE)
             if (result.status){
-
+                invoiceRepository.updateInvoice(
+                    fileName = fileName,
+                    invoice = Invoice(
+                        id = Instant.now().toEpochMilli().toString(),
+                        fileName = fileName,
+                        extractionStatus = ExtractionStatus.SUCCESSFUL,
+                        etimsStatus = EtimsStatus.PENDING,
+                        updatedAt = Instant.now().toString(),
+                        items = result.data?.items?.map { it.toItem() } ?: emptyList()
+                    )
+                )
                 onSuccess(
                     result,
                     filterItems(extractedItems = result.data?.items ?: emptyList()),
-                    result.data?.totals?.subTotal?.toInt() ?: 0
+                    result.data?.totals?.subTotal?.toInt() ?: 0,
+                    fileName,
+                    result.data?.items?.map { it.toItem() } ?: emptyList()
+                )
+            }else{
+                invoiceRepository.updateInvoice(
+                    fileName = fileName,
+                    invoice = Invoice(
+                        id = Instant.now().toEpochMilli().toString(),
+                        fileName = fileName,
+                        extractionStatus = ExtractionStatus.FAILED,
+                        etimsStatus = EtimsStatus.PENDING,
+                        updatedAt = Instant.now().toString(),
+                        items = result.data?.items?.map { it.toItem() } ?: emptyList()
+                    )
                 )
             }
 
@@ -212,6 +273,7 @@ class SubmitInvoicesUseCase(
                             qrCodeImage = qrCode,
                             coordinates = listOf(kraInfoCoordinates, qrCodeCoordinates),
                             onSuccess = {
+                               // printReceiptUseCase.invoke(path.pathString)
                                 qrCode.delete()
                             }
                         )

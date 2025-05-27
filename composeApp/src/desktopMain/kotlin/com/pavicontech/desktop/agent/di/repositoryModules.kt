@@ -21,7 +21,7 @@ val repositoryModules  = module {
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<FilesystemRepository> { FilesystemRepositoryIml() }
     single<PDFExtractorRepository> { PDFExtractorRepositoryImpl(get()) }
-    single<InvoiceRepository> { InvoiceRepositoryImpl(get()) }
+    single<InvoiceRepository> { InvoiceRepositoryImpl() }
     single<SalesRepository> { SalesRepositoryImpl(get()) }
     single<ItemsRepository> { ItemsRepositoryImpl(get()) }
 }

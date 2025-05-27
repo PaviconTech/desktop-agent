@@ -19,7 +19,7 @@ class InsertQrCodeToInvoiceUseCase {
         qrCodeImage: File,
         kraInfoText: String,
         coordinates: List<BoxCoordinates>,
-        onSuccess: () -> Unit
+        onSuccess: suspend () -> Unit
     ): Unit = withContext(Dispatchers.IO) {
         val document = PDDocument.load(inputPdf)
         val page: PDPage = document.getPage(0)
