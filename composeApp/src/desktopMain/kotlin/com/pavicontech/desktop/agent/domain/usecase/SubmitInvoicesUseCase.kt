@@ -10,6 +10,7 @@ import com.pavicontech.desktop.agent.data.local.database.entries.ExtractionStatu
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
 import com.pavicontech.desktop.agent.data.local.database.entries.Item
 import com.pavicontech.desktop.agent.data.local.database.repository.InvoiceRepository
+import com.pavicontech.desktop.agent.data.local.database.repository.ItemLocalRepository
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
 import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.KraResult
@@ -46,8 +47,10 @@ class SubmitInvoicesUseCase(
     private val generateQrCodeAndKraInfoUseCase: GenerateQrCodeAndKraInfoUseCase,
     private val insertQrCodeToInvoiceUseCase: InsertQrCodeToInvoiceUseCase,
     private val createSaleUseCase: CreateSaleUseCase,
-    private val invoiceRepository: InvoiceRepository
-) {
+    private val invoiceRepository: InvoiceRepository,
+    private val localItemsRepository: ItemLocalRepository,
+
+    ) {
 
     suspend operator fun invoke(): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
         try {
@@ -293,9 +296,7 @@ class SubmitInvoicesUseCase(
     suspend fun filterItems(
         extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
     ): List<CreateSaleItem> {
-        val storedItems = keyValueStorage.get(Constants.ITEM_LIST)?.let {
-            Json.decodeFromString<List<com.pavicontech.desktop.agent.data.remote.dto.response.getItems.Item>>(it)
-        } ?: emptyList()
+        val storedItems = localItemsRepository.getAllItems()
 
         return extractedItems.mapNotNull { extracted ->
             val matchedStoredItem = storedItems.find {

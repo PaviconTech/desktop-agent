@@ -2,8 +2,6 @@ package com.pavicontech.desktop.agent.data.local.database.repository
 
 import com.pavicontech.desktop.agent.data.local.database.DatabaseConfig
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.sql.ResultSet
 

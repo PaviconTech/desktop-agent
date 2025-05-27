@@ -14,7 +14,7 @@ data class Invoice(
     val items: List<Item> = emptyList(),
     val totals: Totals? =null,
     val createdAt: String = Instant.now().toString(),
-    val updatedAt: String? = null
+    val updatedAt: String? = Instant.now().toString()
 )
 
 @Serializable

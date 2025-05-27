@@ -23,7 +23,7 @@ val useCaseModules = module {
     single { SignInUseCase(get(), get()) }
     single { FilePathWatcherUseCase(get()) }
     single{ GetUserSessionStatus(get()) }
-    single{ SubmitInvoicesUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    single{ SubmitInvoicesUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory{ GetSalesUseCase(get()) }
 
     single { GenerateHtmlReceipt(get()) }
@@ -37,7 +37,7 @@ val useCaseModules = module {
     single { GenerateQrCodeAndKraInfoUseCase(get(), get()) }
 
 
-    single { GetItemsUseCase(get(), get()) }
+    single { GetItemsUseCase(get(), get(), get()) }
     single { CreateSaleUseCase(get(), get()) }
     single { GetAvailablePrintersUseCase() }
 }

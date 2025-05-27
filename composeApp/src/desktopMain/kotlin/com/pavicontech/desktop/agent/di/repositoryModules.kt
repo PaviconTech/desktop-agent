@@ -6,6 +6,8 @@ import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorageImpl
 import com.pavicontech.desktop.agent.data.local.database.repository.InvoiceRepository
 import com.pavicontech.desktop.agent.data.local.database.repository.InvoiceRepositoryImpl
+import com.pavicontech.desktop.agent.data.local.database.repository.ItemLocalRepository
+import com.pavicontech.desktop.agent.data.local.database.repository.ItemLocalRepositoryImpl
 import com.pavicontech.desktop.agent.data.repository.ItemsRepositoryImpl
 import com.pavicontech.desktop.agent.data.repository.PDFExtractorRepositoryImpl
 import com.pavicontech.desktop.agent.data.repository.SalesRepositoryImpl
@@ -24,4 +26,5 @@ val repositoryModules  = module {
     single<InvoiceRepository> { InvoiceRepositoryImpl() }
     single<SalesRepository> { SalesRepositoryImpl(get()) }
     single<ItemsRepository> { ItemsRepositoryImpl(get()) }
+    single<ItemLocalRepository> { ItemLocalRepositoryImpl() }
 }
