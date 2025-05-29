@@ -26,6 +26,7 @@ fun main() = application {
     CoroutineScope(Dispatchers.IO).launch{ invoices() }
     CoroutineScope(Dispatchers.IO).launch{ items() }
     CoroutineScope(Dispatchers.IO).launch{ autoRetry() }
+
     val windowState = rememberWindowState(
         placement = WindowPlacement.Maximized,
         size = DpSize(width = 1200.dp, height = 800.dp)

@@ -75,7 +75,9 @@ kotlin {
     }
 }
 
-
+tasks.named<JavaExec>("desktopRun") {
+    mainClass.set("com.pavicontech.desktop.agent.MainKt")
+}
 
 compose.desktop {
     application {
@@ -112,6 +114,7 @@ compose.desktop {
 
         }
 
-        javaHome = "/usr/lib/jvm/java-17-openjdk-amd64"
+      //  javaHome = "/usr/lib/jvm/java-17-openjdk-amd64"
+        javaHome = System.getenv("JAVA_HOME") ?: "C:\\Program Files\\Java\\jdk-17"
     }
 }
