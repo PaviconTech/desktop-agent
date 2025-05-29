@@ -2,12 +2,12 @@ package com.pavicontech.desktop.agent.data.local.database.entries
 
 
 import kotlinx.serialization.Serializable
-import org.bson.types.ObjectId
 import java.time.Instant
+import java.util.UUID
 
 @Serializable
 data class Invoice(
-    val id: String = ObjectId().toString(),
+    val id: String = UUID.randomUUID().toString(),
     val fileName: String,
     val extractionStatus: ExtractionStatus = ExtractionStatus.PENDING,
     val etimsStatus: EtimsStatus = EtimsStatus.PENDING,

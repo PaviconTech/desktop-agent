@@ -31,6 +31,7 @@ import org.koin.compose.koinInject
 @Composable
 fun SidePanel(
     onNavigateToHome: () -> Unit,
+    onNavigateToStatus: () -> Unit,
     onNavigateToItems: () -> Unit,
     onNavigateToCreditNotes: () -> Unit,
     onNavigateToCustomers: () -> Unit,
@@ -107,6 +108,11 @@ fun SidePanel(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
+                    SidePanelItem(
+                        isSelected = currentRoute == DashboardScreens.Status,
+                        name = "Status",
+                        onClick = onNavigateToStatus
+                    )
                     SidePanelItem(
                         isSelected = currentRoute == DashboardScreens.Sales,
                         name = "Sales",

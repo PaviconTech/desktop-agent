@@ -8,9 +8,15 @@ plugins {
 }
 
 kotlin {
-    jvm("desktop")
+    jvm("desktop") {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
 
-    val sqllinVersion = "1.4.2"
+    jvmToolchain(17)
 
     sourceSets {
         val commonMain by getting {
@@ -28,11 +34,6 @@ kotlin {
                 // AndroidX + Voyager
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
-                implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
-                implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
-                implementation(libs.voyager.navigator)
-                implementation(libs.voyager.screen.model)
-                implementation(libs.voyager.koin)
 
                 // Koin
                 implementation(project.dependencies.platform(libs.koin.bom))
@@ -52,21 +53,16 @@ kotlin {
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
-                implementation("org.openjfx:javafx-controls:21")
-                implementation("org.openjfx:javafx-web:21")
 
-                // DataStore
-                api(libs.datastore)
-                api(libs.datastore.preferences)
+                // ⚠️ Consider replacing JavaFX 21 with JavaFX 17 to match JVM target
+                implementation("org.openjfx:javafx-controls:17")
+                implementation("org.openjfx:javafx-web:17")
+
                 implementation(libs.navigation.compose)
 
-                // MongoDB
-                implementation(libs.mongodb.core)
-                implementation(libs.mongodb.serializer)
-
-                // QR Code Generator
+                // QR Code Generator + SQLite
                 implementation(libs.ktor.qr.code.gen)
-                implementation("org.xerial:sqlite-jdbc:3.45.1.0") // latest version as of 2025
+                implementation("org.xerial:sqlite-jdbc:3.45.1.0")
             }
         }
 
@@ -80,14 +76,42 @@ kotlin {
 }
 
 
+
 compose.desktop {
     application {
         mainClass = "com.pavicontech.desktop.agent.MainKt"
+
+
+        jvmArgs += listOf(
+            "--add-opens=java.base/sun.misc=ALL-UNNAMED",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--add-modules=jdk.unsupported"  // <-- add this line
+        )
+
+        buildTypes.release.proguard {
+            version.set("7.3.2")
+            configurationFiles.from(project.file("proguard-rules.pro"))
+            isEnabled.set(false)
+            obfuscate.set(false)
+        }
+
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.pavicontech.desktop.agent"
             packageVersion = "1.0.0"
+
+            modules("java.sql") // <-- Add this
+
+
+            // ✅ Bundle full JDK inside your app
+            includeAllModules = true
+            jvmArgs += listOf(
+                "--add-modules=jdk.unsupported,jdk.unsupported.desktop"
+            )
+
         }
+
+        javaHome = "/usr/lib/jvm/java-17-openjdk-amd64"
     }
 }

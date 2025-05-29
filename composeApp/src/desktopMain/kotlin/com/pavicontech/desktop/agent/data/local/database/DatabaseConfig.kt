@@ -20,7 +20,7 @@ object DatabaseConfig {
         val sql = """
         CREATE TABLE IF NOT EXISTS Invoice (
             id TEXT PRIMARY KEY,
-            fileName TEXT NOT NULL,
+            fileName TEXT NOT NULL UNIQUE,
             extractionStatus TEXT,
             etimsStatus TEXT,
             items TEXT,

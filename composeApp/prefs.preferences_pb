@@ -8,13 +8,15 @@ H
 saved_user_credentials.*,{"kraPin":"P051901215P","username":"pasaka"}
 #
 print_out_options*custom_print
-a
-last_selected_printout_invoice?*=/home/dev-pasaka/Desktop/RptInvoice - RptInvoice-1 (Copy).pdf
+l
+last_selected_printout_invoiceJ*H/home/dev-pasaka/Downloads/UFLS - Sampe of Credit Note CN-1113 (1)-1.pdf
 e
-qr_code_coordinatesN*L{"name":"qrCodeBox","startX":146.0,"startY":669.0,"endX":522.0,"endY":719.0}
+qr_code_coordinatesN*L{"name":"qrCodeBox","startX":193.0,"startY":614.0,"endX":596.0,"endY":630.0}
 f
-kra_info_coordinatesN*L{"name":"kraInfoBox","startX":24.0,"startY":651.0,"endX":140.0,"endY":740.0}
+kra_info_coordinatesN*L{"name":"kraInfoBox","startX":64.0,"startY":556.0,"endX":184.0,"endY":668.0}
 *
 watch_folder*/home/dev-pasaka/Desktop
 >
 selected_printer**(Xerox_VersaLink_C7125_Color_MFP_db_66_83
+
+invoice_status_filter*ALL

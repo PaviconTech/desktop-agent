@@ -8,6 +8,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.pavicontech.desktop.agent.di.initKoin
+import com.pavicontech.desktop.agent.domain.usecase.AutoRetryUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GetAvailablePrintersUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -20,15 +21,11 @@ fun main() = application {
 
     val invoices: SubmitInvoicesUseCase = koinInject()
     val items : GetItemsUseCase = koinInject()
-    val printers:GetAvailablePrintersUseCase = koinInject()
-    CoroutineScope(Dispatchers.IO).launch{
-      //  printers.invoke().forEach { println(it.name) }
-        invoices()
-    }
-    CoroutineScope(Dispatchers.IO).launch{
-        //invoices()
-        items()
-    }
+    val autoRetry : AutoRetryUseCase = koinInject()
+
+    CoroutineScope(Dispatchers.IO).launch{ invoices() }
+    CoroutineScope(Dispatchers.IO).launch{ items() }
+    CoroutineScope(Dispatchers.IO).launch{ autoRetry() }
     val windowState = rememberWindowState(
         placement = WindowPlacement.Maximized,
         size = DpSize(width = 1200.dp, height = 800.dp)

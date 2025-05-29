@@ -1,32 +1,29 @@
 package com.pavicontech.desktop.agent.domain.usecase.sales
 
 import com.pavicontech.desktop.agent.common.Constants
-import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.generateTimestamp
-import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
-import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
-import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleReq
-import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.Receipt
+import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.CreateCreditNoteItem
+import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.CreateCreditNoteReq
+
+import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.Receipt
 import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.CreateSaleRes
 import com.pavicontech.desktop.agent.domain.repository.SalesRepository
-import kotlinx.serialization.json.Json
 
 class CreateCreditNoteUseCase(
     private val repository: SalesRepository,
     private val keyValueStorage: KeyValueStorage
 ) {
     suspend fun invoke(
-        items: List<CreateSaleItem>,
+        items: List<CreateCreditNoteItem>,
         taxableAmount: Int,
-        receiptType:String,
     ):CreateSaleRes {
         val token = keyValueStorage.get(Constants.AUTH_TOKEN) ?: ""
-        val createSaleReq = CreateSaleReq(
+        val createSaleReq = CreateCreditNoteReq(
             invcNo = "74",
             orgInvcNo = "0",
             salesTyCd = "N",
-            rcptTyCd = if (receiptType == "credit_note") "R" else "S",
+            rcptTyCd = "R",
             pmtTyCd = "01",
             salesSttsCd = "02",
             cfmDt = generateTimestamp(),
@@ -65,14 +62,13 @@ class CreateCreditNoteUseCase(
             ),
             itemList = items.mapIndexed { index, item ->
                 item.copy(
-                    itemSeq = "${index + 1}",
-                    qty = item.qty
+                    itemSeq = index + 1,
+                    qty = item.qty,
+                    itemNmDef = item.itemNm
                 )
             }
         )
 
-
-        Json.encodeToString(createSaleReq)?.let { it.logger(Type.INFO) }
-        return repository.createSale(body = createSaleReq, token)
+        return repository.createCreditNote(body = createSaleReq, token)
     }
 }

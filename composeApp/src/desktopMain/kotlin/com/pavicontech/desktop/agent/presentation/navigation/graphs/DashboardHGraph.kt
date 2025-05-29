@@ -15,12 +15,20 @@ import com.pavicontech.desktop.agent.presentation.navigation.screens.Graphs
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.ProfileScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.SalesScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.SettingsScreen
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.StatusScreen
 
 
 fun NavGraphBuilder.dashboardGraph(navController: NavHostController) {
     navigation<Graphs.DashboardGraph>(
-        startDestination = DashboardScreens.Sales,
+        startDestination = DashboardScreens.Status,
     ) {
+
+        composable<DashboardScreens.Status>(
+            enterTransition = { slideInVertically( initialOffsetY = { it }, animationSpec = tween(600, easing = FastOutSlowInEasing)) },
+            exitTransition = { slideOutVertically( targetOffsetY = { -it }, animationSpec = tween(600, easing = LinearOutSlowInEasing)) }
+        ) {
+            StatusScreen()
+        }
 
         composable<DashboardScreens.Sales>(
             enterTransition = { slideInVertically( initialOffsetY = { it }, animationSpec = tween(600, easing = FastOutSlowInEasing)) },

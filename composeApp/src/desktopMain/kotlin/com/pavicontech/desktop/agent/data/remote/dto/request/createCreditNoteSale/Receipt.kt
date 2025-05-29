@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.data.remote.dto.request.createSale
+package com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale
 
 
 import kotlinx.serialization.SerialName

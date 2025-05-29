@@ -8,6 +8,8 @@ sealed class DashboardScreens {
     @Serializable
     data object Sales : DashboardScreens()
     @Serializable
+    data object Status : DashboardScreens()
+    @Serializable
     data object Items : DashboardScreens()
     @Serializable
     data object CreditNotes : DashboardScreens()

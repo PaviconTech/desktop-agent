@@ -1,11 +1,10 @@
-package com.pavicontech.desktop.agent.data.remote.dto.request.createSale
+package com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale
 
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateSaleReq(
+data class CreateCreditNoteReq(
     val invcNo: String,
     val orgInvcNo: String,
     val salesTyCd: String,
@@ -40,6 +39,6 @@ data class CreateSaleReq(
     val modrId: String,
     val modrNm: String,
     val receipt: Receipt,
-    val itemList: List<CreateSaleItem>
+    val itemList: List<CreateCreditNoteItem>
 
 )

@@ -12,25 +12,62 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
     }
 
     override suspend fun insertInvoice(invoice: Invoice) {
-        val sql = """
-            INSERT INTO Invoice (id, fileName, extractionStatus, etimsStatus, items, totals, createdAt, updatedAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+        val selectSql = "SELECT id FROM Invoice WHERE fileName = ?"
 
         DatabaseConfig.getConnection().use { conn ->
+            val exists = conn.prepareStatement(selectSql).use { stmt ->
+                stmt.setString(1, invoice.fileName)
+                val rs = stmt.executeQuery()
+                rs.next() // true if row exists
+            }
+
+            val sql = if (exists) {
+                """
+            UPDATE Invoice
+            SET
+                id = ?,
+                extractionStatus = ?,
+                etimsStatus = ?,
+                items = ?,
+                totals = ?,
+                createdAt = ?,
+                updatedAt = ?
+            WHERE fileName = ?
+            """
+            } else {
+                """
+            INSERT INTO Invoice (id, fileName, extractionStatus, etimsStatus, items, totals, createdAt, updatedAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            }
+
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, invoice.id)
-                stmt.setString(2, invoice.fileName)
-                stmt.setString(3, invoice.extractionStatus.name)
-                stmt.setString(4, invoice.etimsStatus.name)
-                stmt.setString(5, Json.encodeToString(invoice.items))
-                stmt.setString(6, Json.encodeToString(invoice.totals))
-                stmt.setString(7, invoice.createdAt)
-                stmt.setString(8, invoice.updatedAt)
+                if (exists) {
+                    stmt.setString(1, invoice.id)
+                    stmt.setString(2, invoice.extractionStatus.name)
+                    stmt.setString(3, invoice.etimsStatus.name)
+                    stmt.setString(4, Json.encodeToString(invoice.items))
+                    stmt.setString(5, Json.encodeToString(invoice.totals))
+                    stmt.setString(6, invoice.createdAt)
+                    stmt.setString(7, invoice.updatedAt)
+                    stmt.setString(8, invoice.fileName) // for WHERE clause
+                } else {
+                    stmt.setString(1, invoice.id)
+                    stmt.setString(2, invoice.fileName)
+                    stmt.setString(3, invoice.extractionStatus.name)
+                    stmt.setString(4, invoice.etimsStatus.name)
+                    stmt.setString(5, Json.encodeToString(invoice.items))
+                    stmt.setString(6, Json.encodeToString(invoice.totals))
+                    stmt.setString(7, invoice.createdAt)
+                    stmt.setString(8, invoice.updatedAt)
+                }
+
                 stmt.executeUpdate()
             }
         }
     }
+
+
 
     override suspend fun updateInvoice(fileName: String, invoice: Invoice) {
         val sql = """

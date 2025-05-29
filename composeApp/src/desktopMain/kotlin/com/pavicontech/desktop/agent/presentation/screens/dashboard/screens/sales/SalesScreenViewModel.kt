@@ -3,7 +3,7 @@ package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sal
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import cafe.adriel.voyager.core.model.ScreenModel
+import androidx.lifecycle.ViewModel
 import com.pavicontech.desktop.agent.common.Resource
 import com.pavicontech.desktop.agent.domain.usecase.GetSalesUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class SalesScreenViewModel(
     private val getSalesUseCase: GetSalesUseCase
-): ScreenModel {
+): ViewModel() {
 
     private val viewModelScope = CoroutineScope(Dispatchers.Main.immediate)
     var getSalesState by mutableStateOf(GetSalesState())

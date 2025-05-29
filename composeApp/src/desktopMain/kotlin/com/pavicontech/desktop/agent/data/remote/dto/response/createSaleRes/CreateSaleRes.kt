@@ -9,7 +9,7 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 @JsonIgnoreUnknownKeys
 @Serializable
 data class CreateSaleRes(
-    val kraResult: KraResult,
+    val kraResult: KraResult? = null,
     val message: String,
     val status: Boolean
 )

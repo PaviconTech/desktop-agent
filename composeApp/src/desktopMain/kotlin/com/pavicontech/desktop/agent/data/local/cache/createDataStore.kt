@@ -1,15 +1,19 @@
 package com.pavicontech.desktop.agent.data.local.cache
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import okio.Path.Companion.toPath
+
+import java.io.File
+import java.nio.file.Paths
+import kotlin.io.path.pathString
 
 
-fun createDataStore(producePath: () -> String): DataStore<Preferences> {
-    return PreferenceDataStoreFactory.createWithPath(
-        produceFile = { producePath().toPath() }
-    )
+fun createDataStore(): File {
+    val home = System.getProperty("user.home")
+    val path = Paths.get(home, "Documents", "DesktopAgent",)
+
+    val dir = File(path.pathString)
+    if (!dir.exists()) {
+        dir.mkdirs()
+    }
+    return File(dir, "profile_prefs.json")
 }
 
-internal const val DATA_STORE_FILE_NAME = "prefs.preferences_pb"

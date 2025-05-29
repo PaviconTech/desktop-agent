@@ -32,6 +32,7 @@ fun DashboardScreen(
         derivedStateOf {
             when (currentBackStackEntry?.destination?.route) {
                 DashboardScreens.Sales::class.qualifiedName -> DashboardScreens.Sales
+                DashboardScreens.Status::class.qualifiedName -> DashboardScreens.Status
                 DashboardScreens.Items::class.qualifiedName -> DashboardScreens.Items
                 DashboardScreens.CreditNotes::class.qualifiedName -> DashboardScreens.CreditNotes
                 DashboardScreens.Customers::class.qualifiedName ->DashboardScreens.Customers
@@ -60,6 +61,7 @@ fun DashboardScreen(
         sidePanel = {
             SidePanel(
                 currentRoute = currentRoute,
+                onNavigateToStatus = { navController.navigate(DashboardScreens.Status) { navController.popBackStack() } },
                 onNavigateToHome = { navController.navigate(DashboardScreens.Sales) { navController.popBackStack() } },
                 onNavigateToItems = { navController.navigate(DashboardScreens.Items) { navController.popBackStack() } },
                 onNavigateToCreditNotes = { navController.navigate(DashboardScreens.CreditNotes) { navController.popBackStack() } },

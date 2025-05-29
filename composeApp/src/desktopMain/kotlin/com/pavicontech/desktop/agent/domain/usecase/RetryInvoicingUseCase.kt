@@ -24,8 +24,6 @@ import kotlin.io.path.pathString
 
 class RetryInvoicingUseCase(
     private val pdfExtractorRepository: PDFExtractorRepository,
-    private val filesystemRepository: FilesystemRepository,
-    private val keyValueStorage: KeyValueStorage,
     private val generateHtmlReceipt: GenerateHtmlReceipt,
     private val createSaleUseCase: CreateSaleUseCase,
     private val invoiceRepository: InvoiceRepository,
@@ -47,41 +45,24 @@ class RetryInvoicingUseCase(
         businessLogo = "P00000000D",
     )
 
-    suspend operator fun invoke(): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
+    suspend operator fun invoke(
+        file:Directory,
+        isLoading: (Boolean) -> Unit,
+        onSuccess: (Boolean) -> Unit,
+        onError: (Boolean) -> Unit
+    ): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
         try {
-            val watchDir = keyValueStorage.get(Constants.WATCH_FOLDER)
-                ?: Paths.get(System.getProperty("user.home"), "Documents").pathString
-
-            filesystemRepository.watchDirectory(
-                path = watchDir,
-                onDelete = {}, // No-op for now
-                onModify = { file ->
-                    handleSuccess(file)
-                }
-            ).collect { event ->
-                handleEvent(event)
-            }
-
+            isLoading(true)
+            handleSuccess(file)
+            onSuccess(true)
         } catch (e: Exception) {
+            e.printStackTrace()
+            onError(true)
             "Error watching invoices: ${e.message}".logger(Type.WARN)
         }
+        isLoading(false)
     }
 
-    private fun CoroutineScope.handleEvent(event: Resource<Directory>) {
-        when (event) {
-            is Resource.Loading -> {
-                "Loading: ${event.message}".logger(Type.INFO)
-            }
-
-            is Resource.Success -> {
-                launch { handleSuccess(event.data) }
-            }
-
-            is Resource.Error -> {
-                "Error: ${event.message}".logger(Type.WARN)
-            }
-        }
-    }
 
     private suspend fun handleSuccess(fileData: Directory?) {
         if (fileData == null) return

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Totals(
     @SerialName("otherAmounts")
-    val otherAmounts: Map<String, Double>? = null,
+    val otherAmounts: Map<String, Double?>? = null,
     @SerialName("subTotal")
     val subTotal: Double,
     @SerialName("totalAmount")

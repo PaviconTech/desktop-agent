@@ -50,7 +50,15 @@ class PDFExtractorRepositoryImpl(
             setBody(multiPartFormData)
         }.bodyAsText().let {
             it.logger(Type.INFO)
-            Json.decodeFromString<ExtractInvoiceRes>(it)
+            try {
+                Json.decodeFromString<ExtractInvoiceRes>(it)
+            }catch (e:Exception){
+                ExtractInvoiceRes(
+                    status = false,
+                    message = e.message ?: "An expected error occurred",
+                    data = null
+                )
+            }
         }
         return result
 

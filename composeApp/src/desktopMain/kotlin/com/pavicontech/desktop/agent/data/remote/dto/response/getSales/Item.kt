@@ -1,6 +1,5 @@
 
 
-import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
