@@ -15,7 +15,7 @@ val PaviconColors = lightColors(
     error = Color(0xFFD32F2F),             // Softer red for errors (Material Red 700)
 
     onPrimary = Color(0xFFFFFFFF),         // White text/icons on navy
-    onSecondary = Color(0xFF1C2526),       // Near-black for contrast on orange
+    onSecondary = Color(0xFFFFFFFF),       // Near-black for contrast on orange
     onBackground = Color(0xFF1C2526),      // Dark gray for readability
     onSurface = Color(0xFF1C2526),         // Consistent with onBackground
     onError = Color(0xFFFFFFFF)            // White text on error

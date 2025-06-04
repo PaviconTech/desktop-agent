@@ -21,6 +21,8 @@ import com.pavicontech.desktop.agent.domain.usecase.receipt.RenderAndSavePdfUseC
 import com.pavicontech.desktop.agent.domain.usecase.sales.CreateCreditNoteUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.CreateSaleUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.ExtractInvoiceUseCase
+import com.pavicontech.desktop.agent.domain.usecase.sales.GenerateQRBitmap
+import com.pavicontech.desktop.agent.domain.usecase.sales.GetEtimsSalesUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.PrintOutOptionUseCase
 import org.koin.dsl.module
 
@@ -31,6 +33,8 @@ val useCaseModules = module {
     single{ GetUserSessionStatus(get()) }
     single{ SubmitInvoicesUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory{ GetSalesUseCase(get()) }
+    single{ GetEtimsSalesUseCase(get(), get()) }
+    single{ GenerateQRBitmap() }
     factory{ CreateCreditNoteUseCase(get(), get()) }
     factory{ ExtractInvoiceUseCase(get(), get(), get(),) }
     factory{ PrintOutOptionUseCase(get(), get(), get(), get(), get()) }

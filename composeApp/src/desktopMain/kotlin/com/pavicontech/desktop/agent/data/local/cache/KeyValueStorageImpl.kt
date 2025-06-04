@@ -70,7 +70,6 @@ class KeyValueStorageImpl(
 
     override fun observe(key: String): Flow<String?> {
         return flowCache.getOrPut(key) {
-            // Try to read from disk synchronously (risky but works if file is small)
             val initialValue = runCatching {
                 if (file.exists()) {
                     val prefs = json.decodeFromString<Map<String, String>>(file.readText())

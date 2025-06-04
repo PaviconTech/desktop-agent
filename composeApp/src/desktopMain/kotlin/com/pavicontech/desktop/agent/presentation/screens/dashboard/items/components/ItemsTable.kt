@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components
+package com.pavicontech.desktop.agent.presentation.screens.dashboard.items.components
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
@@ -33,24 +33,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pavicontech.desktop.agent.data.remote.dto.response.getItems.Item
 import com.pavicontech.desktop.agent.domain.model.Sale
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.SaleDetailsDialog
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
 @Composable
-fun SalesTable(
-    sales: List<Sale>,
+fun ItemsTable(
+    sales: List<Item>,
     isLoading: Boolean,
     onRefresh: () -> Unit,
-    onViewClick: (Sale) -> Unit,
-    onCreditNoteClick: (Sale) -> Unit
 ) {
 
     val headers = listOf(
-        "No.", "Date", "Cust. Name", "KRA PIN", "REF No.",
-        "Invoice No.", "Status", "Items",
-        "Amount", "Tax", "Action"
+        "No.",
+        "Item Name",
+        "Classification Code",
+        "Item Code",
+        "Product Category",
+        "Price",
+        "Tax Type",
+        "Stock Qty",
+        "Stock Status",
+        "Action"
     )
 
     val weights = listOf(
@@ -58,19 +65,17 @@ fun SalesTable(
     )
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        SalesTableHeader(headers, weights, onRefresh = onRefresh)
-        SalesTableBody(
-            sales = sales.toList(),
+        ItemTableHeader(headers, weights, onRefresh = onRefresh)
+        ItemsTableBody(
+            items = sales.toList(),
             weights = weights,
             isLoading = isLoading,
-            onViewClick = onViewClick,
-            onCreditNoteClick = onCreditNoteClick
         )
     }
 }
 
 @Composable
-fun SalesTableHeader(
+fun ItemTableHeader(
     items: List<String>,
     weights: List<Float>,
     onRefresh: () -> Unit
@@ -128,12 +133,10 @@ fun SalesTableHeader(
 
 
 @Composable
-fun SalesTableBody(
+fun ItemsTableBody(
     isLoading: Boolean,
-    sales: List<Sale>,
+    items: List<Item>,
     weights: List<Float>,
-    onViewClick: (Sale) -> Unit,
-    onCreditNoteClick: (Sale) -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -146,13 +149,11 @@ fun SalesTableBody(
                 .padding(end = 12.dp, start = 8.dp)
         ) {
             if (!isLoading) {
-                itemsIndexed(sales) { index, sale ->
-                    SaleTableItem(
-                        sale = sale,
+                itemsIndexed(items) { index, item ->
+                    ItemTableItem(
+                        item = item,
                         index = index,
                         weights = weights,
-                        onCreditNoteClick = onCreditNoteClick,
-                        onViewClick = onViewClick
                     )
                 }
             }
@@ -185,20 +186,18 @@ fun SalesTableBody(
 
 
 @Composable
-fun SaleTableItem(
-    sale: Sale,
+fun ItemTableItem(
+    item: Item,
     index: Int,
     weights: List<Float>,
-    onCreditNoteClick: (Sale) -> Unit,
-    onViewClick: (Sale) -> Unit
 ) {
 
     var showDialog by remember { mutableStateOf(false) }
-    val selectedSale = remember { mutableStateOf<Sale?>(null) }
+    val selectedSale = remember { mutableStateOf<Item?>(null) }
 
     if (showDialog) {
-        SaleDetailsDialog(
-            sale = sale,
+        ItemDetailsDialog(
+            item = item,
             onDismiss = {
                 showDialog = false
             }
@@ -212,32 +211,40 @@ fun SaleTableItem(
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(text = "${index + 1}", modifier = Modifier.weight(weights[0]))
+        Text(text = item.itemName, modifier = Modifier.weight(weights[2]))
+        Text(text = item.itemClassificationCode, modifier = Modifier.weight(weights[3]))
+        Text(text = item.itemCode, modifier = Modifier.weight(weights[4]))
+        Text(text = item.itemCategory.category, modifier = Modifier.weight(weights[5]))
+        Text(text = item.price, modifier = Modifier.weight(weights[7]))
+        Text(text = item.taxCode, modifier = Modifier.weight(weights[8]))
+        Text(text = item.currentStock, modifier = Modifier.weight(weights[9]))
         Text(
-            text = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-            modifier = Modifier.weight(weights[1])
+            text = if (item.currentStock.toLong() < 1)
+                "No Stock"
+            else if (item.currentStock.toLong() < 5)
+                "Low Stock"
+            else "In Stock",
+            modifier = Modifier.weight(weights[10])
         )
-        Text(text = sale.customerName, modifier = Modifier.weight(weights[2]))
-        Text(text = sale.kraPin, modifier = Modifier.weight(weights[3]))
-        Text(text = sale.referenceNumber, modifier = Modifier.weight(weights[4]))
-        Text(text = sale.invoiceNumber, modifier = Modifier.weight(weights[5]))
-        Text(text = sale.status, modifier = Modifier.weight(weights[6]))
-        Text(text = "${sale.itemsCount}", modifier = Modifier.weight(weights[7]))
-        Text(text = "KES %.2f".format(sale.amount), modifier = Modifier.weight(weights[8]))
-        Text(text = "KES %.2f".format(sale.tax), modifier = Modifier.weight(weights[9]))
-
         Row(
             modifier = Modifier.weight(weights[10]),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { onCreditNoteClick(sale) }, modifier = Modifier.weight(1f)) {
-                Text("Credit Note")
-            }
             TextButton(
-                onClick = { selectedSale.value = sale; showDialog = true },
+                onClick = { selectedSale.value = item; showDialog = true },
                 modifier = Modifier.weight(1f)
             ) {
                 Text("View")
+            }
+
+            TextButton(
+                onClick = {
+
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Action")
             }
         }
     }

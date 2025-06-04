@@ -11,12 +11,11 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 @Serializable
 data class Data(
     val documentType: String,
-    @SerialName("fileName")
-    val fileName: String,
-    @SerialName("items")
-    val items: List<Item>,
-  /*  @SerialName("fees")
-    val fees : List<Map<String, String>>? = emptyList(),*/
-    @SerialName("totals")
-    val totals: Totals
+    @SerialName("fileName") val fileName: String,
+    @SerialName("items") val items: List<Item>,
+    /*  @SerialName("fees")
+      val fees : List<Map<String, String>>? = emptyList(),*/
+    @SerialName("customerName") val customerName:String?,
+    @SerialName("customerPin") val customerPin:String?,
+    @SerialName("totals") val totals: Totals
 )

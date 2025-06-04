@@ -84,14 +84,22 @@ data class Item(
             isrccNm = null,
             taxTyCd = taxCode,
             taxblAmt = "$taxblAmt",
-            taxAmt =  "$taxAmt",
-            totAmt = "$totAmt",
+            taxAmt =  "${calculateTax(taxblAmt.toDouble())}",
+            totAmt = "${taxblAmt+calculateTax(taxblAmt.toDouble())}",
             description = "null",
             id = "$id",
             itemId = id,
             itemCodeDf = itemCodeDf,
 
         )
+    }
+
+    private fun calculateTax(amount:Double):Double{
+        return when(taxCode){
+            "B" -> amount * 0.16
+            "E" -> amount * 0.08
+            else -> 0.0
+        }
     }
 
 

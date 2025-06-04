@@ -118,8 +118,8 @@ fun InvoiceRow(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 8.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(vertical = 4.dp, horizontal = 16.dp),
+        shape = RoundedCornerShape(4.dp),
         elevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
@@ -132,7 +132,9 @@ fun InvoiceRow(
                 Text(
                     text = "#$index",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    modifier = Modifier.weight(0.05f)
+
                 )
 
                 // 2. File name
@@ -140,14 +142,16 @@ fun InvoiceRow(
                     text = invoice.fileName,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.width(300.dp),
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .width(300.dp),
                     maxLines = 1
                 )
 
                 // 3. Extraction Status
-                Column(
-                    horizontalAlignment = Alignment.Start
-
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(0.35f)
                 ) {
                     StatusBadge(
                         "Extraction",
@@ -161,7 +165,7 @@ fun InvoiceRow(
                             isDialogBoxVisible = true
                         }
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.width(4.dp))
 
                     // 4. ETIMS Status
                     StatusBadge(
@@ -196,7 +200,9 @@ fun InvoiceRow(
                 }
 
                 // 5. Items
-                Column {
+                Column(
+                    modifier = Modifier.weight(0.2f)
+                ) {
 
                     if (!showMoreItems) {
                         if (invoice.items.isNotEmpty()) {
@@ -244,7 +250,9 @@ fun InvoiceRow(
                 }
 
                 // 6. Total Price
-                Column {
+                Column(
+                    modifier = Modifier.weight(0.2f)
+                ) {
                     Text(
                         text = "Total Amount",
                         fontWeight = FontWeight.Bold,
@@ -260,27 +268,11 @@ fun InvoiceRow(
                     )
                 }
 
-                // 7. Total Tax
-                Column(
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        text = "Total VAT",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                    Spacer(Modifier.height(4.dp))
-
-                    Text(
-                        text = "KES ${invoice.items.sumOf { it.taxAmount }}",
-                        fontSize = 13.sp
-                    )
-                }
-
 
                 // 8 & 9. Created/Updated
                 Column(
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.weight(0.2f)
                 ) {
                     Text(
                         text = "Created: $createdDate",
@@ -409,7 +401,7 @@ fun String.toLocalFormattedString(): String {
     return try {
         val utcInstant = Instant.parse(this)
         val localDateTime = utcInstant.atZone(ZoneId.systemDefault()).toLocalDateTime()
-        val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")
+        val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm:ss a")
         localDateTime.format(formatter)
     } catch (e: Exception) {
         this

@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateSaleReq(
+    val custTin:String? = null,
+    val custNm: String? = null,
     val invcNo: String,
     val orgInvcNo: String,
     val salesTyCd: String,

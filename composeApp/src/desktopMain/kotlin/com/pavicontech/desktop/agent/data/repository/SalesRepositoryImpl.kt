@@ -121,8 +121,11 @@ class SalesRepositoryImpl(
 
 
     override suspend fun getSales(token: String): GetSalesRes = withContext(Dispatchers.Default) {
-        val response = api.get(urlString = "${Constants.ETIMS_BACKEND}/sales").bodyAsText()
-        response logger (Type.DEBUG)
-        Json.decodeFromString(response)
+        api.get(urlString = "${Constants.ETIMS_BACKEND}/sales"){
+            header("Authorization", "Bearer $token")
+        }.bodyAsText().let {
+            it.logger(Type.DEBUG)
+            Json.decodeFromString(it)
+        }
     }
 }

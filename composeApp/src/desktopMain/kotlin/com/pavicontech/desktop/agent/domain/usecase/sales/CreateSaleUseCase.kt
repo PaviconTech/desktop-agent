@@ -17,9 +17,13 @@ class CreateSaleUseCase(
     suspend fun invoke(
         items: List<CreateSaleItem>,
         taxableAmount: Int,
+        customerName:String? = null,
+        customerPin:String? = null
     ):CreateSaleRes {
         val token = keyValueStorage.get(Constants.AUTH_TOKEN) ?: ""
         val createSaleReq = CreateSaleReq(
+            custNm = customerName,
+            custTin = customerPin,
             invcNo = "74",
             orgInvcNo = "0",
             salesTyCd = "N",
@@ -44,9 +48,9 @@ class CreateSaleUseCase(
             taxAmtC = "0",
             taxAmtD = "0",
             taxAmtE = "0",
-            totTaxblAmt = "$taxableAmount",
-            totTaxAmt = "0",
-            totAmt = "$taxableAmount",
+            totTaxblAmt = "${items.sumOf { it.taxblAmt.toDoubleOrNull() ?: 0.0 }}",
+            totTaxAmt = "${items.sumOf { it.taxAmt.toDoubleOrNull() ?: 0.0 }}",
+            totAmt = "${items.sumOf { it.taxblAmt.toDoubleOrNull() ?: 0.0 } + items.sumOf { it.taxAmt.toDoubleOrNull() ?: 0.0 }}",
             prchrAcptcYn = "N",
             remark = "",
             regrId = "11999",
@@ -70,4 +74,10 @@ class CreateSaleUseCase(
 
         return repository.createSale(body = createSaleReq, token)
     }
+
+
+
+
+
+
 }

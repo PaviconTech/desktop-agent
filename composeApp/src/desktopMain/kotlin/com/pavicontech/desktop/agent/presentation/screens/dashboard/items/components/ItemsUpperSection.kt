@@ -1,4 +1,5 @@
-package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components
+package com.pavicontech.desktop.agent.presentation.screens.dashboard.items.components
+
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -37,7 +38,7 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun SalesUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit) {
+fun ItemsUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit) {
     val brush = Brush.linearGradient(
         listOf(
             MaterialTheme.colors.primary,
@@ -50,7 +51,7 @@ fun SalesUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit)
             .padding(horizontal = 16.dp)
     ) {
         Text(
-            text = "Sales",
+            text = "Items",
             style = MaterialTheme.typography.body1,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -88,7 +89,20 @@ fun SalesUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "Add Invoice",
+                        text = "Add Items",
+                        color = MaterialTheme.colors.onSecondary,
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Box(
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(4.dp))
+                        .background(MaterialTheme.colors.secondary)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "Batch Upload",
                         color = MaterialTheme.colors.onSecondary,
                         modifier = Modifier.align(Alignment.Center),
                     )

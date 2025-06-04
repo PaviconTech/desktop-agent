@@ -3,7 +3,6 @@ package com.pavicontech.desktop.agent.domain.usecase.sales
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.fileToByteArray
 import com.pavicontech.desktop.agent.common.utils.logger
-import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.data.local.database.entries.EtimsStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.ExtractionStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
@@ -38,6 +37,8 @@ class ExtractInvoiceUseCase(
             """
         --------------------------------------------------------------------------------------------------------------------------        
                 Filename: ${result.data?.fileName}
+                Customer Name: ${result.data?.customerName}
+                Customer Pin: ${result.data?.customerPin}
                 Items: ${result.data?.items}
                 Amounts: ${result.data?.totals}
         -------------------------------------------------------------------------------------------------------------------------

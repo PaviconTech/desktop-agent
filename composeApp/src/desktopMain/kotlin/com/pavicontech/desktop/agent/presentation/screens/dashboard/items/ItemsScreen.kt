@@ -1,51 +1,53 @@
-package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales
+package com.pavicontech.desktop.agent.presentation.screens.dashboard.items
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pavicontech.desktop.agent.data.remote.dto.response.getItems.Item
 import com.pavicontech.desktop.agent.domain.model.Sale
+import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.GetEtimsSalesUseCase
-import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.SaleDetailsDialog
-import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.SalesBody
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.items.components.ItemsBody
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.items.components.ItemsUpperSection
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.SalesUpperSection
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun SalesScreen() {
-    val getEtimsSalesUseCase: GetEtimsSalesUseCase = koinInject()
-    val sales = remember { mutableStateListOf<Sale>() }
+fun ItemsScreen() {
+    val getItemsUseCase: GetItemsUseCase = koinInject()
+    val items = remember { mutableStateListOf<Item>() }
     var refresh by remember { mutableStateOf("") }
     var searchQuery by remember { mutableStateOf("") }
+
     var isSaleLoading by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(refresh) {
         isSaleLoading = true
-        sales.clear()
-        getEtimsSalesUseCase()?.let { sales.addAll(it) }
+        items.clear()
+        getItemsUseCase()?.let { items.addAll(it) }
         isSaleLoading = false
     }
 
     val formatter = DateTimeFormatter.ISO_DATE_TIME
 
-    val filteredSales = sales.filter {
+    val filteredItems = items.filter {
         searchQuery.isBlank() ||
-                it.customerName.contains(searchQuery, ignoreCase = true) ||
-                it.kraPin.contains(searchQuery, ignoreCase = true) ||
-                it.invoiceNumber.contains(searchQuery, ignoreCase = true)
+                it.itemName.contains(searchQuery, ignoreCase = true) ||
+                it.itemCode.contains(searchQuery, ignoreCase = true) ||
+                it.itemClassificationCode.contains(searchQuery, ignoreCase = true) ||
+                it.barcode?.contains(searchQuery, ignoreCase = true) == true
     }.sortedByDescending {
         runCatching {
             LocalDateTime.parse(
@@ -55,33 +57,26 @@ fun SalesScreen() {
         }.getOrElse { LocalDateTime.MIN }
     }
 
-
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 8.dp)
     ) {
-        SalesUpperSection(
+        ItemsUpperSection(
             searchQuery = searchQuery,
             onSearchQueryChange = {
                 searchQuery = it
             }
         )
-        SalesBody(
-            sales = filteredSales,
+        ItemsBody(
+            items = filteredItems,
             isLoading = isSaleLoading,
-            onRefresh = { refresh = LocalDateTime.now().format(formatter) },
-            onViewClick = {
-            },
-            onCreditNoteClick = {
-                // Handle credit note click
+            onRefresh = {
+                refresh = LocalDateTime.now().format(formatter)
             }
         )
-    }
-}
 
-    
-    
-    
+    }
+
+
+}

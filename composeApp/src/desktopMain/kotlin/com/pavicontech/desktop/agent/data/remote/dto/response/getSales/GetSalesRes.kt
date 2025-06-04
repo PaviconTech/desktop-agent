@@ -1,24 +1,31 @@
 package com.pavicontech.desktop.agent.data.remote.dto.response.getSales
 
-
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetSalesRes(
-    @SerialName("message")
     val message: String,
-    @SerialName("sales")
-    val sales: List<Sale>,
-    @SerialName("status")
+    val sales: List<Sale> = emptyList(),
     val status: Boolean
 ){
-/*    fun toSale() = sales.map {
-*//*        com.pavicontech.desktop.agent.domain.model.Sale(
-            id = it.id,
-            customerName = it.custNm,
-            kraPin = it.custTin,
-            referenceNumber = it.
-        )*//*
-    }*/
+    fun toSale(): List<com.pavicontech.desktop.agent.domain.model.Sale> {
+        return sales.map {
+            com.pavicontech.desktop.agent.domain.model.Sale(
+                id = it.id.toString(),
+                intrlData = it.intrlData,
+                receiptSign = it.rcptSign,
+                customerName = it.custNm ?: "",
+                kraPin = it.custTin ?: "",
+                referenceNumber = it.rcptTyCd ?: "",
+                invoiceNumber = it.invcNo.toString(),
+                etimsReceiptNumber = it.receipt ?: "",
+                status = it.rcptTyCd ?: "",
+                itemsCount = it.totItemCnt,
+                amount = it.totAmt.toDoubleOrNull() ?: 0.0,
+                tax = it.totTaxAmt.toDoubleOrNull() ?: 0.0,
+                createdAt = it.createdAt,
+            )
+        }
+
+    }
 }

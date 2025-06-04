@@ -6,6 +6,8 @@ object Constants {
     const val ETIMS_BACKEND = "https://etims.pavicontech.com/api"
     //const val ETIMS_BACKEND = "https://6815-197-248-204-65.ngrok-free.app/"
     const val ETIMS_AI_BACKEND = "http://172.104.129.116:8005"
+    //const val ETIMS_AI_BACKEND = "http://localhost:8000"
+   //const val ETIMS_AI_BACKEND = "https://zebra-advanced-manually.ngrok-free.app"
 
     private val HOME_PATH = System.getProperty("user.home")
     val FISCALIZED_RECEIPTS_PATH = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "FiscalizedReceipts")

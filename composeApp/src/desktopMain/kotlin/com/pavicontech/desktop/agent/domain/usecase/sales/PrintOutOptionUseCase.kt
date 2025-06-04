@@ -71,7 +71,7 @@ class PrintOutOptionUseCase(
                             qrCodeImage = qrCode,
                             coordinates = listOf(kraInfoCoordinates, qrCodeCoordinates),
                             onSuccess = {
-                                // printReceiptUseCase.invoke(path.pathString)
+                                printReceiptUseCase.invoke(path.pathString)
                                 qrCode.delete()
                             }
                         )

@@ -23,6 +23,7 @@ object KtorClient {
             install(ContentNegotiation) {
                 json(
                     Json {
+                        coerceInputValues = true
                         isLenient = true
                         ignoreUnknownKeys = true
                         this.prettyPrint = true

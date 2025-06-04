@@ -21,8 +21,6 @@ class GenerateQrCodeUseCase {
         bhfId: String,
         rcptSign:String
     ): File {
-        val logoPath = "/logo-img.png"
-
         val qrCode = QRCode.Companion
             .ofRoundedSquares()
             .withColor(0xFF000000.toInt())
@@ -31,7 +29,6 @@ class GenerateQrCodeUseCase {
 
         val pngBytes = qrCode
             .render()
-
         // Save QR to filesystem
         val qrFile = path.toFile()
         qrFile.parentFile.mkdirs() // Ensure directories exist

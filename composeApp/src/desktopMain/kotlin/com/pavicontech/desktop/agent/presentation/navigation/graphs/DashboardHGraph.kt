@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardScreens
 import com.pavicontech.desktop.agent.presentation.navigation.screens.Graphs
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.items.ItemsScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.ProfileScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.SalesScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.SettingsScreen
@@ -38,7 +39,9 @@ fun NavGraphBuilder.dashboardGraph(navController: NavHostController) {
         composable<DashboardScreens.Items>(
             enterTransition = { slideInVertically( initialOffsetY = { it }, animationSpec = tween(600, easing = FastOutSlowInEasing)) },
             exitTransition = { slideOutVertically( targetOffsetY = { -it }, animationSpec = tween(600, easing = LinearOutSlowInEasing)) }
-        ) { Text("Items") }
+        ) {
+            ItemsScreen()
+        }
 
         composable<DashboardScreens.CreditNotes>(
             enterTransition = { slideInVertically( initialOffsetY = { it }, animationSpec = tween(600, easing = FastOutSlowInEasing)) },

@@ -2,13 +2,17 @@ package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sta
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.DropdownMenuState
@@ -63,65 +67,107 @@ fun StatusScreenBody() {
         .map { list -> list.sortedByDescending { Instant.parse(it.createdAt) } }.collectAsState(emptyList())
 
 
-            Surface(
-                color = MaterialTheme.colors.primary,
-                contentColor = MaterialTheme.colors.onPrimary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+    Surface(
+        color = MaterialTheme.colors.primary,
+        contentColor = MaterialTheme.colors.onPrimary,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Column {
+            // Top Row with Filter and Retry Button
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier
+                    Text(
+                        text = "Filter:",
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    SelectFilterItem(
+                        name = "Extraction Pending"
+                    )
+                }
 
-                    ) {
-
-                        Text(
-                            text = "Filter: ",
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                        ) {
-                            SelectFilterItem(
-                                name = "Extraction Pending",
-                            )
-
-                        }
-                    }
-
-                    TextButton(
-                        onClick = {
-                            scope.launch {
-                                autoRetry.invoke()
-                            }
-                        },
-                        colors = ButtonDefaults.textButtonColors(
-                            backgroundColor = Color.Transparent,
-                            contentColor = MaterialTheme.colors.onPrimary
-                        )
-                    ) {
-                        Text(
-                            text = "Retry all",
-                            color  =  MaterialTheme.colors.onPrimary,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                        )
-                    }
+                TextButton(
+                    onClick = {
+                        scope.launch { autoRetry.invoke() }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        backgroundColor = Color.Transparent,
+                        contentColor = MaterialTheme.colors.onPrimary
+                    )
+                ) {
+                    Text(
+                        text = "Retry all",
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                 }
             }
 
-            if (filteredInvoices.isNotEmpty()) {
+            Divider(
+                color = MaterialTheme.colors.onPrimary.copy(0.3f)
+            )
+
+            // Header Row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            ) {
+                Text( // No.
+                    text = "No.",
+                    modifier = Modifier
+                        .weight(0.1f)
+                        .padding(horizontal = 8.dp)
+                )
+                Text( // Invoice Name
+                    text = "Invoice Name",
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .padding(horizontal = 8.dp)
+                )
+                Text( // Extraction Status
+                    text = "Extraction Status",
+                    modifier = Modifier
+                        .weight(0.15f)
+                        .padding(horizontal = 8.dp)
+                )
+                Text( // Etims Status
+                    text = "Etims Status",
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .padding(horizontal = 8.dp)
+                )
+                Text( // Items
+                    text = "Items",
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .padding(horizontal = 8.dp)
+                )
+                Text( // Total Amount
+                    text = "Total Amount",
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .padding(horizontal = 8.dp)
+                )
+                Text( // Date
+                    text = "Date",
+                    modifier = Modifier
+                        .weight(0.25f)
+                        .padding(horizontal = 8.dp)
+                )
+            }
+        }
+    }
+
+
+    if (filteredInvoices.isNotEmpty()) {
                 LazyColumn {
                     itemsIndexed(filteredInvoices) { index, invoice ->
                         InvoiceRow(
@@ -161,6 +207,7 @@ fun StatusScreenBody() {
                 onClick = {
                     state = DropdownMenuState(DropdownMenuState.Status.Open(Offset.Zero))
                 },
+
                 modifier = Modifier
             ) {
                 Row(

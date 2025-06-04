@@ -103,7 +103,9 @@ class SubmitInvoicesUseCase(
             fileName = fileName,
             onSuccess = { extractedData, saleItems, taxableAmount, _, invoiceItems, _ ->
 
-                val saleResult = createSaleUseCase.invoke(saleItems, taxableAmount)
+                val saleResult = createSaleUseCase.invoke(saleItems, taxableAmount,
+                    customerName = extractedData.data?.customerName,
+                    customerPin = extractedData.data?.customerPin)
 
                 val updatedStatus = if (saleResult.status) EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
 
