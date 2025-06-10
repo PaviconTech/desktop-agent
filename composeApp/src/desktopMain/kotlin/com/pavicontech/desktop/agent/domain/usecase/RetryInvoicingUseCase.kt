@@ -95,8 +95,8 @@ class RetryInvoicingUseCase(
                     val htmlContent = generateHtmlReceipt(
                         data = extractedData.toExtractedData(),
                         businessInfo = businessInfo,
-                        businessPin = "P051901215P",
-                        bhfId = "00",
+                        businessPin = businessInfo.kraPin,
+                        bhfId = businessInfo.branchId,
                         rcptSign = saleResult.kraResult?.result?.rcptSign ?: "No Receipt Sign"
                     )
 
