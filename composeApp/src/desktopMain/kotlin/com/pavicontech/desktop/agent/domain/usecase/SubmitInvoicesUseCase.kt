@@ -12,13 +12,14 @@ import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
 import com.pavicontech.desktop.agent.data.local.database.repository.InvoiceRepository
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
+import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt
 import com.pavicontech.desktop.agent.domain.usecase.sales.CreateSaleUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.ExtractInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.PrintOutOptionUseCase
 import kotlinx.coroutines.*
-import java.nio.file.Paths
+import java.io.File
 import java.time.Instant
 import kotlin.io.path.pathString
 
@@ -33,33 +34,29 @@ class SubmitInvoicesUseCase(
     private val printOutOptionUseCase: PrintOutOptionUseCase
 ) {
 
-    private val businessInfo = BusinessInformation(
-        id = 23456,
-        branchId = "12345678",
-        branchName = "Demo12",
-        districtName = "Kasarani",
-        kraPin = "P000000000D",
-        name = "John Doe",
-        provinceName = "Kasarani",
-        sectorName = "Agritech",
-        sdcId = "123456",
-        taxpayerName = "John Doe",
-        businessLogo = "P00000000D",
-    )
-
     suspend operator fun invoke(): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
         try {
+            val businessInfo = keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.fromBusinessJson()
             val watchDir = keyValueStorage.get(Constants.WATCH_FOLDER)
-                ?: Paths.get(System.getProperty("user.home"), "Documents").pathString
+            if (watchDir == null){
+                val file = File(Constants.INVOICE_WATCH_FOLDER.pathString)
+                file.mkdirs()
+                keyValueStorage.set(Constants.WATCH_FOLDER, Constants.INVOICE_WATCH_FOLDER.pathString)
+            }
+            val watchFolder = keyValueStorage.get(Constants.WATCH_FOLDER) ?: ""
 
             filesystemRepository.watchDirectory(
-                path = watchDir,
+                path = watchFolder,
                 onDelete = {}, // No-op for now
                 onModify = { file ->
-                    handleSuccess(file)
+                    businessInfo?.let {
+                        handleSuccess(file, it)
+                    }
                 }
             ).collect { event ->
-                handleEvent(event)
+               businessInfo?.let {
+                   handleEvent(event = event, businessInfo = it)
+               }
             }
 
         } catch (e: Exception) {
@@ -67,14 +64,14 @@ class SubmitInvoicesUseCase(
         }
     }
 
-    private fun CoroutineScope.handleEvent(event: Resource<Directory>) {
+    private fun CoroutineScope.handleEvent(event: Resource<Directory>,businessInfo: BusinessInformation) {
         when (event) {
             is Resource.Loading -> {
                 "Loading: ${event.message}".logger(Type.INFO)
             }
 
             is Resource.Success -> {
-                launch { handleSuccess(event.data) }
+                launch { handleSuccess(event.data, businessInfo) }
             }
 
             is Resource.Error -> {
@@ -83,7 +80,7 @@ class SubmitInvoicesUseCase(
         }
     }
 
-    private suspend fun handleSuccess(fileData: Directory?) {
+    private suspend fun handleSuccess(fileData: Directory?, businessInfo: BusinessInformation) {
         if (fileData == null) return
 
         val fileName = fileData.fileName
@@ -101,6 +98,7 @@ class SubmitInvoicesUseCase(
         extractInvoiceUseCase(
             filePath = filePath,
             fileName = fileName,
+            businessInfo = businessInfo,
             onSuccess = { extractedData, saleItems, taxableAmount, _, invoiceItems, _ ->
 
                 val saleResult = createSaleUseCase.invoke(saleItems, taxableAmount,
@@ -124,8 +122,8 @@ class SubmitInvoicesUseCase(
                     val htmlContent = generateHtmlReceipt(
                         data = extractedData.toExtractedData(),
                         businessInfo = businessInfo,
-                        businessPin = "P051901215P",
-                        bhfId = "00",
+                        businessPin = businessInfo.kraPin,
+                        bhfId = businessInfo.branchId,
                         rcptSign = saleResult.kraResult?.result?.rcptSign ?: "No Receipt Sign"
                     )
 
@@ -134,7 +132,8 @@ class SubmitInvoicesUseCase(
                             kraResult = it,
                             htmlContent = htmlContent,
                             fileName = fileName,
-                            filePath = filePath
+                            filePath = filePath,
+                            businessInfo = businessInfo
                         )
                     }
                 }

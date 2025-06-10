@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.presentation.screens.dashboard
 
+import SubmitInvoicesUseCase
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -12,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.pavicontech.desktop.agent.domain.usecase.AutoRetryUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.presentation.navigation.graphs.dashboardGraph
 import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardScreens
 import com.pavicontech.desktop.agent.presentation.navigation.screens.Graphs
@@ -19,6 +22,9 @@ import com.pavicontech.desktop.agent.presentation.screens.dashboard.components.N
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.components.ProfileDialogBox
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.components.DashboardLayout
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.components.SidePanel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
@@ -48,6 +54,10 @@ fun DashboardScreen(
 
     val viewModel: DashboardViewModel = koinInject()
     var isBusinessDialogOpen by remember { mutableStateOf(false) }
+
+
+
+
 
     ProfileDialogBox(
         isDialogVisible = isBusinessDialogOpen,

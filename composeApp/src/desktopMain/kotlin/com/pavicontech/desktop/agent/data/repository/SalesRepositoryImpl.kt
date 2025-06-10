@@ -39,6 +39,7 @@ class SalesRepositoryImpl(
         try {
             Json.decodeFromString(responseText)
         } catch (e: Exception) {
+            e.printStackTrace()
             CreateSaleRes(
                 status = false,
                 kraResult = null,

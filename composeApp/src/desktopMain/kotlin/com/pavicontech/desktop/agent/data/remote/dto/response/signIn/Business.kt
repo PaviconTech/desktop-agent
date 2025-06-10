@@ -29,9 +29,9 @@ data class Business(
         name = name,
         branchId = branchId,
         branchName = branchName,
-        districtName = districtName,
+        locality = districtName,
         kraPin = kraPin,
-        provinceName = provinceName,
+        county = provinceName,
         sectorName = sectorName,
         sdcId = sdcId,
         taxpayerName = taxpayerName

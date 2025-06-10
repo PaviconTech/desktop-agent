@@ -65,8 +65,8 @@ fun ProfileScreen(
             kraPin = loaded.kraPin
             branchName = loaded.branchName
             branchId = loaded.branchId
-            districtName = loaded.districtName
-            provinceName = loaded.provinceName
+            districtName = loaded.locality
+            provinceName = loaded.county
             sectorName = loaded.sectorName
             sdcId = loaded.sdcId
             businessLogo = loaded.businessLogo ?: ""
@@ -159,8 +159,8 @@ fun ProfileScreen(
                                     kraPin = kraPin,
                                     branchName = branchName,
                                     branchId = branchId,
-                                    districtName = districtName,
-                                    provinceName = provinceName,
+                                    locality = districtName,
+                                    county = provinceName,
                                     sectorName = sectorName,
                                     sdcId = sdcId,
                                     businessLogo = businessLogo

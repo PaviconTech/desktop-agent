@@ -1,10 +1,8 @@
 import com.pavicontech.desktop.agent.common.Constants
-import com.pavicontech.desktop.agent.common.Resource
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.fileToByteArray
 import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.fileSystem.Directory
-import com.pavicontech.desktop.agent.data.fileSystem.FilesystemRepository
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.data.local.database.entries.EtimsStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.ExtractionStatus
@@ -12,15 +10,14 @@ import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
 import com.pavicontech.desktop.agent.data.local.database.repository.InvoiceRepository
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
+import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt
 import com.pavicontech.desktop.agent.domain.usecase.sales.CreateSaleUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.ExtractInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.PrintOutOptionUseCase
 import kotlinx.coroutines.*
-import java.nio.file.Paths
 import java.time.Instant
-import kotlin.io.path.pathString
 
 class RetryInvoicingUseCase(
     private val pdfExtractorRepository: PDFExtractorRepository,
@@ -28,22 +25,12 @@ class RetryInvoicingUseCase(
     private val createSaleUseCase: CreateSaleUseCase,
     private val invoiceRepository: InvoiceRepository,
     private val extractInvoiceUseCase: ExtractInvoiceUseCase,
-    private val printOutOptionUseCase: PrintOutOptionUseCase
-) {
+    private val printOutOptionUseCase: PrintOutOptionUseCase,
+    private val keyValueStorage: KeyValueStorage,
 
-    private val businessInfo = BusinessInformation(
-        id = 23456,
-        branchId = "12345678",
-        branchName = "Demo12",
-        districtName = "Kasarani",
-        kraPin = "P000000000D",
-        name = "John Doe",
-        provinceName = "Kasarani",
-        sectorName = "Agritech",
-        sdcId = "123456",
-        taxpayerName = "John Doe",
-        businessLogo = "P00000000D",
-    )
+    ) {
+
+
 
     suspend operator fun invoke(
         file:Directory,
@@ -51,10 +38,14 @@ class RetryInvoicingUseCase(
         onSuccess: (Boolean) -> Unit,
         onError: (Boolean) -> Unit
     ): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
+        val businessInfo = keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.fromBusinessJson()
+
         try {
             isLoading(true)
-            handleSuccess(file)
-            onSuccess(true)
+            businessInfo?.let{
+                handleSuccess(file, it)
+                onSuccess(true)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             onError(true)
@@ -64,7 +55,7 @@ class RetryInvoicingUseCase(
     }
 
 
-    private suspend fun handleSuccess(fileData: Directory?) {
+    private suspend fun handleSuccess(fileData: Directory?, businessInfo: BusinessInformation) {
         if (fileData == null) return
 
         val fileName = fileData.fileName
@@ -82,6 +73,7 @@ class RetryInvoicingUseCase(
         extractInvoiceUseCase(
             filePath = filePath,
             fileName = fileName,
+            businessInfo = businessInfo,
             onSuccess = { extractedData, saleItems, taxableAmount, _, invoiceItems, _ ->
 
                 val saleResult = createSaleUseCase.invoke(saleItems, taxableAmount)
@@ -113,7 +105,8 @@ class RetryInvoicingUseCase(
                             kraResult = it,
                             htmlContent = htmlContent,
                             fileName = fileName,
-                            filePath = filePath
+                            filePath = filePath,
+                            businessInfo = businessInfo,
                         )
                     }
                 }

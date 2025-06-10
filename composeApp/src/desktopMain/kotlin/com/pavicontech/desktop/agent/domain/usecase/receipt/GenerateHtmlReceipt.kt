@@ -156,7 +156,7 @@ class GenerateHtmlReceipt(
                             <div>Branch: ${businessInfo.branchName}</div>
                             <div>Taxpayer: ${businessInfo.taxpayerName}</div>
                             <div>KRA PIN: ${businessInfo.kraPin}</div>
-                            <div>Location: ${businessInfo.districtName}, ${businessInfo.provinceName}</div>
+                            <div>Location: ${businessInfo.locality}, ${businessInfo.county}</div>
                             <div>SDC ID: ${businessInfo.sdcId}</div>
                             <div>Branch ID: ${businessInfo.branchId}</div>
                             <div>Sector: ${businessInfo.sectorName}</div>

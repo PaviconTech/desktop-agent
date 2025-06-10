@@ -40,10 +40,10 @@ class SignInUseCase(
                     Constants.SAVED_USER_CREDENTIALS,
                     SavedUserCredentials(username = username, kraPin = kraPin).toJson()
                 )
-               /* keyValueStorage.set(
+               keyValueStorage.set(
                     Constants.BUSINESS_INFORMATION,
                     response.business.toBusinessInformation().toJsonString()
-                )*/
+                )
                 emit(Resource.Success(message = "Sign in Success", data = null))
             } else emit(Resource.Error(message = "Sign In failed. Kindly check your credentials"))
         } catch (e: Exception) {

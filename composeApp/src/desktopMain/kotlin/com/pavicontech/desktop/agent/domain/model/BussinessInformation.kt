@@ -1,9 +1,7 @@
 package com.pavicontech.desktop.agent.domain.model
 
-import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlin.compareTo
 
 @Serializable
 data class BusinessInformation(
@@ -11,9 +9,9 @@ data class BusinessInformation(
     val name: String,
     val branchId: String,
     val branchName: String,
-    val districtName: String,
+    val locality: String,
     val kraPin: String,
-    val provinceName: String,
+    val county: String,
     val sectorName: String,
     val sdcId: String,
     val taxpayerName: String,

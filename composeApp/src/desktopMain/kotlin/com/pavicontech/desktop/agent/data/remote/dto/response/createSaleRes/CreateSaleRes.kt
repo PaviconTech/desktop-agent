@@ -11,5 +11,5 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 data class CreateSaleRes(
     val kraResult: KraResult? = null,
     val message: String,
-    val status: Boolean
+    val status: Boolean,
 )

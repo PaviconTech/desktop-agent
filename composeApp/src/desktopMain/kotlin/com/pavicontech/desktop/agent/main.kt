@@ -11,13 +11,17 @@ import com.pavicontech.desktop.agent.di.initKoin
 import com.pavicontech.desktop.agent.domain.usecase.AutoRetryUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GetAvailablePrintersUseCase
+import desktopagent.composeapp.generated.resources.Res
+import desktopagent.composeapp.generated.resources.kra
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
 fun main() = application {
     initKoin()
+
 
     val invoices: SubmitInvoicesUseCase = koinInject()
     val items : GetItemsUseCase = koinInject()
@@ -26,6 +30,7 @@ fun main() = application {
     CoroutineScope(Dispatchers.IO).launch{ invoices() }
     CoroutineScope(Dispatchers.IO).launch{ items() }
     CoroutineScope(Dispatchers.IO).launch{ autoRetry() }
+
     val windowState = rememberWindowState(
         placement = WindowPlacement.Maximized,
         size = DpSize(width = 1200.dp, height = 800.dp)
@@ -33,8 +38,9 @@ fun main() = application {
     )
     Window(
         onCloseRequest = ::exitApplication,
-        title = "Desktop Agent",
-        state = windowState
+        title = "Etims Sync",
+        state = windowState,
+        icon = painterResource(Res.drawable.kra),
     ) {
         val width = windowState.size.width
         val height = windowState.size.height

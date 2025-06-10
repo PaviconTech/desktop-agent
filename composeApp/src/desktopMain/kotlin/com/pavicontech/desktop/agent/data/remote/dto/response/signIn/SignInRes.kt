@@ -8,4 +8,5 @@ data class SignInRes(
     @SerialName("access_token")
     val accessToken: String,
     val status: Boolean,
+    val business: BussinessInfo
 )

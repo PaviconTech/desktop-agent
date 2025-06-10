@@ -11,8 +11,10 @@ object Constants {
 
     private val HOME_PATH = System.getProperty("user.home")
     val FISCALIZED_RECEIPTS_PATH = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "FiscalizedReceipts")
+    val INVOICE_WATCH_FOLDER = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "InvoiceWatch")
 
     // Local Storage Key Values
+    const val INSTALLATION_PROCESS_STATUS = "INSTALLATION_PROCESS_STATUS"
     const val AUTH_TOKEN = "auth_token"
     const val AUTH_TOKEN_EXPIRY = "auth_token_expiry"
     const val SAVED_USER_CREDENTIALS = "saved_user_credentials"

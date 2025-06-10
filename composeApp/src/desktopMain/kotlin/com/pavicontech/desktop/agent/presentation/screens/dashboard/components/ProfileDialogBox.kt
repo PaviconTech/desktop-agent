@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindow
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 
@@ -50,8 +49,8 @@ fun ProfileDialogBox(
             InfoRow(label = "Taxpayer Name", value = profile.taxpayerName)
             InfoRow(label = "KRA PIN", value = profile.kraPin)
             InfoRow(label = "Branch", value = "${profile.branchName} (${profile.branchId})")
-            InfoRow(label = "District", value = profile.districtName)
-            InfoRow(label = "Province", value = profile.provinceName)
+            InfoRow(label = "District", value = profile.locality)
+            InfoRow(label = "Province", value = profile.county)
             InfoRow(label = "Sector", value = profile.sectorName)
             InfoRow(label = "SDC ID", value = profile.sdcId)
 

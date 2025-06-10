@@ -12,6 +12,7 @@ import com.pavicontech.desktop.agent.data.local.database.repository.ItemLocalRep
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
 import com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.ExtractInvoiceRes
+import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,6 +26,7 @@ class ExtractInvoiceUseCase(
      suspend  operator fun invoke(
         filePath: String,
         fileName: String,
+        businessInfo: BusinessInformation,
         onSuccess: suspend (ExtractInvoiceRes, saleItems:List<CreateSaleItem>, taxableAmount:Int, fileName:String, invoiceItems:List<Item>, receiptType:String) -> Unit,
     ): Unit = withContext(Dispatchers.IO) {
         try {

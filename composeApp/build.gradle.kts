@@ -98,20 +98,24 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.pavicontech.desktop.agent"
+
+            // 👇 Correct this:
+            packageName = "Etims Sync" // Use a simple internal name (lowercase, hyphenated)
+
             packageVersion = "1.0.0"
+            description = "Empower your business with an AI-driven virtual printer that integrates effortlessly with your ERP and KRA eTIMS for smart, compliant invoicing."
+            vendor = "Pavicon Technologies"
 
-            modules("java.sql") // <-- Add this
-
-
-            // ✅ Bundle full JDK inside your app
+            modules("java.sql")
             includeAllModules = true
             jvmArgs += listOf(
                 "--add-modules=jdk.unsupported,jdk.unsupported.desktop"
             )
-
         }
 
-        javaHome = "/usr/lib/jvm/java-17-openjdk-amd64"
+
+        //javaHome = "/usr/lib/jvm/java-17-openjdk-amd64"
+        javaHome =  "C:\\Program Files\\Java\\jdk-17"
+
     }
 }
