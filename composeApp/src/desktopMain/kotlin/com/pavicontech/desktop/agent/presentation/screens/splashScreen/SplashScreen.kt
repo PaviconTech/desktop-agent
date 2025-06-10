@@ -34,13 +34,31 @@ fun SplashScreen(
 
     LaunchedEffect(watchFolder) {
         delay(2000)
+        val osName = System.getProperty("os.name")
         val result = session()
-        val isInstallationComplete = keyValueStorage.get(Constants.INSTALLATION_PROCESS_STATUS)?.toBooleanStrictOrNull() ?: false
-        if (isInstallationComplete) {
-            if (result) onNavigateToDashBoard() else onNavigateToSignIn()
-        }else{
-            onNavigateToInstallation()
+        when {
+            osName.contains("Windows", ignoreCase = true) -> {
+                val isInstallationComplete = keyValueStorage.get(Constants.INSTALLATION_PROCESS_STATUS)?.toBooleanStrictOrNull() ?: false
+                if (isInstallationComplete) {
+                    if (result) onNavigateToDashBoard() else onNavigateToSignIn()
+                }else{
+                    onNavigateToInstallation()
+                }
+            }
+            osName.contains("Linux", ignoreCase = true) -> {
+
+                    if (result) onNavigateToDashBoard() else onNavigateToSignIn()
+
+            }
+            osName.contains("Mac", ignoreCase = true) -> {
+                if (result) onNavigateToDashBoard() else onNavigateToSignIn()
+
+            }
+            else -> {
+
+            }
         }
+
 
 
     }
