@@ -8,6 +8,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.pavicontech.desktop.agent.di.initKoin
+import com.pavicontech.desktop.agent.domain.InitUseCases
 import com.pavicontech.desktop.agent.domain.usecase.AutoRetryUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GetAvailablePrintersUseCase
@@ -22,14 +23,10 @@ import org.koin.compose.koinInject
 fun main() = application {
     initKoin()
 
-
-    val invoices: SubmitInvoicesUseCase = koinInject()
-    val items : GetItemsUseCase = koinInject()
-    val autoRetry : AutoRetryUseCase = koinInject()
-
-    CoroutineScope(Dispatchers.IO).launch{ invoices() }
-    CoroutineScope(Dispatchers.IO).launch{ items() }
-    CoroutineScope(Dispatchers.IO).launch{ autoRetry() }
+    val initUseCases: InitUseCases = koinInject()
+    CoroutineScope(Dispatchers.IO).launch {
+        initUseCases()
+    }
 
     val windowState = rememberWindowState(
         placement = WindowPlacement.Maximized,

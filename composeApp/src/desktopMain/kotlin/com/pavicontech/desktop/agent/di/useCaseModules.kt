@@ -2,6 +2,7 @@ package com.pavicontech.desktop.agent.di
 
 import RetryInvoicingUseCase
 import SubmitInvoicesUseCase
+import com.pavicontech.desktop.agent.domain.InitUseCases
 import com.pavicontech.desktop.agent.domain.usecase.AutoRetryUseCase
 import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.FilePathWatcherUseCase
 import com.pavicontech.desktop.agent.domain.usecase.GetSalesUseCase
@@ -10,7 +11,12 @@ import com.pavicontech.desktop.agent.domain.usecase.SignInUseCase
 import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFileUseCase
 import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFolderUseCase
 import com.pavicontech.desktop.agent.domain.usecase.invoices.GetFilteredInvoicesUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.AddItemUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.GetClassificationCodesUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.GetItemCodesListUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.PullClassificationCodesUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.PullCodesUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeAndKraInfoUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeUseCase
@@ -56,4 +62,10 @@ val useCaseModules = module {
     single { GetItemsUseCase(get(), get(), get()) }
     single { CreateSaleUseCase(get(), get()) }
     single { GetAvailablePrintersUseCase() }
+    single { GetItemCodesListUseCase(get()) }
+    single { PullCodesUseCase(get(), get(), get()) }
+    single { PullClassificationCodesUseCase(get(), get(), get()) }
+    single { GetClassificationCodesUseCase(get()) }
+    single { AddItemUseCase(get(), get()) }
+    single { InitUseCases(get(), get(), get(), get(), get()) }
 }

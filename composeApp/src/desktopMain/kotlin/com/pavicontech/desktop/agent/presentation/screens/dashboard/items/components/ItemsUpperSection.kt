@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,7 +39,11 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun ItemsUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit) {
+fun ItemsUpperSection(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onAddNewItem: () -> Unit
+) {
     val brush = Brush.linearGradient(
         listOf(
             MaterialTheme.colors.primary,
@@ -57,7 +62,7 @@ fun ItemsUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit)
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colors.primary
         )
-        Spacer(modifier = Modifier.height(8 .dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -87,6 +92,7 @@ fun ItemsUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit)
                         .clip(shape = RoundedCornerShape(4.dp))
                         .background(MaterialTheme.colors.secondary)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .clickable(onClick = onAddNewItem)
                 ) {
                     Text(
                         text = "Add Items",

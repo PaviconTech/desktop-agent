@@ -58,13 +58,56 @@ object DatabaseConfig {
     );
 """.trimIndent()
 
+        val classificationTableSql = """
+        CREATE TABLE IF NOT EXISTS ItemClass (
+            itemClsCd TEXT PRIMARY KEY,
+            itemClsNm TEXT NOT NULL,
+            itemClsLvl INTEGER NOT NULL,
+            taxTyCd TEXT,
+            mjrTgYn TEXT,
+            useYn TEXT NOT NULL
+        );
+    """.trimIndent()
+
+
+        // Place this inside your DatabaseConfig.init()
+        val clsTableSql = """
+    CREATE TABLE IF NOT EXISTS Codes (
+        cdCls TEXT PRIMARY KEY,
+        cdClsNm TEXT NOT NULL,
+        cdClsDesc TEXT,
+        useYn TEXT NOT NULL,
+        userDfnNm1 TEXT,
+        userDfnNm2 TEXT,
+        userDfnNm3 TEXT
+    );
+""".trimIndent()
+
+        val dtlTableSql = """
+    CREATE TABLE IF NOT EXISTS CodeDtl (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        clsCd TEXT NOT NULL,
+        cd TEXT NOT NULL,
+        cdNm TEXT NOT NULL,
+        cdDesc TEXT,
+        srtOrd INTEGER NOT NULL,
+        useYn TEXT NOT NULL,
+        userDfnCd1 TEXT,
+        userDfnCd2 TEXT,
+        userDfnCd3 TEXT,
+        FOREIGN KEY(clsCd) REFERENCES Cls(cdCls) ON DELETE CASCADE
+    );
+""".trimIndent()
+
 
         getConnection().use { conn ->
-            // 👇 Enable Write-Ahead Logging
             conn.createStatement().use { stmt ->
                 stmt.execute("PRAGMA journal_mode=WAL") // ✅ Enables concurrent reads/writes
                 stmt.execute(sql)
                 stmt.execute(itemTableSql)
+                stmt.execute(classificationTableSql)
+                stmt.execute(clsTableSql)
+                stmt.execute(dtlTableSql)
             }
         }
     }

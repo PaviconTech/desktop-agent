@@ -9,16 +9,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pavicontech.desktop.agent.common.Resource
 import com.pavicontech.desktop.agent.data.remote.dto.response.getItems.Item
 import com.pavicontech.desktop.agent.domain.model.Sale
+import com.pavicontech.desktop.agent.domain.usecase.items.AddItemUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.GetEtimsSalesUseCase
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.items.components.AddNewItemDialog
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.items.components.ItemsBody
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.items.components.ItemsUpperSection
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.SalesUpperSection
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -26,11 +31,15 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ItemsScreen() {
     val getItemsUseCase: GetItemsUseCase = koinInject()
+    val scope = rememberCoroutineScope()
+
+
     val items = remember { mutableStateListOf<Item>() }
     var refresh by remember { mutableStateOf("") }
     var searchQuery by remember { mutableStateOf("") }
 
     var isSaleLoading by remember { mutableStateOf(false) }
+    var addingState by remember { mutableStateOf(AddItemState()) }
 
 
     LaunchedEffect(refresh) {
@@ -57,6 +66,15 @@ fun ItemsScreen() {
         }.getOrElse { LocalDateTime.MIN }
     }
 
+    var showAddNewItem by remember { mutableStateOf(false) }
+    AddNewItemDialog(
+        isLoading = addingState.isLoading,
+        onDismissRequest = {
+            showAddNewItem = !showAddNewItem
+        },
+        isShown = showAddNewItem
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -66,7 +84,8 @@ fun ItemsScreen() {
             searchQuery = searchQuery,
             onSearchQueryChange = {
                 searchQuery = it
-            }
+            },
+            onAddNewItem = {showAddNewItem =!showAddNewItem }
         )
         ItemsBody(
             items = filteredItems,
