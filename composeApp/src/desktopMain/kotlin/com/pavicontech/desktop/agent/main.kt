@@ -7,6 +7,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.pavicontech.desktop.agent.common.utils.LogManager
 import com.pavicontech.desktop.agent.di.initKoin
 import com.pavicontech.desktop.agent.domain.InitUseCases
 import com.pavicontech.desktop.agent.domain.usecase.AutoRetryUseCase
@@ -21,7 +22,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
 fun main() = application {
+    LogManager.init()
     initKoin()
+
 
     val initUseCases: InitUseCases = koinInject()
     CoroutineScope(Dispatchers.IO).launch {
