@@ -42,7 +42,6 @@ class ItemsRepositoryImpl(private val api: HttpClient) : ItemsRepository {
             api.get(urlString = "${Constants.ETIMS_BACKEND}/items/pullcodes"){
                 headers { header("Authorization", "Bearer $token") }
             }.bodyAsText().let {
-                it.logger(Type.INFO)
                 Json.decodeFromString(it)
             }
         }catch (e: Exception){
@@ -56,7 +55,6 @@ class ItemsRepositoryImpl(private val api: HttpClient) : ItemsRepository {
             api.get(urlString = "${Constants.ETIMS_BACKEND}/items/pullclassifications"){
                 headers { header("Authorization", "Bearer $token") }
             }.bodyAsText().let {
-               // it.logger(Type.INFO)
                 Json.decodeFromString(it)
             }
         }catch (e: Exception){
@@ -75,7 +73,6 @@ class ItemsRepositoryImpl(private val api: HttpClient) : ItemsRepository {
             }
             setBody(item)
         }.bodyAsText().let {
-            it.logger(Type.INFO)
             Json.decodeFromString(it)
         }
     }

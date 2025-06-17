@@ -1,51 +1,82 @@
-package com.pavicontech.desktop.agent
+    package com.pavicontech.desktop.agent
 
-import SubmitInvoicesUseCase
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
-import com.pavicontech.desktop.agent.common.utils.LogManager
-import com.pavicontech.desktop.agent.di.initKoin
-import com.pavicontech.desktop.agent.domain.InitUseCases
-import com.pavicontech.desktop.agent.domain.usecase.AutoRetryUseCase
-import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
-import com.pavicontech.desktop.agent.domain.usecase.receipt.GetAvailablePrintersUseCase
-import desktopagent.composeapp.generated.resources.Res
-import desktopagent.composeapp.generated.resources.kra
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
-import org.koin.compose.koinInject
+    import SubmitInvoicesUseCase
+    import androidx.compose.runtime.*
+    import androidx.compose.ui.unit.DpSize
+    import androidx.compose.ui.unit.dp
+    import androidx.compose.ui.window.*
+    import com.pavicontech.desktop.agent.common.utils.LogManager
+    import com.pavicontech.desktop.agent.di.initKoin
+    import com.pavicontech.desktop.agent.domain.InitUseCases
+    import desktopagent.composeapp.generated.resources.Res
+    import desktopagent.composeapp.generated.resources.kra
+    import kotlinx.coroutines.CoroutineScope
+    import kotlinx.coroutines.Dispatchers
+    import kotlinx.coroutines.launch
+    import org.jetbrains.compose.resources.painterResource
+    import org.koin.compose.koinInject
+    import java.awt.*
+    import java.awt.image.BufferedImage
+    import javax.imageio.ImageIO
+    import kotlin.system.exitProcess
 
-fun main() = application {
-    LogManager.init()
-    initKoin()
+    fun main() {
+        initKoin()
+        LogManager.init()
 
+        application(exitProcessOnExit = false) {
+            val initUseCases: InitUseCases = koinInject()
+            CoroutineScope(Dispatchers.IO).launch {
+                initUseCases()
+            }
 
-    val initUseCases: InitUseCases = koinInject()
-    CoroutineScope(Dispatchers.IO).launch {
-        initUseCases()
+            var isVisible by remember { mutableStateOf(true) }
+
+            val tray = SystemTray.getSystemTray()
+            val iconImage: BufferedImage = ImageIO.read(object {}.javaClass.getResource("/icon.png"))
+
+            lateinit var trayIcon: TrayIcon
+
+            val popup = PopupMenu().apply {
+                add(MenuItem("Open").apply {
+                    addActionListener {
+                        isVisible = true
+                    }
+                })
+                add(MenuItem("Quit").apply {
+                    addActionListener {
+                        tray.remove(trayIcon)
+                        exitProcess(0)
+                    }
+                })
+            }
+
+            trayIcon = TrayIcon(iconImage, "Etims Sync", popup).apply {
+                isImageAutoSize = true
+            }
+
+            if (!tray.trayIcons.contains(trayIcon)) {
+                try {
+                    tray.add(trayIcon)
+                } catch (e: Exception) {
+                    println("Failed to add tray icon: ${e.message}")
+                }
+            }
+
+            val windowState = rememberWindowState(
+                placement = WindowPlacement.Floating,
+                size = DpSize(width = 1200.dp, height = 800.dp)
+            )
+
+            Window(
+                onCloseRequest = { isVisible = false },
+                title = "Etims Sync",
+                visible = isVisible,
+                state = windowState,
+                icon = painterResource(Res.drawable.kra)
+            ) {
+                App(width = windowState.size.width, height = windowState.size.height)
+            }
+        }
     }
-
-    val windowState = rememberWindowState(
-        placement = WindowPlacement.Maximized,
-        size = DpSize(width = 1200.dp, height = 800.dp)
-
-    )
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "Etims Sync",
-        state = windowState,
-        icon = painterResource(Res.drawable.kra),
-    ) {
-        val width = windowState.size.width
-        val height = windowState.size.height
-
-        App(width = width, height = height)
-    }
-}
 

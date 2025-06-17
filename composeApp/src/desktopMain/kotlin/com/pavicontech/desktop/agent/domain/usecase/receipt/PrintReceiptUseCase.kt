@@ -4,54 +4,65 @@ import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
+import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorageImpl
+import com.pavicontech.desktop.agent.data.local.cache.createDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.printing.PDFPageable
+import java.awt.print.PrinterJob
 import java.io.File
-import javax.print.Doc
-import javax.print.DocFlavor
-import javax.print.DocPrintJob
-import javax.print.PrintException
-import javax.print.PrintServiceLookup
-import javax.print.SimpleDoc
+import javax.print.*
 import javax.print.attribute.HashPrintRequestAttributeSet
 import javax.print.attribute.standard.Copies
 
 class PrintReceiptUseCase(
     private val keyValueStorage: KeyValueStorage
 ) {
-    suspend operator fun invoke(filePath: String): Pair<String, Boolean?> =
-        withContext(Dispatchers.IO) {
-            "Printing receipt...".logger(Type.INFO)
-            val selectedPrinterName = keyValueStorage.get(Constants.SELECTED_PRINTER)
-            "Selected Printer: $selectedPrinterName".logger(Type.INFO)
-            val file = File(filePath)
-            if (!file.exists()) {
-                "Printing path does not exist: $filePath".logger(Type.WARN)
-                return@withContext Pair("File not found: $filePath", false)
+    suspend operator  fun invoke(filePath: String): Pair<String, Boolean> = withContext(Dispatchers.IO) {
+        val file = File(filePath)
+        if (!file.exists()) return@withContext "PDF file not found." to false
+
+
+        try {
+            val printerName = keyValueStorage.get(Constants.SELECTED_PRINTER)?.trim()
+            "Selected printer: '$printerName'".logger(Type.INFO)
+
+
+            val document = PDDocument.load(file)
+
+            val job = PrinterJob.getPrinterJob()
+
+            // Find the printer
+            val printServices = PrinterJob.lookupPrintServices()
+            val selectedPrinter = printServices.find {
+                it.name.trim().equals(printerName?.trim(), ignoreCase = true)
             }
 
-            val printServices = PrintServiceLookup.lookupPrintServices(null, null)
-            val printService = printServices.find { it.name == selectedPrinterName }
-                ?: return@withContext Pair("Printer '$selectedPrinterName' not found.", false)
-
-            val docPrintJob = printService.createPrintJob()
-            val flavor = DocFlavor.INPUT_STREAM.PNG
-            val doc: Doc = SimpleDoc(file.inputStream(), flavor, null)
-
-            val printRequestAttributeSet = HashPrintRequestAttributeSet().apply {
-                add(Copies(1))
+            if (selectedPrinter == null) {
+                "Printer '$printerName' not found.".logger(Type.WARN)
+                return@withContext "Printer not found." to false
             }
 
-            try {
-                docPrintJob.print(doc, printRequestAttributeSet)
-                "Printing completed successfully.".logger(Type.INFO)
-                return@withContext Pair("Printing completed successfully.", true)
-            } catch (e: PrintException) {
-                "Printing failed: ${e.message}".logger(Type.WARN)
-                e.printStackTrace()
-                return@withContext Pair("Printing failed: ${e.message}", false)
-            }
+            job.printService = selectedPrinter
+            job.setPageable( PDFPageable(document))
+
+            "Sending PDF to printer: ${selectedPrinter.name}".logger(Type.INFO)
+            job.print()
+            document.close()
+
+            return@withContext "PDF printed successfully." to true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return@withContext "Failed to print PDF: ${e.message}" to false
         }
+    }}
 
+
+
+
+suspend fun main(){
+    val printer = PrintReceiptUseCase(KeyValueStorageImpl(createDataStore()))
+    println(printer.invoke("C:/Users/pasaka/Downloads/GA_life_Invoice%20(2).pdf"))
 }
 

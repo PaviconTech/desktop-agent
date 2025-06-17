@@ -111,6 +111,14 @@ compose.desktop {
             jvmArgs += listOf(
                 "--add-modules=jdk.unsupported,jdk.unsupported.desktop"
             )
+
+            // 👉 Set .ico file for Windows installer and shortcut
+            windows {
+                menuGroup = "Pavicon Technologies"
+                upgradeUuid = "12345678-90ab-cdef-1234-567890abcdef" // change to your UUID
+                shortcut = true
+                iconFile.set(project.file("src/desktopMain/resources/icon.ico"))
+            }
         }
 
 

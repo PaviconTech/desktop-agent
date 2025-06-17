@@ -1,7 +1,9 @@
 package com.pavicontech.desktop.agent.domain.usecase.sales
 
 import com.pavicontech.desktop.agent.common.Constants
+import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.generateTimestamp
+import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 
 import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.Receipt
@@ -71,7 +73,8 @@ class CreateSaleUseCase(
                 )
             }
         )
-
+        "Total Item Count: ${createSaleReq.totItemCnt}".logger(Type.INFO)
+        "Total Item list size: ${createSaleReq.itemList.size}".logger(Type.INFO)
         return repository.createSale(body = createSaleReq, token)
     }
 

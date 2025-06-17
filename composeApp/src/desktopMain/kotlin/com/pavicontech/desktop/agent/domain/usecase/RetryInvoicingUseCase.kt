@@ -75,6 +75,7 @@ class RetryInvoicingUseCase(
             fileName = fileName,
             businessInfo = businessInfo,
             onSuccess = { extractedData, saleItems, taxableAmount, _, invoiceItems, _ ->
+                "items: $saleItems".logger(Type.INFO)
 
                 val saleResult = createSaleUseCase.invoke(saleItems, taxableAmount)
 
