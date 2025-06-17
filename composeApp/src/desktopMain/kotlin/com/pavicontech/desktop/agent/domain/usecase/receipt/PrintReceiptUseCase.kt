@@ -21,9 +21,12 @@ class PrintReceiptUseCase(
 ) {
     suspend operator fun invoke(filePath: String): Pair<String, Boolean?> =
         withContext(Dispatchers.IO) {
+            "Printing receipt...".logger(Type.INFO)
             val selectedPrinterName = keyValueStorage.get(Constants.SELECTED_PRINTER)
+            "Selected Printer: $selectedPrinterName".logger(Type.INFO)
             val file = File(filePath)
             if (!file.exists()) {
+                "Printing path does not exist: $filePath".logger(Type.WARN)
                 return@withContext Pair("File not found: $filePath", false)
             }
 
@@ -41,8 +44,10 @@ class PrintReceiptUseCase(
 
             try {
                 docPrintJob.print(doc, printRequestAttributeSet)
+                "Printing completed successfully.".logger(Type.INFO)
                 return@withContext Pair("Printing completed successfully.", true)
             } catch (e: PrintException) {
+                "Printing failed: ${e.message}".logger(Type.WARN)
                 e.printStackTrace()
                 return@withContext Pair("Printing failed: ${e.message}", false)
             }
