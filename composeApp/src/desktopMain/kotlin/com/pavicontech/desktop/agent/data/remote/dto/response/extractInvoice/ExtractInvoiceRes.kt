@@ -24,9 +24,12 @@ data class ExtractInvoiceRes(
 
     fun toExtractedData(): ExtractedInvoiceData{
         return ExtractedInvoiceData(
+            customerName = data?.customerName,
+            customerPin = data?.customerPin,
             fileName = data?.fileName ?: "",
             items = data?.items?.map {
                 ExtractedItem(
+                    invoiceNumber = data.invoiceNumber,
                     name = it.itemDescription,
                     amount = it.amount,
                     itemDescription = it.itemDescription,

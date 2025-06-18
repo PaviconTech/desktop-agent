@@ -11,6 +11,35 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
         DatabaseConfig.init()
     }
 
+    override suspend fun getInvoicesByInvoiceNumber(invoiceNumber: String): List<Invoice> {
+        val sql = "SELECT * FROM Invoice WHERE invoiceNumber = ?"
+
+        DatabaseConfig.getConnection().use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, invoiceNumber)
+                val rs = stmt.executeQuery()
+
+                val invoices = mutableListOf<Invoice>()
+                while (rs.next()) {
+                    invoices.add(rsToInvoice(rs))
+                }
+                return invoices
+            }
+        }
+    }
+
+    override suspend fun deleteInvoiceByFileName(fileName: String) {
+        val sql = "DELETE FROM Invoice WHERE fileName = ?"
+
+        DatabaseConfig.getConnection().use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, fileName)
+                stmt.executeUpdate()
+            }
+        }
+    }
+
+
     override suspend fun insertInvoice(invoice: Invoice) {
         val selectSql = "SELECT id FROM Invoice WHERE fileName = ?"
 
@@ -72,18 +101,19 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
     override suspend fun updateInvoice(fileName: String, invoice: Invoice) {
         val sql = """
             UPDATE Invoice SET
-                extractionStatus = ?, etimsStatus = ?, items = ?, totals = ?, updatedAt = ?
+                   etimsStatus = ?, items = ?,invoiceNumber = ?, extractionStatus = ?, totals = ?, updatedAt = ?
             WHERE fileName = ?
         """.trimIndent()
 
         DatabaseConfig.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, invoice.extractionStatus.name)
-                stmt.setString(2, invoice.etimsStatus.name)
-                stmt.setString(3, Json.encodeToString(invoice.items))
-                stmt.setString(4, Json.encodeToString(invoice.totals))
-                stmt.setString(5, invoice.updatedAt)
-                stmt.setString(6, fileName)
+                stmt.setString(1, invoice.etimsStatus.name)
+                stmt.setString(2, Json.encodeToString(invoice.items))
+                stmt.setString(3, invoice.invoiceNumber) // invoiceNumber
+                stmt.setString(4, invoice.extractionStatus.name) // extractionStatus
+                stmt.setString(5, Json.encodeToString(invoice.totals))
+                stmt.setString(6, invoice.updatedAt)
+                stmt.setString(7, fileName)
                 stmt.executeUpdate()
             }
         }
@@ -131,6 +161,7 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
         return Invoice(
             id = rs.getString("id"),
             fileName = rs.getString("fileName"),
+            invoiceNumber = rs.getString("invoiceNumber"), // ✅ Safe: nullable assigned to nullable
             extractionStatus = enumValueOf(rs.getString("extractionStatus")),
             etimsStatus = enumValueOf(rs.getString("etimsStatus")),
             items = Json.decodeFromString(rs.getString("items")),
@@ -139,4 +170,6 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
             updatedAt = rs.getString("updatedAt")
         )
     }
+
+
 }

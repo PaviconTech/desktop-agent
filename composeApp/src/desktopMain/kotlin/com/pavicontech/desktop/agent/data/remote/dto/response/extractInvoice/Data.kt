@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 @JsonIgnoreUnknownKeys
 @Serializable
 data class Data(
+    @SerialName("invoiceNumber") val invoiceNumber: String?,
     val documentType: String,
     @SerialName("fileName") val fileName: String,
     @SerialName("items") val items: List<Item>,

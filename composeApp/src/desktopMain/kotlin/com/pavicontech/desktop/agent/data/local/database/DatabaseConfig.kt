@@ -21,6 +21,7 @@ object DatabaseConfig {
         CREATE TABLE IF NOT EXISTS Invoice (
             id TEXT PRIMARY KEY,
             fileName TEXT NOT NULL UNIQUE,
+            invoiceNumber TEXT,
             extractionStatus TEXT,
             etimsStatus TEXT,
             items TEXT,

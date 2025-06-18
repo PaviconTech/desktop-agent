@@ -22,7 +22,7 @@ fun SettingScreenBody(
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.2f)
+                .fillMaxWidth(0.3f)
         ) {
             sideColumn()
         }

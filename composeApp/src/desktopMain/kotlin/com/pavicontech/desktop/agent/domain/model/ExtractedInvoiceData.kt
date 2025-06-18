@@ -3,6 +3,8 @@ package com.pavicontech.desktop.agent.domain.model
 
 data class ExtractedInvoiceData(
     val fileName: String,
+    val customerName: String? = null,
+    val customerPin: String? = null,
     val items: List<ExtractedItem> = emptyList(),
     val subTotal: Double,
     val totalAmount: Double,
@@ -11,6 +13,7 @@ data class ExtractedInvoiceData(
 
 
 data class ExtractedItem(
+    val invoiceNumber: String? = null,
     val name: String,
     val amount: Double,
     val itemDescription: String,

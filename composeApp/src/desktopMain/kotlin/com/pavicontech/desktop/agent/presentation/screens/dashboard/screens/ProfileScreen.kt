@@ -50,11 +50,10 @@ fun ProfileScreen(
     var kraPin by remember { mutableStateOf("") }
     var branchName by remember { mutableStateOf("") }
     var branchId by remember { mutableStateOf("") }
-    var districtName by remember { mutableStateOf("") }
-    var provinceName by remember { mutableStateOf("") }
-    var sectorName by remember { mutableStateOf("") }
-    var sdcId by remember { mutableStateOf("") }
     var businessLogo by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         keyStorage.get(Constants.BUSINESS_INFORMATION)?.let {
@@ -65,11 +64,10 @@ fun ProfileScreen(
             kraPin = loaded.kraPin
             branchName = loaded.branchName
             branchId = loaded.branchId
-            districtName = loaded.locality
-            provinceName = loaded.county
-            sectorName = loaded.sectorName
-            sdcId = loaded.sdcId
             businessLogo = loaded.businessLogo ?: ""
+            address = loaded.address ?: ""
+            email = loaded.email ?: ""
+            phone = loaded.phone ?: ""
         }
     }
 
@@ -129,14 +127,13 @@ fun ProfileScreen(
                                     EditableRow("Business Name", name) { name = it }
                                     EditableRow("KRA PIN", kraPin) { kraPin = it }
                                     EditableRow("Branch ID", branchId) { branchId = it }
-                                    EditableRow("Province", provinceName) { provinceName = it }
-                                    EditableRow("SDC ID", sdcId) { sdcId = it }
+                                    EditableRow("Address", address) { address = it }
+                                    EditableRow("Email", email) { email = it }
                                 }
                                 Column(modifier = Modifier.weight(1f)) {
                                     EditableRow("Taxpayer Name", taxpayerName) { taxpayerName = it }
                                     EditableRow("Branch Name", branchName) { branchName = it }
-                                    EditableRow("District", districtName) { districtName = it }
-                                    EditableRow("Sector", sectorName) { sectorName = it }
+                                    EditableRow("Phone", phone) { phone = it }
                                     EditableRow("Business Logo", businessLogo) { businessLogo = it }
                                 }
                             }
@@ -159,11 +156,14 @@ fun ProfileScreen(
                                     kraPin = kraPin,
                                     branchName = branchName,
                                     branchId = branchId,
-                                    locality = districtName,
-                                    county = provinceName,
-                                    sectorName = sectorName,
-                                    sdcId = sdcId,
-                                    businessLogo = businessLogo
+                                    locality = "",
+                                    county = "",
+                                    sectorName = "",
+                                    sdcId = "",
+                                    businessLogo = businessLogo,
+                                    address = address,
+                                    email = email,
+                                    phone = phone
                                 )
                                 scope.launch {
                                     keyStorage.set(Constants.BUSINESS_INFORMATION, updated.toJsonString())

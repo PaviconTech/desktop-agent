@@ -37,6 +37,9 @@ class PDFExtractorRepositoryImpl(
             val multiPartFormData = MultiPartFormDataContent(
                 formData {
                     append("fileName", body.fileName)
+                    body.invoiceWords?.let {
+                        append("invoiceWords", it)
+                    }
                     body.file?.let {
                         append(
                             key = "file",

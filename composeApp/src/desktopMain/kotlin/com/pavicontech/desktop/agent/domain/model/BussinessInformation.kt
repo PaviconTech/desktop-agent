@@ -15,7 +15,10 @@ data class BusinessInformation(
     val sectorName: String,
     val sdcId: String,
     val taxpayerName: String,
-    val businessLogo: String? = null
+    val businessLogo: String? = null,
+    val address: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
 ){
     fun toJsonString(): String = Json.encodeToString(this)
 

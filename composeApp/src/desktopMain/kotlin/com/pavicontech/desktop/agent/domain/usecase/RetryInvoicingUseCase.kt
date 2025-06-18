@@ -13,9 +13,10 @@ import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt
+import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt80MMUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.CreateSaleUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.ExtractInvoiceUseCase
-import com.pavicontech.desktop.agent.domain.usecase.sales.PrintOutOptionUseCase
+import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintOutOptionUseCase
 import kotlinx.coroutines.*
 import java.time.Instant
 
@@ -27,6 +28,8 @@ class RetryInvoicingUseCase(
     private val extractInvoiceUseCase: ExtractInvoiceUseCase,
     private val printOutOptionUseCase: PrintOutOptionUseCase,
     private val keyValueStorage: KeyValueStorage,
+    private val generateHtmlReceipt80MMUseCase: GenerateHtmlReceipt80MMUseCase,
+
 
     ) {
 
@@ -84,6 +87,7 @@ class RetryInvoicingUseCase(
                 invoiceRepository.updateInvoice(
                     fileName = fileName,
                     invoice = Invoice(
+                        invoiceNumber = extractedData.data?.invoiceNumber,
                         id = Instant.now().toEpochMilli().toString(),
                         fileName = fileName,
                         extractionStatus = ExtractionStatus.SUCCESSFUL,
@@ -100,10 +104,19 @@ class RetryInvoicingUseCase(
                         bhfId = businessInfo.branchId,
                         rcptSign = saleResult.kraResult?.result?.rcptSign ?: "No Receipt Sign"
                     )
+                    val htmlContent80mm = generateHtmlReceipt80MMUseCase(
+                        data = extractedData.toExtractedData(),
+                        businessInfo = businessInfo,
+                        businessPin = businessInfo.kraPin,
+                        bhfId = businessInfo.branchId,
+                        kraResult = saleResult.kraResult?.result,
+                        rcptSign = saleResult.kraResult?.result?.rcptSign ?: "No Receipt Sign"
+                    )
 
                     saleResult.kraResult?.result?.let {
                         printOutOptionUseCase(
                             kraResult = it,
+                            htmlContent80mm = htmlContent80mm,
                             htmlContent = htmlContent,
                             fileName = fileName,
                             filePath = filePath,

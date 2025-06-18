@@ -21,7 +21,7 @@ class GenerateQrCodeUseCase {
         bhfId: String,
         rcptSign:String
     ): File {
-        val qrCode = QRCode.Companion
+        val qrCode = QRCode
             .ofRoundedSquares()
             .withColor(0xFF000000.toInt())
             .withSize(25)
@@ -37,6 +37,7 @@ class GenerateQrCodeUseCase {
 
         return qrFile
     }
+
 
 
 }

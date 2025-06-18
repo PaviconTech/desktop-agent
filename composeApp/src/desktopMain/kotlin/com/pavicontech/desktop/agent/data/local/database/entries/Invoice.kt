@@ -9,6 +9,7 @@ import java.util.UUID
 data class Invoice(
     val id: String = UUID.randomUUID().toString(),
     val fileName: String,
+    val invoiceNumber: String? = null,
     val extractionStatus: ExtractionStatus = ExtractionStatus.PENDING,
     val etimsStatus: EtimsStatus = EtimsStatus.PENDING,
     val items: List<Item> = emptyList(),

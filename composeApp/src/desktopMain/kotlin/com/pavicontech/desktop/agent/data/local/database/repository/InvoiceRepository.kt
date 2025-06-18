@@ -8,6 +8,8 @@ import com.pavicontech.desktop.agent.data.local.database.entries.Totals
 
 
     interface InvoiceRepository {
+        suspend fun getInvoicesByInvoiceNumber(invoiceNumber: String): List<Invoice>
+        suspend fun deleteInvoiceByFileName(fileName: String)
         suspend fun insertInvoice(invoice: Invoice)
         suspend fun updateInvoice(fileName: String, invoice: Invoice)
         suspend fun deleteInvoice(id: String)

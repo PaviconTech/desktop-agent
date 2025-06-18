@@ -20,10 +20,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,6 +57,7 @@ import com.pavicontech.desktop.agent.data.local.database.entries.EtimsStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.ExtractionStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
 import com.pavicontech.desktop.agent.domain.usecase.invoices.GetFilteredInvoicesUseCase
+import com.pavicontech.desktop.agent.domain.usecase.sales.DeleteInvoiceUseCase
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.components.loadPdfFirstPageAsImage
 import io.github.vinceglb.filekit.utils.toFile
 import kotlinx.coroutines.launch
@@ -72,6 +77,7 @@ fun InvoiceRow(
     onRefresh:()->Unit,
     modifier: Modifier = Modifier
 ) {
+    val deleteInvoiceUseCase: DeleteInvoiceUseCase = koinInject()
     val extractionColor = when (invoice.extractionStatus) {
         ExtractionStatus.SUCCESSFUL -> Color(0xFF4CAF50)
         ExtractionStatus.FAILED -> Color(0xFFF44336)
@@ -284,6 +290,20 @@ fun InvoiceRow(
                         text = "Updated: $updatedDate",
                         fontSize = 11.sp,
                         color = Color.Gray
+                    )
+                }
+
+                IconButton(
+                    onClick ={
+                        scope.launch {
+                            deleteInvoiceUseCase(invoice.fileName)
+                            onRefresh()
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Invoice"
                     )
                 }
             }

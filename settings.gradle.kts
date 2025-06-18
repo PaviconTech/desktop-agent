@@ -11,7 +11,9 @@ pluginManagement {
             }
         }
         mavenCentral()
+        maven("https://jitpack.io")
         gradlePluginPortal()
+
     }
 }
 
@@ -26,6 +28,11 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         maven("https://mobile.maven.couchbase.com/maven2/dev/")
+        maven {
+            url = uri("http://repo.e-iceblue.com/nexus/content/groups/public/")
+            isAllowInsecureProtocol = true
+        }
+        maven("https://jitpack.io")
     }
 }
 

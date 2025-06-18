@@ -15,9 +15,10 @@ import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt
+import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateHtmlReceipt80MMUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.CreateSaleUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.ExtractInvoiceUseCase
-import com.pavicontech.desktop.agent.domain.usecase.sales.PrintOutOptionUseCase
+import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintOutOptionUseCase
 import kotlinx.coroutines.*
 import java.io.File
 import java.time.Instant
@@ -28,6 +29,7 @@ class SubmitInvoicesUseCase(
     private val filesystemRepository: FilesystemRepository,
     private val keyValueStorage: KeyValueStorage,
     private val generateHtmlReceipt: GenerateHtmlReceipt,
+    private val generateHtmlReceipt80MMUseCase: GenerateHtmlReceipt80MMUseCase,
     private val createSaleUseCase: CreateSaleUseCase,
     private val invoiceRepository: InvoiceRepository,
     private val extractInvoiceUseCase: ExtractInvoiceUseCase,
@@ -86,14 +88,7 @@ class SubmitInvoicesUseCase(
         val fileName = fileData.fileName
         val filePath = fileData.fullDirectory
 
-        invoiceRepository.insertInvoice(
-            Invoice(
-                id = Instant.now().toEpochMilli().toString(),
-                fileName = fileName,
-                extractionStatus = ExtractionStatus.PENDING,
-                etimsStatus = EtimsStatus.PENDING,
-            )
-        )
+
 
         extractInvoiceUseCase(
             filePath = filePath,
@@ -110,6 +105,7 @@ class SubmitInvoicesUseCase(
                 invoiceRepository.updateInvoice(
                     fileName = fileName,
                     invoice = Invoice(
+                        invoiceNumber = extractedData.data?.invoiceNumber,
                         id = Instant.now().toEpochMilli().toString(),
                         fileName = fileName,
                         extractionStatus = ExtractionStatus.SUCCESSFUL,
@@ -127,10 +123,21 @@ class SubmitInvoicesUseCase(
                         rcptSign = saleResult.kraResult?.result?.rcptSign ?: "No Receipt Sign"
                     )
 
+                    val htmlContent80mm = generateHtmlReceipt80MMUseCase(
+                        data = extractedData.toExtractedData(),
+                        businessInfo = businessInfo,
+                        businessPin = businessInfo.kraPin,
+                        bhfId = businessInfo.branchId,
+                        rcptSign = saleResult.kraResult?.result?.rcptSign ?: "No Receipt Sign",
+                        kraResult = saleResult.kraResult?.result,
+
+                        )
+
                     saleResult.kraResult?.result?.let {
                         printOutOptionUseCase(
                             kraResult = it,
                             htmlContent = htmlContent,
+                            htmlContent80mm = htmlContent80mm,
                             fileName = fileName,
                             filePath = filePath,
                             businessInfo = businessInfo

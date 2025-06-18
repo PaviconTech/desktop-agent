@@ -29,4 +29,6 @@ object Constants {
     const val  WATCH_FOLDER = "watch_folder"
     const val SELECTED_PRINTER = "selected_printer"
     const  val ITEM_CODE_LIST = "item_code_list"
+    const val PRINTOUT_SIZE = "printout_size"
+    const val INVOICE_NO_PREFIX = "invoice_no_prefix"
 }

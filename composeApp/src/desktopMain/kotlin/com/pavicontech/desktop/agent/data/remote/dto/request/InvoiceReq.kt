@@ -2,7 +2,8 @@ package com.pavicontech.desktop.agent.data.remote.dto.request
 
 data class InvoiceReq(
     val fileName: String = "",
-    val file: ByteArray? = null
+    val file: ByteArray? = null,
+    val invoiceWords: String? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
