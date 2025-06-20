@@ -11,7 +11,7 @@ data class Invoice(
     val fileName: String,
     val invoiceNumber: String? = null,
     val extractionStatus: ExtractionStatus = ExtractionStatus.PENDING,
-    val etimsStatus: EtimsStatus = EtimsStatus.PENDING,
+    val etimsStatus: EtimsStatus? = null,
     val items: List<Item> = emptyList(),
     val totals: Totals? =null,
     val createdAt: String = Instant.now().toString(),

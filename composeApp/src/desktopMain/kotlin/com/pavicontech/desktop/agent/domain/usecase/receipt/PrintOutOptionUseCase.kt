@@ -45,9 +45,12 @@ class PrintOutOptionUseCase(
         val userHome = System.getProperty("user.home")
         val receiptDir = Paths.get(userHome, "Documents", "DesktopAgent", "FiscalizedReceipts")
         receiptDir.toFile().mkdirs() // ✅ Ensure directory exists
-        val path = receiptDir.resolve("${UUID.randomUUID()}.png")
+        val path = receiptDir.resolve(
+            if (printOutStatus == "80mm") fileName.replaceAfterLast('.', "png") else fileName
+        )
 
         if (printOutStatus == "80mm"){
+            "printer name $printerName".logger(Type.INFO)
             SaveHtmlAsPdfUseCase().invoke(
                 html = htmlContent80mm,
                 outputFile = path.toFile(),

@@ -41,6 +41,7 @@ class RetryInvoicingUseCase(
         onSuccess: (Boolean) -> Unit,
         onError: (Boolean) -> Unit
     ): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
+        println(file.fileName)
         val businessInfo = keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.fromBusinessJson()
 
         try {
@@ -61,7 +62,8 @@ class RetryInvoicingUseCase(
     private suspend fun handleSuccess(fileData: Directory?, businessInfo: BusinessInformation) {
         if (fileData == null) return
 
-        val fileName = fileData.fileName
+        val fileName = fileData.fileName.replaceAfterLast('.', "pdf")
+        println("Retry file: $fileName")
         val filePath = fileData.fullDirectory
 
         invoiceRepository.insertInvoice(
@@ -83,13 +85,14 @@ class RetryInvoicingUseCase(
                 val saleResult = createSaleUseCase.invoke(saleItems, taxableAmount)
 
                 val updatedStatus = if (saleResult.status) EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
+                val getPrintOutSize= keyValueStorage.get(Constants.PRINTOUT_SIZE)
 
                 invoiceRepository.updateInvoice(
                     fileName = fileName,
                     invoice = Invoice(
                         invoiceNumber = extractedData.data?.invoiceNumber,
                         id = Instant.now().toEpochMilli().toString(),
-                        fileName = fileName,
+                        fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png") else fileName,
                         extractionStatus = ExtractionStatus.SUCCESSFUL,
                         etimsStatus = updatedStatus,
                         items = invoiceItems

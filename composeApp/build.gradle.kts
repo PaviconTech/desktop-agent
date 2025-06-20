@@ -63,6 +63,11 @@ kotlin {
                 // QR Code Generator + SQLite
                 implementation(libs.ktor.qr.code.gen)
                 implementation("org.xerial:sqlite-jdbc:3.45.1.0")
+                implementation("org.jetbrains.exposed:exposed-core:0.50.1")
+                implementation("org.jetbrains.exposed:exposed-dao:0.50.1")
+                implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
+
+
                 implementation("com.github.hkirk:java-html2image:0.9")            }
         }
 

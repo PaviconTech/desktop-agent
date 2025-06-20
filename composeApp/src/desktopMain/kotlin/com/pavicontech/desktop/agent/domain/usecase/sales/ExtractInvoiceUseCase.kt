@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.domain.usecase.sales
 
+import SaveHtmlAsPdfUseCase
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.fileToByteArray
@@ -16,19 +17,25 @@ import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSa
 import com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.ExtractInvoiceRes
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.domain.repository.PDFExtractorRepository
+import com.pavicontech.desktop.agent.domain.usecase.receipt.InvoiceNumberChecker
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintReceiptUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.awt.image.BufferedImage
+import java.io.File
 import java.lang.System
 import java.nio.file.Paths
 import java.time.Instant
+import javax.imageio.ImageIO
+import kotlin.io.path.pathString
 
 class ExtractInvoiceUseCase(
     private val pdfExtractorRepository: PDFExtractorRepository,
     private val invoiceRepository: InvoiceRepository,
     private val localItemsRepository: ItemLocalRepository,
     private val keyValueStorage: KeyValueStorage,
-    private val printReceiptUseCase: PrintReceiptUseCase
+    private val printReceiptUseCase: PrintReceiptUseCase,
+    private val invoiceNumberChecker: InvoiceNumberChecker,
 ) {
     suspend operator fun invoke(
         filePath: String,
@@ -37,8 +44,11 @@ class ExtractInvoiceUseCase(
         onSuccess: suspend (ExtractInvoiceRes, saleItems: List<CreateSaleItem>, taxableAmount: Int, fileName: String, invoiceItems: List<Item>, receiptType: String) -> Unit,
     ): Unit = withContext(Dispatchers.IO) {
         try {
+            val printerName = keyValueStorage.get(Constants.SELECTED_PRINTER)?.trim()
+            "Selected printer: '$printerName'".logger(Type.INFO)
             val getInvoiceWords = keyValueStorage.get(Constants.INVOICE_NO_PREFIX)
-            val result = pdfExtractorRepository.extractInvoiceData(
+            val getPrintOutSize = keyValueStorage.get(Constants.PRINTOUT_SIZE)
+            val extractionResult = pdfExtractorRepository.extractInvoiceData(
                 body = InvoiceReq(
                     fileName = fileName,
                     file = filePath.fileToByteArray(),
@@ -47,56 +57,86 @@ class ExtractInvoiceUseCase(
             )
             """
         --------------------------------------------------------------------------------------------------------------------------        
-                Filename: ${result.data?.fileName}
-                Invoice Number: ${result.data?.invoiceNumber}
-                Customer Name: ${result.data?.customerName}
-                Customer Pin: ${result.data?.customerPin}
-                Items: ${result.data?.items}
-                Amounts: ${result.data?.totals}
+                Filename: ${extractionResult.data?.fileName}
+                Invoice Number: ${extractionResult.data?.invoiceNumber}
+                Customer Name: ${extractionResult.data?.customerName}
+                Customer Pin: ${extractionResult.data?.customerPin}
+                Items: ${extractionResult.data?.items}
+                Amounts: ${extractionResult.data?.totals}
         -------------------------------------------------------------------------------------------------------------------------
             """.trimIndent().logger(Type.TRACE)
 
             val doesInvoiceExist =
-                invoiceRepository.getInvoicesByInvoiceNumber(result.data?.invoiceNumber ?: "")
+                invoiceRepository.getInvoicesByInvoiceNumber(extractionResult.data?.invoiceNumber ?: "")
 
-            println("Invoice from db : ${doesInvoiceExist}")
+            "Invoices available from db : ${doesInvoiceExist.size}".logger(Type.INFO)
 
-            if (doesInvoiceExist.isNotEmpty()) {
-                val home = System . getProperty ("user.home")
+            if (invoiceNumberChecker.doesInvoiceExist(extractionResult.data?.invoiceNumber)) {
+                val home = System.getProperty("user.home")
                 val path = Paths.get(home, "Documents", "DesktopAgent", "FiscalizedReceipts")
-                printReceiptUseCase.invoke(filePath = "${path.toFile().path}/${doesInvoiceExist.first().fileName}")
-                return@withContext
-            }else {
+                val filename = if (getPrintOutSize == "80mm")
+                    invoiceNumberChecker.getFileName(extractionResult.data?.invoiceNumber)?.replaceAfterLast('.', "png")
+                else fileName
+                val image =
+                    File(path.pathString, filename)
+                if (getPrintOutSize == "80mm") {
+                    loadImageFromFile(image)?.let {
+                        SaveHtmlAsPdfUseCase().printImageFromBufferedImage(
+                            image =it,
+                            printerName = printerName ?: ""
+                        )
+                    }
 
-                if (result.status) {
+                    return@withContext
+                } else {
+                    printReceiptUseCase.invoke(
+                        filePath = "${path.toFile().path}/${
+                            invoiceNumberChecker.getFileName(
+                                extractionResult.data?.invoiceNumber
+                            )
+                        }"
+                    )
+                    return@withContext
+                }
+
+            } else {
+
+                if (extractionResult.status) {
                     invoiceRepository.insertInvoice(
                         invoice = Invoice(
-                            invoiceNumber = result.data?.invoiceNumber,
+                            invoiceNumber = extractionResult.data?.invoiceNumber,
                             id = Instant.now().toEpochMilli().toString(),
-                            fileName = fileName,
+                            fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
+                                '.',
+                                "png"
+                            ) else fileName,
                             extractionStatus = ExtractionStatus.SUCCESSFUL,
-                            etimsStatus = EtimsStatus.PENDING,
+                            etimsStatus = null,
                             updatedAt = Instant.now().toString(),
-                            items = result.data?.items?.map { it.toItem() } ?: emptyList()
+                            items = extractionResult.data?.items?.map { it.toItem() } ?: emptyList()
                         )
                     )
+
                     onSuccess(
-                        result,
-                        filterItems(extractedItems = result.data?.items ?: emptyList()),
-                        result.data?.totals?.subTotal?.toInt() ?: 0,
+                        extractionResult,
+                        filterItems(extractedItems = extractionResult.data?.items ?: emptyList()),
+                        extractionResult.data?.totals?.subTotal?.toInt() ?: 0,
                         fileName,
-                        result.data?.items?.map { it.toItem() } ?: emptyList(),
-                        result.data?.documentType ?: "invoice"
+                        extractionResult.data?.items?.map { it.toItem() } ?: emptyList(),
+                        extractionResult.data?.documentType ?: "invoice"
                     )
                 } else {
                     invoiceRepository.insertInvoice(
                         invoice = Invoice(
                             id = Instant.now().toEpochMilli().toString(),
-                            fileName = fileName,
+                            fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
+                                '.',
+                                "png"
+                            ) else fileName,
                             extractionStatus = ExtractionStatus.FAILED,
                             etimsStatus = EtimsStatus.PENDING,
                             updatedAt = Instant.now().toString(),
-                            items = result.data?.items?.map { it.toItem() } ?: emptyList()
+                            items = extractionResult.data?.items?.map { it.toItem() } ?: emptyList()
                         )
                     )
                 }
@@ -128,6 +168,17 @@ class ExtractInvoiceUseCase(
                 taxAmt = extracted.taxAmount?.toInt() ?: 0,
                 totAmt = extracted.amount.toInt()
             )
+        }
+    }
+
+
+    fun loadImageFromFile(file: File): BufferedImage? {
+        return try {
+            ImageIO.read(file)
+        } catch (e: Exception) {
+            println("Failed to load image from file: ${file.path}")
+            e.printStackTrace()
+            null
         }
     }
 }

@@ -31,4 +31,5 @@ object Constants {
     const  val ITEM_CODE_LIST = "item_code_list"
     const val PRINTOUT_SIZE = "printout_size"
     const val INVOICE_NO_PREFIX = "invoice_no_prefix"
+    const val INVOICE_NO_LIST = "invoice_no_list"
 }

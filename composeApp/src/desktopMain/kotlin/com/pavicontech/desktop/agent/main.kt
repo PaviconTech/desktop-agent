@@ -65,7 +65,7 @@
 
             val windowState = rememberWindowState(
                 placement = WindowPlacement.Floating,
-                size = DpSize(width = 1200.dp, height = 800.dp)
+                size = DpSize(width = 1600.dp, height = 800.dp)
             )
 
             Window(

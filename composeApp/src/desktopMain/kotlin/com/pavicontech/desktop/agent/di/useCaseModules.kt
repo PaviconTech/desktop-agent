@@ -24,6 +24,7 @@ import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeAndKra
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.GetAvailablePrintersUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.InsertQrCodeToInvoiceUseCase
+import com.pavicontech.desktop.agent.domain.usecase.receipt.InvoiceNumberChecker
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintReceiptUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.RenderAndSavePdfUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.CreateCreditNoteUseCase
@@ -40,12 +41,12 @@ val useCaseModules = module {
     single { SignInUseCase(get(), get()) }
     single { FilePathWatcherUseCase(get()) }
     single{ GetUserSessionStatus(get()) }
-    single{ SubmitInvoicesUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    single{ SubmitInvoicesUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory{ GetSalesUseCase(get()) }
     single{ GetEtimsSalesUseCase(get(), get()) }
     single{ GenerateQRBitmap() }
     factory{ CreateCreditNoteUseCase(get(), get()) }
-    factory{ ExtractInvoiceUseCase(get(), get(), get(),get(), get()) }
+    factory{ ExtractInvoiceUseCase(get(), get(), get(),get(), get(), get()) }
     factory{ PrintOutOptionUseCase(get(), get(), get(), get(), get()) }
     factory{ RetryInvoicingUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory{ AutoRetryUseCase(get(), get(), get()) }
@@ -74,4 +75,5 @@ val useCaseModules = module {
     single { InitUseCases(get(), get(), get(), get(), get()) }
     single { SaveHtmlAsPdfUseCase() }
     single { GenerateHtmlReceipt80MMUseCase(get()) }
+    single { InvoiceNumberChecker(get()) }
 }

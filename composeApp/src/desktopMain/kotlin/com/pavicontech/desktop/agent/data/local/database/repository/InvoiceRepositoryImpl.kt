@@ -1,6 +1,7 @@
 package com.pavicontech.desktop.agent.data.local.database.repository
 
 import com.pavicontech.desktop.agent.data.local.database.DatabaseConfig
+import com.pavicontech.desktop.agent.data.local.database.entries.EtimsStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
 import kotlinx.serialization.json.Json
 import java.sql.ResultSet
@@ -74,7 +75,7 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
                 if (exists) {
                     stmt.setString(1, invoice.id)
                     stmt.setString(2, invoice.extractionStatus.name)
-                    stmt.setString(3, invoice.etimsStatus.name)
+                    stmt.setString(3, invoice.etimsStatus?.name)
                     stmt.setString(4, Json.encodeToString(invoice.items))
                     stmt.setString(5, Json.encodeToString(invoice.totals))
                     stmt.setString(6, invoice.createdAt)
@@ -84,7 +85,7 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
                     stmt.setString(1, invoice.id)
                     stmt.setString(2, invoice.fileName)
                     stmt.setString(3, invoice.extractionStatus.name)
-                    stmt.setString(4, invoice.etimsStatus.name)
+                    stmt.setString(4, invoice.etimsStatus?.name)
                     stmt.setString(5, Json.encodeToString(invoice.items))
                     stmt.setString(6, Json.encodeToString(invoice.totals))
                     stmt.setString(7, invoice.createdAt)
@@ -107,7 +108,7 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
 
         DatabaseConfig.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, invoice.etimsStatus.name)
+                stmt.setString(1, invoice.etimsStatus?.name)
                 stmt.setString(2, Json.encodeToString(invoice.items))
                 stmt.setString(3, invoice.invoiceNumber) // invoiceNumber
                 stmt.setString(4, invoice.extractionStatus.name) // extractionStatus
@@ -163,7 +164,7 @@ class InvoiceRepositoryImpl() : InvoiceRepository {
             fileName = rs.getString("fileName"),
             invoiceNumber = rs.getString("invoiceNumber"), // ✅ Safe: nullable assigned to nullable
             extractionStatus = enumValueOf(rs.getString("extractionStatus")),
-            etimsStatus = enumValueOf(rs.getString("etimsStatus")),
+            etimsStatus = rs.getString("etimsStatus")?.let { EtimsStatus.valueOf(it) },
             items = Json.decodeFromString(rs.getString("items")),
             totals = Json.decodeFromString(rs.getString("totals")),
             createdAt = rs.getString("createdAt"),

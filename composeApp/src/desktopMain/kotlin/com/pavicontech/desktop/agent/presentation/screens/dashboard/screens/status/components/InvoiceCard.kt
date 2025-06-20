@@ -62,6 +62,7 @@ import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sett
 import io.github.vinceglb.filekit.utils.toFile
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import java.io.File
 import java.time.Instant
@@ -88,6 +89,7 @@ fun InvoiceRow(
         EtimsStatus.SUCCESSFUL -> Color(0xFF4CAF50)
         EtimsStatus.FAILED -> Color(0xFFF44336)
         EtimsStatus.PENDING -> Color(0xFFFFC107)
+        else -> Color(0xFFFFC107)
     }
 
     val createdDate = invoice.createdAt.toLocalFormattedString()
@@ -101,6 +103,7 @@ fun InvoiceRow(
     var showMoreItems by remember { mutableStateOf(false) }
     var isDialogBoxVisible by remember { mutableStateOf(false) }
     var selectedFile by remember { mutableStateOf<File?>(null) }
+    var selectedPath by remember { mutableStateOf<String?>(null) }
     var watchFolder: String? by remember { mutableStateOf(null) }
     val selectedFilter by keyValueStorage.observe(Constants.INVOICE_STATUS_FILTER)
         .collectAsState("ALL")
@@ -165,7 +168,7 @@ fun InvoiceRow(
                         extractionColor,
                         viewInvoice = watchFolder != null,
                         onViewInvoice = {
-                            val path = watchFolder?.let { Path(it, invoice.fileName) }
+                            val path = watchFolder?.let { Path(it, invoice.fileName.replaceAfterLast('.', "pdf")) }
 
                             selectedFile = path?.toFile()
                             isDialogBoxVisible = true
@@ -176,7 +179,7 @@ fun InvoiceRow(
                     // 4. ETIMS Status
                     StatusBadge(
                         "ETIMS",
-                        invoice.etimsStatus.name,
+                        invoice.etimsStatus?.name ?: "",
                         etimsColor,
                         viewInvoice = invoice.etimsStatus == EtimsStatus.SUCCESSFUL,
                         onViewInvoice = {
@@ -311,6 +314,50 @@ fun InvoiceRow(
     }
 }
 
+@Composable
+fun ShowInvoice(
+    file: File?,
+    showDialogBox: Boolean,
+    onDismiss: () -> Unit
+) {
+    var image: ImageBitmap? by remember(file) { mutableStateOf(null) }
+    val isPdf = remember(file) { file?.extension?.lowercase() == "pdf" }
+    val isPng = remember(file) { file?.extension?.lowercase() == "png" }
+
+    // Load PDF or PNG image
+    LaunchedEffect(file) {
+        image = when {
+            file == null -> null
+            isPdf -> loadPdfFirstPageAsImage(file)
+            isPng -> file.inputStream().use { androidx.compose.ui.res.loadImageBitmap(it) }
+            else -> null
+        }
+    }
+
+    if (showDialogBox) {
+        Dialog(
+            onDismissRequest = onDismiss,
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true
+            )
+        ) {
+            image?.let {
+                Image(bitmap = it, contentDescription = "Invoice")
+            } ?: Surface(modifier = Modifier.size(200.dp)) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Invoice not found")
+                }
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun StatusBadge(
@@ -377,45 +424,12 @@ fun StatusBadge(
 }
 
 
-@Composable
-fun ShowInvoice(
-    file: File?,
-    showDialogBox: Boolean,
-    onDismiss: () -> Unit
-) {
-    var image: ImageBitmap? by remember { mutableStateOf(null) }
-    LaunchedEffect(file) {
-        image = file?.let { loadPdfFirstPageAsImage(it) }
-    }
-    if (showDialogBox) {
-        Dialog(
-            onDismissRequest = onDismiss,
-            properties = DialogProperties(
-                dismissOnBackPress = true,
-                dismissOnClickOutside = true
-            )
-        ) {
-            image?.let {
-                Image(
-                    bitmap = it,
-                    contentDescription = "Invoice"
-                )
-            } ?: Surface(
-                modifier = Modifier.size(200.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Invoice not found"
-                    )
-                }
-            }
-        }
-    }
-}
+
+
+
+
+
+
 
 fun String.toLocalFormattedString(): String {
     return try {
