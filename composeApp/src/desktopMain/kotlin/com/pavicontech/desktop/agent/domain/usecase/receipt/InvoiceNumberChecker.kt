@@ -5,70 +5,75 @@ import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
+import com.pavicontech.desktop.agent.data.local.database.DatabaseConfig
+import com.pavicontech.desktop.agent.data.local.database.entries.InvoiceEntries
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Serializable
-data class InvoiceEntry(
-    val invoiceNumber: String,
-    val fileName: String
-)
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 
-class InvoiceNumberChecker(
-    private val keyValueStorage: KeyValueStorage
-) {
-    private val scope = CoroutineScope(Dispatchers.IO)
 
-    suspend fun doesInvoiceExist(invoiceNumber: String?): Boolean {
-        if (invoiceNumber.isNullOrBlank()) return false
+class InvoiceNumberChecker {
 
-        val stored = keyValueStorage.get(Constants.INVOICE_NO_LIST)
-        val list = try {
-            stored?.let { Json.decodeFromString<List<InvoiceEntry>>(it) } ?: emptyList()
-        } catch (e: Exception) {
-            emptyList()
-        }
-
-        val result = list.any { it.invoiceNumber == invoiceNumber }
-        "Invoice Number: $invoiceNumber, Exists: $result".logger(Type.INFO)
-        return result
+    init {
+        DatabaseConfig.init()
     }
 
-    suspend fun addInvoice(invoiceNumber: String?, fileName: String) {
-        if (invoiceNumber.isNullOrBlank()) return
+    suspend fun doesInvoiceExist(invoiceNumber: String?): Boolean = withContext(Dispatchers.IO) {
+        if (invoiceNumber.isNullOrBlank()) return@withContext false
 
-        val stored = keyValueStorage.get(Constants.INVOICE_NO_LIST)
-        val currentList = try {
-            stored?.let { Json.decodeFromString<List<InvoiceEntry>>(it) }?.toMutableList() ?: mutableListOf()
-        } catch (e: Exception) {
-            mutableListOf()
+        val exists = transaction {
+            InvoiceEntries.selectAll().where { InvoiceEntries.invoiceNumber eq invoiceNumber }.count() > 0
         }
 
-        if (currentList.any { it.invoiceNumber == invoiceNumber }) return
-
-        currentList.add(InvoiceEntry(invoiceNumber, fileName))
-
-        keyValueStorage.set(
-            Constants.INVOICE_NO_LIST,
-            Json.encodeToString(currentList)
-        )
+        "Invoice Number: $invoiceNumber, Exists: $exists".logger(Type.INFO)
+        return@withContext exists
     }
 
-    suspend fun getFileName(invoiceNumber: String?): String? {
-        if (invoiceNumber.isNullOrBlank()) return null
+    suspend fun addInvoice(invoiceNumber: String?, fileName: String) = withContext(Dispatchers.IO) {
+        if (invoiceNumber.isNullOrBlank()) return@withContext
 
-        val stored = keyValueStorage.get(Constants.INVOICE_NO_LIST)
-        val list = try {
-            stored?.let { Json.decodeFromString<List<InvoiceEntry>>(it) } ?: emptyList()
-        } catch (e: Exception) {
-            emptyList()
+        transaction {
+            // Skip if already exists
+            val exists = InvoiceEntries.select {
+                InvoiceEntries.invoiceNumber eq invoiceNumber
+            }.count() > 0
+
+            if (!exists) {
+                InvoiceEntries.insert {
+                    it[InvoiceEntries.invoiceNumber] = invoiceNumber
+                    it[InvoiceEntries.fileName] = fileName
+                }
+            }
+        }
+    }
+
+    suspend fun getFileName(invoiceNumber: String?): String? = withContext(Dispatchers.IO) {
+        if (invoiceNumber.isNullOrBlank()) return@withContext null
+
+        return@withContext transaction {
+            InvoiceEntries
+                .selectAll().where { InvoiceEntries.invoiceNumber eq invoiceNumber }
+                .firstNotNullOfOrNull { it[InvoiceEntries.fileName] }
+        }
+    }
+
+    suspend fun deleteByFileName(fileName: String) = withContext(Dispatchers.IO) {
+        transaction {
+            InvoiceEntries.deleteWhere {
+                InvoiceEntries.fileName eq fileName
+            }
         }
 
-        return list.find { it.invoiceNumber == invoiceNumber }?.fileName
+        "Deleted invoice entry for fileName: $fileName".logger(Type.INFO)
     }
 }

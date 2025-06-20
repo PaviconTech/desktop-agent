@@ -15,5 +15,5 @@ val configModules = module{
     }
 
 
-    single { DatabaseConfig }
+    single { DatabaseConfig.init() }
 }

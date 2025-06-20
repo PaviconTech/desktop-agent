@@ -48,7 +48,7 @@ val useCaseModules = module {
     factory{ CreateCreditNoteUseCase(get(), get()) }
     factory{ ExtractInvoiceUseCase(get(), get(), get(),get(), get(), get()) }
     factory{ PrintOutOptionUseCase(get(), get(), get(), get(), get()) }
-    factory{ RetryInvoicingUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory{ RetryInvoicingUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory{ AutoRetryUseCase(get(), get(), get()) }
 
     single { GenerateHtmlReceipt(get()) }
@@ -75,5 +75,5 @@ val useCaseModules = module {
     single { InitUseCases(get(), get(), get(), get(), get()) }
     single { SaveHtmlAsPdfUseCase() }
     single { GenerateHtmlReceipt80MMUseCase(get()) }
-    single { InvoiceNumberChecker(get()) }
+    single { InvoiceNumberChecker() }
 }
