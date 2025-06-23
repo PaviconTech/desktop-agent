@@ -49,15 +49,15 @@ class PrintOutOptionUseCase(
             if (printOutStatus == "80mm") fileName.replaceAfterLast('.', "png") else fileName
         )
 
-        if (printOutStatus == "80mm"){
-            "printer name $printerName".logger(Type.INFO)
-            SaveHtmlAsPdfUseCase().invoke(
-                html = htmlContent80mm,
-                outputFile = path.toFile(),
-                printerName=printerName
-            )
-            return Unit
-        }
+//        if (printOutStatus == "80mm"){
+//            "printer name $printerName".logger(Type.INFO)
+//            SaveHtmlAsPdfUseCase().invoke(
+//                html = htmlContent80mm,
+//                outputFile = path.toFile(),
+//                printerName=printerName
+//            )
+//            return Unit
+//        }
 
         when (option) {
             "default" -> {

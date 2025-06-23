@@ -59,7 +59,7 @@ val useCaseModules = module {
     single { SelectFolderUseCase(get()) }
     single { SelectFileUseCase(get()) }
     single { DeleteInvoiceUseCase(get()) }
-    single { InsertQrCodeToInvoiceUseCase() }
+    single { InsertQrCodeToInvoiceUseCase(get()) }
     single { GenerateQrCodeAndKraInfoUseCase(get(), get()) }
     single { GetFilteredInvoicesUseCase(get()) }
 

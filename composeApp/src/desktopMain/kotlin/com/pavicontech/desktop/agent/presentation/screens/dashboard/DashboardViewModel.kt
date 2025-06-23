@@ -25,7 +25,7 @@ class DashboardViewModel(
 
     fun logout(){
         viewModelScope.launch {
-            keyValueStorage.clear()
+            keyValueStorage.set(Constants.AUTH_TOKEN, "")
         }
     }
 
