@@ -55,7 +55,7 @@ fun ItemDetailsDialog(
     var quantityType by remember { mutableStateOf(item.quantityUnit) }
     var taxCode by remember { mutableStateOf(item.taxCode) }
     var barCode by remember { mutableStateOf(item.barcode ?: "") }
-    var productCategory by remember { mutableStateOf(item.itemCategory.category ?: "") }
+    var productCategory by remember { mutableStateOf(item.itemCategory?.category ?: "") }
     var price by remember { mutableStateOf(item.price) }
 
     Dialog(

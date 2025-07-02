@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class CreateSaleItem(
     val itemSeq:String,
     val itemId:Int,
-    val itemCd:String,
+    val itemCd:String? = null,
     val itemClsCd:String,
     val itemNm:String,
     val itemCodeDf:String,

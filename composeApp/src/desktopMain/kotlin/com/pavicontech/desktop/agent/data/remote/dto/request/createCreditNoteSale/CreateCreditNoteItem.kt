@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class CreateCreditNoteItem(
     val itemSeq:Int,
     val itemId:Int,
-    val itemCd:String,
+    val itemCd:String? = null,
     val itemClsCd:String,
     val itemNm:String,
     val itemNmDef:String = itemNm,

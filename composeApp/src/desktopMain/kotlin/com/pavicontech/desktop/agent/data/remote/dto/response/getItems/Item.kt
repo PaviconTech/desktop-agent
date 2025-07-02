@@ -23,9 +23,9 @@ data class Item(
     @SerialName("id")
     val id: Int,
     @SerialName("ItemCategory")
-    val itemCategory: ItemCategory,
+    val itemCategory: ItemCategory? = null,
     @SerialName("itemCategoryId")
-    val itemCategoryId: Int,
+    val itemCategoryId: Int? = null,
     @SerialName("itemClassificationCode")
     val itemClassificationCode: String,
     @SerialName("itemCode")
@@ -67,7 +67,7 @@ data class Item(
     ): CreateSaleItem {
         return CreateSaleItem(
             itemSeq = "0",
-            itemCd = itemCategory.category,
+            itemCd = itemCategory?.category,
             itemClsCd = itemClassificationCode,
             itemNm = itemName,
             bcd = "$barcode",
@@ -115,7 +115,7 @@ data class Item(
     ): CreateCreditNoteItem {
         return CreateCreditNoteItem(
             itemSeq = 0,
-            itemCd = itemCategory.category,
+            itemCd = itemCategory?.category,
             itemClsCd = itemClassificationCode,
             itemNm = itemName,
             bcd = "$barcode",

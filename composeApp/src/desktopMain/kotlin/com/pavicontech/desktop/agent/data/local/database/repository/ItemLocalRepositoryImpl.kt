@@ -143,7 +143,7 @@ class ItemLocalRepositoryImpl : ItemLocalRepository {
                     it[createdAt] = item.createdAt
                     it[currentStock] = item.currentStock
                     it[deletedAt] = item.deletedAt
-                    it[itemCategoryId] = item.itemCategoryId
+                    it[itemCategoryId] = item.itemCategoryId ?: 0
                     it[itemCategory] = Json.encodeToString(item.itemCategory)
                     it[itemClassificationCode] = item.itemClassificationCode
                     it[itemCode] = item.itemCode

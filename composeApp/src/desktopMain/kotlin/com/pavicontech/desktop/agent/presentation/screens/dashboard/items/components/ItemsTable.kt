@@ -214,7 +214,7 @@ fun ItemTableItem(
         Text(text = item.itemName, modifier = Modifier.weight(weights[2]))
         Text(text = item.itemClassificationCode, modifier = Modifier.weight(weights[3]))
         Text(text = item.itemCode, modifier = Modifier.weight(weights[4]))
-        Text(text = item.itemCategory.category, modifier = Modifier.weight(weights[5]))
+        Text(text = item.itemCategory?.category ?: "", modifier = Modifier.weight(weights[5]))
         Text(text = item.price, modifier = Modifier.weight(weights[7]))
         Text(text = item.taxCode, modifier = Modifier.weight(weights[8]))
         Text(text = item.currentStock, modifier = Modifier.weight(weights[9]))
