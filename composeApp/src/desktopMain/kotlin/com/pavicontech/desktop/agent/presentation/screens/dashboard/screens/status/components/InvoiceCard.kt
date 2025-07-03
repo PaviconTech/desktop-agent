@@ -299,7 +299,7 @@ fun InvoiceRow(
                 IconButton(
                     onClick ={
                         scope.launch {
-                            deleteInvoiceUseCase(invoice.fileName)
+                            deleteInvoiceUseCase(invoice.fileName, invoice.invoiceNumber)
                             onRefresh()
                         }
                     }

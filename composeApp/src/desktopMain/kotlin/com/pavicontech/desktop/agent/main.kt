@@ -64,7 +64,7 @@
             }
 
             val windowState = rememberWindowState(
-                placement = WindowPlacement.Floating,
+                placement = WindowPlacement.Maximized,
                 size = DpSize(width = 1600.dp, height = 800.dp)
             )
 

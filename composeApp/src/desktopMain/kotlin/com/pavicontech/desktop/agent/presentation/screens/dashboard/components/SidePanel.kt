@@ -123,7 +123,7 @@ fun SidePanel(
                         name = "Items",
                         onClick = onNavigateToItems
                     )
-                    SidePanelItem(
+                  /*  SidePanelItem(
                         isSelected = currentRoute == DashboardScreens.CreditNotes,
                         name = "Credit Notes",
                         onClick = onNavigateToCreditNotes
@@ -147,7 +147,7 @@ fun SidePanel(
                         isSelected = currentRoute == DashboardScreens.Reports,
                         name = "Reports",
                         onClick = onNavigateToReports
-                    )
+                    )*/
                     SidePanelItem(
                         isSelected = currentRoute == DashboardScreens.SettingsScreen,
                         name = "Settings",

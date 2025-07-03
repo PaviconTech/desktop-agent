@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Item(
-    val bcd: String,
+    val bcd: String? = null,
     val createdAt: String,
     val dcAmt: String,
     val dcRt: String,

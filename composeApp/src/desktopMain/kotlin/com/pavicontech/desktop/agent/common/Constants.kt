@@ -7,7 +7,12 @@ object Constants {
     //const val ETIMS_BACKEND = "https://etims.pavicontech.com/api"
     //LIVE
     const val ETIMS_BACKEND = "https://erp.pavicontech.com/api"
-    const val ETIMS_AI_BACKEND = "http://172.104.129.116:8005"
+    const val ETIMS_AI_BACKEND = "https://ai.pavicontech.com/pdf-extractor"
+    //DEMO
+    //const val ETIMS_QR_URL = "https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
+    //LIVE
+    const val ETIMS_QR_URL = "https://etims.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
+    //https://etims.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data=
 
     private val HOME_PATH = System.getProperty("user.home")
     val FISCALIZED_RECEIPTS_PATH = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "FiscalizedReceipts")

@@ -8,6 +8,8 @@ import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.Resu
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.components.BoxCoordinates
 import java.nio.file.Paths
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
@@ -22,6 +24,18 @@ class PrintOutOptionUseCase(
     private val insertQrCodeToInvoiceUseCase: InsertQrCodeToInvoiceUseCase,
 
     ) {
+
+    private fun formatVsdcDate(dateString: String?): String {
+        if (dateString.isNullOrEmpty()) return ""
+        return try {
+            val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+            val dateTime = LocalDateTime.parse(dateString, formatter)
+            val outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+            dateTime.format(outputFormatter)
+        } catch (e: Exception) {
+            dateString // Return original string if parsing fails
+        }
+    }
 
 
     suspend operator fun invoke(
@@ -78,7 +92,7 @@ class PrintOutOptionUseCase(
                         val receiptText = """
                         INTRLDATA: ${kraResult.intrlData}
                         RCPTSIGN: ${kraResult.rcptSign}
-                        VSDC DATE: ${kraResult.vsdcRcptPbctDate}
+                        VSDC DATE: ${formatVsdcDate(kraResult.vsdcRcptPbctDate)}
                         MRCNO: ${kraResult.mrcNo},
                     """.trimIndent()
                         insertQrCodeToInvoiceUseCase.invoke(

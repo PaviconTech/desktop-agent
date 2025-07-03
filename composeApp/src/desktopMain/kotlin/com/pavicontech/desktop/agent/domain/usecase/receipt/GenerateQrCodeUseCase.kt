@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.domain.usecase.receipt
 
+import com.pavicontech.desktop.agent.common.Constants
 import qrcode.QRCode
 import qrcode.render.QRCodeGraphics
 import java.awt.Color
@@ -25,7 +26,7 @@ class GenerateQrCodeUseCase {
             .ofRoundedSquares()
             .withColor(0xFF000000.toInt())
             .withSize(25)
-            .build("https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data=$businessPin$bhfId$rcptSign")
+        .build("${Constants.ETIMS_QR_URL}$businessPin$bhfId$rcptSign")
 
         val pngBytes = qrCode
             .render()

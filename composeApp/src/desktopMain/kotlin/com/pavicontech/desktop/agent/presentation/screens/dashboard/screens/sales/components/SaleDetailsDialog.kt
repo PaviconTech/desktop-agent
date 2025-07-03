@@ -23,14 +23,26 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.pavicontech.desktop.agent.common.Constants
+import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
+import com.pavicontech.desktop.agent.data.remote.dto.response.signIn.BussinessInfo
 import com.pavicontech.desktop.agent.domain.model.Sale
+import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import com.pavicontech.desktop.agent.domain.usecase.sales.GenerateQRBitmap
+import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
 import org.koin.compose.koinInject
 
 @Composable
@@ -39,9 +51,20 @@ fun SaleDetailsDialog(
     onDismiss: () -> Unit
 ) {
     val generateQRBitmap:GenerateQRBitmap = koinInject()
-    val pin = "P051901215P"
-    val bhfId = "00"
-    val qrUrl ="https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data=$pin$bhfId${sale.receiptSign}"
+    val keyValueStorage: KeyValueStorage = koinInject()
+    var pin by remember { mutableStateOf("") }
+    var bhfid by remember { mutableStateOf("") }
+
+    var qrUrl by  remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.let {
+            val loaded = it.fromBusinessJson()
+            pin = loaded.kraPin
+            bhfid = loaded.branchId
+            qrUrl = "${Constants.ETIMS_QR_URL}$pin$bhfid${sale.receiptSign}"
+        } ?: "No data"
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -113,12 +136,12 @@ fun SaleDetailsDialog(
                             .weight(0.7f)
                     ) {
                         Text(
-                            text = "Receipt Sign: ${sale.receiptSign}",
+                            text = "Receipt Sign: ${sale.receiptSign ?: ""}",
                             style = MaterialTheme.typography.body2,
 
                             )
                         Text(
-                            text = "Intrl Data: ${sale.intrlData}",
+                            text = "Intrl Data: ${sale.intrlData ?: ""}",
                             style = MaterialTheme.typography.body2,
 
                         )
@@ -141,6 +164,3 @@ fun SaleInfoRow(label: String, value: String) {
         Text(text = value)
     }
 }
-
-
-

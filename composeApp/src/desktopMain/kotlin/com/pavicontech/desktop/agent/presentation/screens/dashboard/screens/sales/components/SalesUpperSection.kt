@@ -49,20 +49,20 @@ fun SalesUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit)
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
-        Text(
+   /*     Text(
             text = "Sales",
             style = MaterialTheme.typography.body1,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colors.primary
-        )
-        Spacer(modifier = Modifier.height(8 .dp))
+        )*/
+        //Spacer(modifier = Modifier.height(8 .dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.End,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
+            /*Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
@@ -93,7 +93,7 @@ fun SalesUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit)
                         modifier = Modifier.align(Alignment.Center),
                     )
                 }
-            }
+            }*/
             Column {
                 Text(
                     text = "Search:",

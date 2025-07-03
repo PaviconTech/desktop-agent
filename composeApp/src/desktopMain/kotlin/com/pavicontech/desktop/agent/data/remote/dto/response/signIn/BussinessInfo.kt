@@ -3,6 +3,8 @@ package com.pavicontech.desktop.agent.data.remote.dto.response.signIn
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -37,4 +39,45 @@ data class BussinessInfo(
         sdcId = "",
         taxpayerName = managerName ?: ""
     )
+    companion object{
+        fun toBusinessInfo(json: String): BussinessInfo {
+            return try {
+                if (json.isBlank()) {
+                    // Return a default BussinessInfo with empty values
+                    BussinessInfo(
+                        branch = "",
+                        branchId = "",
+                        createdAt = "",
+                        email = "",
+                        id = 0,
+                        isHeadquarter = false,
+                        name = "",
+                        phone = "",
+                        pin = "",
+                        status = "",
+                        type = "",
+                        updatedAt = ""
+                    )
+                } else {
+                    Json.decodeFromString<BussinessInfo>(json)
+                }
+            } catch (e: Exception) {
+                // Return a default BussinessInfo with empty values
+                BussinessInfo(
+                    branch = "",
+                    branchId = "",
+                    createdAt = "",
+                    email = "",
+                    id = 0,
+                    isHeadquarter = false,
+                    name = "",
+                    phone = "",
+                    pin = "",
+                    status = "",
+                    type = "",
+                    updatedAt = ""
+                )
+            }
+        }
+    }
 }

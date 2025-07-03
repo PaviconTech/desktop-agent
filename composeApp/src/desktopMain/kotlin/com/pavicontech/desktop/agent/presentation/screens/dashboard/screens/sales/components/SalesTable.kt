@@ -230,9 +230,9 @@ fun SaleTableItem(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { onCreditNoteClick(sale) }, modifier = Modifier.weight(1f)) {
+            /*TextButton(onClick = { onCreditNoteClick(sale) }, modifier = Modifier.weight(1f)) {
                 Text("Credit Note")
-            }
+            }*/
             TextButton(
                 onClick = { selectedSale.value = sale; showDialog = true },
                 modifier = Modifier.weight(1f)
