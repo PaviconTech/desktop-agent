@@ -11,7 +11,7 @@ class GetUserSessionStatus(
     suspend operator fun invoke(): Boolean  = withContext(Dispatchers.IO) {
         keyValueStorage.get(Constants.AUTH_TOKEN)?.let {
             keyValueStorage.get(Constants.AUTH_TOKEN_EXPIRY)?.let { tokenExpiry ->
-                tokenExpiry.toLong() > System.currentTimeMillis() // token is still valid
+                tokenExpiry.toLong() > System.currentTimeMillis()
             } == true
         } == true
     }

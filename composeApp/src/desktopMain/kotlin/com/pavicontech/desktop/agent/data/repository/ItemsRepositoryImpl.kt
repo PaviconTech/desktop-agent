@@ -29,7 +29,10 @@ class ItemsRepositoryImpl(private val api: HttpClient) : ItemsRepository {
             }
         }.bodyAsText().let {
             try {
-                Json.decodeFromString<GetItemsRes>(it)
+                Json.decodeFromString<GetItemsRes>(it).also { itemsRes ->
+                    "Items count: ${itemsRes.items.size}".logger(Type.INFO)
+                    println(itemsRes)
+                }
             }catch (e:Exception){
                 it.logger(Type.INFO)
                 throw e

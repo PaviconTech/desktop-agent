@@ -66,7 +66,7 @@ data class Item(
         totAmt:Int,
     ): CreateSaleItem {
         return CreateSaleItem(
-            itemSeq = "0",
+            itemSeq = 0,
             itemCd = itemCategory?.category,
             itemClsCd = itemClassificationCode,
             itemNm = itemName,

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateSaleItem(
-    val itemSeq:String,
+    val itemSeq:Int,
     val itemId:Int,
     val itemCd:String? = null,
     val itemClsCd:String,

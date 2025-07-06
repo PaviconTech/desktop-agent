@@ -153,7 +153,7 @@ class ExtractInvoiceUseCase(
     ): List<CreateSaleItem> {
         val storedItems = localItemsRepository.getAllItems()
 
-        return extractedItems.mapNotNull { extracted ->
+        val items =  extractedItems.mapNotNull { extracted ->
             val matchedStoredItem = storedItems.find {
                 it.itemName.trim().equals(extracted.itemDescription.trim(), ignoreCase = true)
             }
@@ -169,6 +169,9 @@ class ExtractInvoiceUseCase(
                 totAmt = extracted.amount.toInt()
             )
         }
+        "Sending items for sale: $items".logger(Type.INFO)
+
+        return  items
     }
 
 

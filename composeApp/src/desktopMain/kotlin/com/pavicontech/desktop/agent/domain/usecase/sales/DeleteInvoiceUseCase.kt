@@ -10,7 +10,7 @@ class DeleteInvoiceUseCase(
     suspend operator fun invoke(fileName: String, invoiceNumber: String?){
         try {
             invoiceRepository.deleteInvoiceByFileName(fileName)
-            invoiceNumberChecker.doesInvoiceExist(invoiceNumber)
+            invoiceNumberChecker.deleteByFileName(fileName)
         }catch (e: Exception){
             e.printStackTrace()
         }

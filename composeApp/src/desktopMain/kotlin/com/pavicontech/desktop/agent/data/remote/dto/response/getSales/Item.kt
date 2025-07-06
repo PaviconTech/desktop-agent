@@ -12,7 +12,7 @@ data class Item(
     val id: Int,
     val itemCd: String,
     val itemClsCd: String,
-    val itemId: Int,
+    val itemId: Int? = null,
     val itemNm: String,
     val itemNmDef: String,
     val itemSeq: Int,

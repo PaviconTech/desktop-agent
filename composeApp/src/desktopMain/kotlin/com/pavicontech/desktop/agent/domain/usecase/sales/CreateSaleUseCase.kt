@@ -68,7 +68,7 @@ class CreateSaleUseCase(
             ),
             itemList = items.mapIndexed { index, item ->
                 item.copy(
-                    itemSeq = "${index + 1}",
+                    itemSeq = index + 1,
                     qty = item.qty
                 )
             }
