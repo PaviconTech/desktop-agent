@@ -267,7 +267,7 @@ fun InvoiceRow(
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
-                    val totalAmount = invoice.items.sumOf { it.amount }
+                    val totalAmount = invoice.items.sumOf { it.amount * it.quantity }
                     val totalTax = invoice.items.sumOf { it.taxAmount }
 
                     Text(

@@ -253,22 +253,44 @@ class RetryInvoicingUseCase(
     ): List<CreateSaleItem> {
         val storedItems = localItemsRepository.getAllItems()
 
-        return extractedItems.mapNotNull { extracted ->
+
+        val items =  extractedItems.mapNotNull { extracted ->
             val matchedStoredItem = storedItems.find {
                 it.itemName.trim().equals(extracted.itemDescription.trim(), ignoreCase = true)
             }
 
+            val taxAmount = when(extracted.taxType){
+                "A" -> 0
+                "C" -> 0
+                "E" -> {
+                    val amount = extracted.amount.toInt() * extracted.quantity.toInt()
+                    ((0.08) * amount).toInt()
+                }
+                "B" -> {
+                    val amount = extracted.amount.toInt() * extracted.quantity.toInt()
+                    ((0.16) * amount).toInt()
+                }
+                "D" -> 0
+
+                else -> 0
+            }
+            val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
             matchedStoredItem?.toCreateSaleItem(
-                qty = extracted.quantity.toInt() ?: 1,
-                prc = extracted.amount.toInt() ?: 0,
+                qty = extracted.quantity.toInt(),
+                prc = extracted.amount.toInt(),
                 dcRt = 0,
                 dcAmt = 0,
-                splyAmt = extracted.amount.toInt(),
-                taxblAmt = extracted.amount.toInt(),
-                taxAmt = extracted.taxAmount?.toInt() ?: 0,
-                totAmt = extracted.amount.toInt()
+                splyAmt = itemAmount,
+                taxblAmt = itemAmount-taxAmount,
+                taxAmt = taxAmount,
+                totAmt = itemAmount
             )
         }
+        "Sending items for sale: $items".logger(Type.INFO)
+        "Items: $items".logger(Type.DEBUG)
+
+        return  items
+
     }
 
 

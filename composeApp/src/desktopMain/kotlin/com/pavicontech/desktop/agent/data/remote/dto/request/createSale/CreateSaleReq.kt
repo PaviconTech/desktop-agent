@@ -27,7 +27,7 @@ data class CreateSaleReq(
     val taxRtC: String,
     val taxRtD: String,
     val taxRtE: String,
-    val taxAmtA: String,
+    val taxAmtA: String? = null,
     val taxAmtB: String,
     val taxAmtC: String,
     val taxAmtD: String,
