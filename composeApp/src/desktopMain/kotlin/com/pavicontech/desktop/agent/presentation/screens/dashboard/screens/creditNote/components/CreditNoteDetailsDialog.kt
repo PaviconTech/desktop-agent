@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -54,13 +56,15 @@ fun CreditNoteDialog(
         onCloseRequest = onDismiss,
         visible = isVisible,
         title = "Credit Note",
-        state = rememberDialogState(width = 1000.dp, height = 800.dp),
+        state = rememberDialogState(width = 1000.dp, height = 700.dp),
         resizable = true
     ) {
         Surface(
             shape = RoundedCornerShape(12.dp),
             color = MaterialTheme.colors.background,
             modifier = Modifier.fillMaxSize()
+                .verticalScroll(rememberScrollState())
+
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
 

@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -77,14 +79,16 @@ fun SaleDetailsDialog(
     DialogWindow(
         onCloseRequest = onDismiss,
         title = "Sale Details",
-        state = rememberDialogState(width = 1200.dp, height = 800.dp),
+        state = rememberDialogState(width = 1200.dp, height = 700.dp),
         resizable = true
     ) {
         Surface(
             shape = RoundedCornerShape(12.dp),
             color = MaterialTheme.colors.background,
             modifier = Modifier.fillMaxSize()
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
 

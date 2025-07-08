@@ -1,107 +1,158 @@
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
+import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.awt.Desktop
 import java.io.File
 import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
+import kotlin.Result
 
 class ShareInvoiceUseCase(
     private val keyValueStorage: KeyValueStorage
 ) {
 
-    suspend operator fun invoke(attachment: File?) {
-        val businessInfo = keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.fromBusinessJson()
+    suspend operator fun invoke(attachment: File?): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val businessInfo = keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.fromBusinessJson()
 
-        val subject = "Invoice from ${businessInfo?.name}"
-        val body = buildString {
+            // Validate business info
+            if (businessInfo?.name.isNullOrBlank()) {
+                return@withContext Result.failure(IllegalStateException("Business information not available"))
+            }
+
+            val recipient = "" // TODO: Should be passed as parameter or configured
+            val subject = createSubject(businessInfo.name!!)
+            val body = createEmailBody(businessInfo)
+
+            val emailSent = when {
+                isWindows() -> tryOpenOutlook(subject, body, recipient, attachment)
+                else -> false
+            }
+
+            if (!emailSent) {
+                openGmailCompose(subject, body, recipient)
+                attachment?.let { openAttachmentDirectoryIfExists(it) }
+            }
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private fun isWindows(): Boolean =
+        System.getProperty("os.name").lowercase().contains("win")
+
+    private fun createSubject(businessName: String): String =
+        "Invoice from $businessName"
+
+    private fun createEmailBody(businessInfo: BusinessInformation): String =
+        buildString {
             appendLine("Hello,")
             appendLine()
-            appendLine("Please find attached the invoice from ${businessInfo?.name}.")
-            appendLine("KRA PIN: ${businessInfo?.kraPin}")
+            appendLine("Please find attached the invoice from ${businessInfo.name}.")
+            businessInfo.kraPin?.let { appendLine("KRA PIN: $it") }
             appendLine()
             appendLine("If you have any questions, feel free to reach out.")
         }
 
-        val recipient = ""
-
-        val os = System.getProperty("os.name").lowercase()
-
-        if (os.contains("win")) {
-            val outlookOpened = tryOpenOutlook(subject, body, recipient, attachment)
-            if (outlookOpened) return
-        }
-
-        // Gmail fallback (works on all OS)
-        openGmailCompose(subject, body, recipient)
-
-        if (attachment != null && attachment.exists()) {
-            openAttachmentDirectory(attachment)
-        } else {
-            println("Attachment missing or null.")
-        }
-    }
-
-    private fun tryOpenOutlook(
+    private suspend fun tryOpenOutlook(
         subject: String,
         body: String,
         recipient: String,
         attachment: File?
-    ): Boolean {
-        val outlookPaths = listOf(
-            "C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
-            "C:\\Program Files (x86)\\Microsoft Office\\Office16\\OUTLOOK.EXE",
-            "C:\\Program Files\\Microsoft Office\\Office15\\OUTLOOK.EXE"
-        )
+    ): Boolean = withContext(Dispatchers.IO) {
+        if (attachment?.exists() != true) return@withContext false
 
-        val outlook = outlookPaths.firstOrNull { File(it).exists() }
-        if (outlook != null && attachment != null && attachment.exists()) {
-            try {
-                val cmd = arrayOf(
-                    outlook,
-                    "/c", "ipm.note",
-                    "/m", "$recipient&subject=${uriEncode(subject)}&body=${uriEncode(body)}",
-                    "/a", attachment.absolutePath
-                )
-                println("Launching Outlook...")
-                Runtime.getRuntime().exec(cmd)
-                return true
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        try {
+            val scriptFile = File.createTempFile("outlook_mail", ".ps1")
+            val script = createPowerShellScript(subject, body, recipient, attachment)
+
+            scriptFile.writeText(script)
+
+            val process = ProcessBuilder(
+                "powershell.exe",
+                "-ExecutionPolicy", "Bypass",
+                "-File", scriptFile.absolutePath
+            )
+                .redirectErrorStream(true)
+                .start()
+
+            val success = process.waitFor(30, TimeUnit.SECONDS) && process.exitValue() == 0
+
+            // Clean up temp file
+            scriptFile.delete()
+
+            success
+        } catch (e: Exception) {
+            false // Log this in production
         }
-        return false
     }
+
+    private fun createPowerShellScript(
+        subject: String,
+        body: String,
+        recipient: String,
+        attachment: File
+    ): String = """
+        try {
+            '$'Outlook = New-Object -ComObject Outlook.Application
+            '$'mail = '$'Outlook.CreateItem(0)
+            '$'mail.Subject = "${escapeForPowerShell(subject)}"
+            '$'mail.Body = "${escapeForPowerShell(body)}"
+            '$'mail.To = "$recipient"
+            '$'mail.Attachments.Add("${attachment.absolutePath.replace("\\", "\\\\")}")
+            '$'mail.Display()
+            exit 0
+        } catch {
+            Write-Error '$'_.Exception.Message
+            exit 1
+        }
+    """.trimIndent()
 
     private fun openGmailCompose(subject: String, body: String, recipient: String) {
-        val gmailUrl = "https://mail.google.com/mail/?view=cm&fs=1" +
-                "&to=${uriEncode(recipient)}" +
-                "&su=${uriEncode(subject)}" +
-                "&body=${uriEncode(body)}"
+        val gmailUrl = buildString {
+            append("https://mail.google.com/mail/?view=cm&fs=1")
+            append("&to=${uriEncode(recipient)}")
+            append("&su=${uriEncode(subject)}")
+            append("&body=${uriEncode(body)}")
+        }
 
         try {
-            println("Opening Gmail compose in browser...")
-            Desktop.getDesktop().browse(URI(gmailUrl))
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(URI(gmailUrl))
+            }
         } catch (e: Exception) {
-            e.printStackTrace()
+            // Log error in production - don't print to console
+            throw RuntimeException("Failed to open Gmail compose window", e)
         }
     }
 
-    private fun openAttachmentDirectory(file: File) {
-        try {
-            println("Opening directory: ${file.parentFile}")
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(file.parentFile)
-            } else {
-                println("Desktop not supported on this OS.")
+    private fun openAttachmentDirectoryIfExists(file: File) {
+        val parentDir = file.parentFile
+        if (parentDir?.exists() == true) {
+            try {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(parentDir)
+                }
+            } catch (e: Exception) {
+                // Log error in production
+                throw RuntimeException("Failed to open attachment directory: ${parentDir.absolutePath}", e)
             }
-        } catch (e: Exception) {
-            println("Failed to open file directory.")
-            e.printStackTrace()
         }
     }
 
     private fun uriEncode(value: String): String =
-        URLEncoder.encode(value, StandardCharsets.UTF_8.toString()).replace("+", "%20")
+        URLEncoder.encode(value, StandardCharsets.UTF_8)
+            .replace("+", "%20")
+
+    private fun escapeForPowerShell(text: String): String =
+        text.replace("`", "``")      // Escape backticks
+            .replace("\"", "`\"")    // Escape double quotes
+            .replace("$", "`$")      // Escape dollar signs
 }
