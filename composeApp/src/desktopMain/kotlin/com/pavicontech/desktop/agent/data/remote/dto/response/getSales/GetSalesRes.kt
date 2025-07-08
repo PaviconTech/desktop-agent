@@ -24,6 +24,7 @@ data class GetSalesRes(
                 amount = it.totAmt.toDoubleOrNull() ?: 0.0,
                 tax = it.totTaxAmt.toDoubleOrNull() ?: 0.0,
                 createdAt = it.createdAt,
+                items = it.items
             )
         }
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -31,16 +33,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindow
+import androidx.compose.ui.window.rememberDialogState
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
+import com.pavicontech.desktop.agent.data.remote.dto.response.getSales.Item
 import com.pavicontech.desktop.agent.data.remote.dto.response.signIn.BussinessInfo
 import com.pavicontech.desktop.agent.domain.model.Sale
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import com.pavicontech.desktop.agent.domain.usecase.sales.GenerateQRBitmap
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.components.toLocalFormattedString
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import org.koin.compose.koinInject
@@ -50,12 +58,12 @@ fun SaleDetailsDialog(
     sale: Sale,
     onDismiss: () -> Unit
 ) {
-    val generateQRBitmap:GenerateQRBitmap = koinInject()
+    val generateQRBitmap: GenerateQRBitmap = koinInject()
     val keyValueStorage: KeyValueStorage = koinInject()
+
     var pin by remember { mutableStateOf("") }
     var bhfid by remember { mutableStateOf("") }
-
-    var qrUrl by  remember { mutableStateOf("") }
+    var qrUrl by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.let {
@@ -63,89 +71,132 @@ fun SaleDetailsDialog(
             pin = loaded.kraPin
             bhfid = loaded.branchId
             qrUrl = "${Constants.ETIMS_QR_URL}$pin$bhfid${sale.receiptSign}"
-        } ?: "No data"
+        }
     }
 
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        )
+    DialogWindow(
+        onCloseRequest = onDismiss,
+        title = "Sale Details",
+        state = rememberDialogState(width = 1200.dp, height = 800.dp),
+        resizable = true
     ) {
         Surface(
             shape = RoundedCornerShape(12.dp),
             color = MaterialTheme.colors.background,
-            modifier = Modifier
-                .width(800.dp)
+            modifier = Modifier.fillMaxSize()
                 .padding(16.dp),
-            elevation = 16.dp
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                // Header
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Sale Details",
-                        style = MaterialTheme.typography.h6,
-                        color = MaterialTheme.colors.primary
-                    )
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
-                    }
-                }
+            Column(modifier = Modifier.padding(24.dp)) {
 
-                Spacer(Modifier.height(12.dp))
-
-                // Sale Basic Info
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SaleInfoRow("Customer Name", sale.customerName)
-                    SaleInfoRow("KRA PIN", sale.kraPin)
-                    SaleInfoRow("Reference No.", sale.referenceNumber)
-                    SaleInfoRow("Invoice No.", sale.invoiceNumber)
-                    SaleInfoRow("ETIMS Receipt", sale.etimsReceiptNumber)
-                    SaleInfoRow("Status", sale.status)
-                    SaleInfoRow("Created At", sale.createdAt)
-                    SaleInfoRow("Items Count", sale.itemsCount.toString())
-                    SaleInfoRow("Amount", "KES %.2f".format(sale.amount))
-                    SaleInfoRow("Tax", "KES %.2f".format(sale.tax))
-                }
-
-                Spacer(Modifier.height(16.dp))
-
+                // Header with title and QR
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.Top
                 ) {
+                    Column {
+                        Text("Sale Details", style = MaterialTheme.typography.h5)
+                        Text("Invoice No: ${sale.invoiceNumber}", style = MaterialTheme.typography.subtitle2)
+                    }
                     Image(
                         bitmap = generateQRBitmap(qrUrl),
-                        contentDescription = "Qr code",
-                        modifier = Modifier
-                            .weight(0.3f)
-                            .size(200.dp)
-
+                        contentDescription = "QR Code",
+                        modifier = Modifier.size(200.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(0.7f)
-                    ) {
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                // Sale and Customer Information
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+
+                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Sale Info", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        InfoRow("Reference No.", sale.referenceNumber)
+                        InfoRow("ETIMS Receipt", sale.etimsReceiptNumber ?: "-")
+                        InfoRow("Status", sale.status, highlight = true)
+                        InfoRow("Created At", sale.createdAt.toLocalFormattedString())
+                        InfoRow("Items Count", sale.itemsCount.toString())
+                        InfoRow("Amount", "KES %.2f".format(sale.amount), highlight = true)
+                        InfoRow("Tax", "KES %.2f".format(sale.tax))
+                    }
+
+                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Customer", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1565C0))
+                        InfoRow("Name", sale.customerName)
+                        InfoRow("KRA PIN", sale.kraPin)
+                        InfoRow("Receipt Sign", sale.receiptSign ?: "-")
+                        InfoRow("Internal Data", sale.intrlData ?: "-")
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+                SaleItemsTable(sale.items)
+
+                // You can add Sale Items table here if you want
+
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SaleItemsTable(items: List<Item>) {
+    Column {
+        Text("Sale Items", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+
+        // Table Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primary)
+                .padding(vertical = 8.dp)
+        ) {
+            val headers = listOf(
+                "No.", "Item Name", "Desc", "Item Code", "Qty", "Unit", "Price", "Disc Amt", "Tax", "Total"
+            )
+            headers.forEach {
+                Text(
+                    text = it,
+                    modifier = Modifier.weight(1f),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                )
+            }
+        }
+
+        // Table Body
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 200.dp, max = 400.dp)
+        ) {
+            itemsIndexed(items) { index, item ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    listOf(
+                        "${index + 1}",
+                        item.itemNm,
+                        item.itemNmDef,
+                        item.itemCd,
+                        item.qty,
+                        item.qtyUnitCd,
+                        item.prc,
+                        item.dcAmt,
+                        item.taxAmt,
+                        item.totAmt
+                    ).forEach {
                         Text(
-                            text = "Receipt Sign: ${sale.receiptSign ?: ""}",
-                            style = MaterialTheme.typography.body2,
-
-                            )
-                        Text(
-                            text = "Intrl Data: ${sale.intrlData ?: ""}",
-                            style = MaterialTheme.typography.body2,
-
-                            )
-
+                            text = it,
+                            fontSize = 13.sp,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
@@ -155,12 +206,19 @@ fun SaleDetailsDialog(
 
 
 @Composable
-fun SaleInfoRow(label: String, value: String) {
+fun InfoRow(label: String, value: String, highlight: Boolean = false) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = label, fontWeight = FontWeight.SemiBold)
-        Text(text = value)
+        Text(
+            text = label,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.width(180.dp)
+        )
+        Text(
+            text = value,
+            color = if (highlight) Color(0xFF00C853) else MaterialTheme.colors.onBackground
+        )
     }
 }

@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.domain.usecase.sales
 
+import androidx.compose.ui.graphics.Color
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.Resource
 import com.pavicontech.desktop.agent.common.utils.generateTimestamp
@@ -38,6 +39,9 @@ class CreateCreditNoteUseCase(
             if (!response.status) return@flow emit(Resource.Error(message = response.message))
             return@flow emit(Resource.Success(message = response.message, data = response))
         }catch (e: Exception){
+            SnackbarController.sendEvent(
+                event = SnackbarEvent(message = "An unexpected error occurred", color = Color.Red)
+            )
             emit(Resource.Error(message = e.message ?: "An unexpected error occurred"))
             e.printStackTrace()
         }

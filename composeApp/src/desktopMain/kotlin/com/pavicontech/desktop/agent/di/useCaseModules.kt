@@ -2,6 +2,7 @@ package com.pavicontech.desktop.agent.di
 
 import RetryInvoicingUseCase
 import SaveHtmlAsPdfUseCase
+import ShareInvoiceUseCase
 import SubmitInvoicesUseCase
 import com.pavicontech.desktop.agent.domain.InitUseCases
 import com.pavicontech.desktop.agent.domain.usecase.AutoRetryUseCase
@@ -81,4 +82,5 @@ val useCaseModules = module {
 
     single { AdjustStockUseCase(get(), get()) }
     single { GetAllCreditNotesUseCase(get(), get()) }
+    single { ShareInvoiceUseCase(get()) }
 }

@@ -1,5 +1,7 @@
 package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -28,13 +32,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pavicontech.desktop.agent.common.Resource
+import com.pavicontech.desktop.agent.data.remote.dto.response.getSales.toCrediNoteReq
 import com.pavicontech.desktop.agent.domain.model.Sale
+import com.pavicontech.desktop.agent.domain.usecase.sales.CreateCreditNoteUseCase
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -45,7 +56,7 @@ fun SalesTable(
     isLoading: Boolean,
     onRefresh: () -> Unit,
     onViewClick: (Sale) -> Unit,
-    onCreditNoteClick: (Sale) -> Unit
+    saleDto: SnapshotStateList<com.pavicontech.desktop.agent.data.remote.dto.response.getSales.Sale>
 ) {
 
     val headers = listOf(
@@ -62,10 +73,10 @@ fun SalesTable(
         SalesTableHeader(headers, weights, onRefresh = onRefresh)
         SalesTableBody(
             sales = sales.toList(),
+            saleDto = saleDto,
             weights = weights,
             isLoading = isLoading,
             onViewClick = onViewClick,
-            onCreditNoteClick = onCreditNoteClick
         )
     }
 }
@@ -134,8 +145,9 @@ fun SalesTableBody(
     sales: List<Sale>,
     weights: List<Float>,
     onViewClick: (Sale) -> Unit,
-    onCreditNoteClick: (Sale) -> Unit
-) {
+    saleDto: SnapshotStateList<com.pavicontech.desktop.agent.data.remote.dto.response.getSales.Sale>,
+
+    ) {
     val listState = rememberLazyListState()
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -149,11 +161,11 @@ fun SalesTableBody(
             if (!isLoading) {
                 itemsIndexed(sales) { index, sale ->
                     SaleTableItem(
+                        saleDto = saleDto,
                         sale = sale,
                         index = index,
                         weights = weights,
-                        onCreditNoteClick = onCreditNoteClick,
-                        onViewClick = onViewClick
+                        onViewClick = {}
                     )
                 }
             }
@@ -190,12 +202,16 @@ fun SaleTableItem(
     sale: Sale,
     index: Int,
     weights: List<Float>,
-    onCreditNoteClick: (Sale) -> Unit,
-    onViewClick: (Sale) -> Unit
+    onViewClick: (Sale) -> Unit,
+    saleDto: SnapshotStateList<com.pavicontech.desktop.agent.data.remote.dto.response.getSales.Sale>
 ) {
+    var isCreditNoteLoading by remember { mutableStateOf(false) }
 
     var showDialog by remember { mutableStateOf(false) }
     val selectedSale = remember { mutableStateOf<Sale?>(null) }
+    val creditNoteUseCase: CreateCreditNoteUseCase = koinInject()
+    val scope = rememberCoroutineScope()
+
 
     if (showDialog) {
         SaleDetailsDialog(
@@ -232,11 +248,32 @@ fun SaleTableItem(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(
-                onClick = { onCreditNoteClick(sale) },
-                modifier = Modifier.width(180.dp)
-            ) {
-                Text("Credit Note")
+            AnimatedVisibility(isCreditNoteLoading){
+                CircularProgressIndicator(color = MaterialTheme.colors.error, modifier = Modifier.padding(70.dp)
+                    .width(24.dp))
+            }
+            AnimatedVisibility(!isCreditNoteLoading){
+                OutlinedButton(
+                    onClick = {
+                        val saleBody = saleDto.first { it.id.toString() == sale.id }
+                        scope.launch {
+                            creditNoteUseCase(body = saleBody.toCrediNoteReq()).collect { result->
+                                isCreditNoteLoading = when(result){
+                                    is Resource.Loading -> true
+                                    is Resource.Success -> false
+                                    is Resource.Error -> false
+                                }
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colors.error
+                    ),
+                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.error),
+                    modifier = Modifier.width(150.dp),
+                ) {
+                    Text("Credit Note")
+                }
             }
             TextButton(
                 onClick = { selectedSale.value = sale; showDialog = true },

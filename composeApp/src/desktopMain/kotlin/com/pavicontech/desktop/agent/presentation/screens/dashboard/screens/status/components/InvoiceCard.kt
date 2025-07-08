@@ -1,6 +1,7 @@
 package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.components
 
 import RetryInvoicingUseCase
+import ShareInvoiceUseCase
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
@@ -28,6 +30,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,9 +60,11 @@ import com.pavicontech.desktop.agent.data.local.database.entries.EtimsStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.ExtractionStatus
 import com.pavicontech.desktop.agent.data.local.database.entries.Invoice
 import com.pavicontech.desktop.agent.domain.usecase.invoices.GetFilteredInvoicesUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.DeleteInvoiceUseCase
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.components.loadPdfFirstPageAsImage
 import io.github.vinceglb.filekit.utils.toFile
+import io.ktor.network.tls.CipherSuite
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import org.jetbrains.compose.resources.painterResource
@@ -76,6 +81,8 @@ fun InvoiceRow(
     index: Int, invoice: Invoice, onRefresh: () -> Unit, modifier: Modifier = Modifier
 ) {
     val deleteInvoiceUseCase: DeleteInvoiceUseCase = koinInject()
+    val shareInvoiceUseCase:ShareInvoiceUseCase = koinInject()
+    val getItemsUseCase: GetItemsUseCase = koinInject()
     val extractionColor = when (invoice.extractionStatus) {
         ExtractionStatus.SUCCESSFUL -> Color(0xFF4CAF50)
         ExtractionStatus.FAILED -> Color(0xFFF44336)
@@ -286,16 +293,48 @@ fun InvoiceRow(
                     )
                 }
 
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            deleteInvoiceUseCase(invoice.fileName, invoice.invoiceNumber)
-                            onRefresh()
-                        }
-                    }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete, contentDescription = "Delete Invoice"
-                    )
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    IconButton(
+                        modifier = Modifier
+                            .clip(shape = CircleShape)
+                            .background(color = MaterialTheme.colors.primary.copy(0.3f)),
+                        onClick = {
+                            scope.launch {
+
+                                shareInvoiceUseCase(
+                                    attachment = Path(
+                                        Constants.FISCALIZED_RECEIPTS_PATH.pathString,
+                                        invoice.fileName
+                                    ).toFile()
+                                )
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Default.Share, contentDescription = "Share Invoice",
+                            tint = MaterialTheme.colors.primary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    IconButton(
+                        modifier = Modifier
+                            .clip(shape = CircleShape)
+                            .background(color = MaterialTheme.colors.error.copy(0.3f)),
+                        onClick = {
+                            scope.launch {
+                                deleteInvoiceUseCase(invoice.fileName, invoice.invoiceNumber)
+                                getItemsUseCase()
+                                onRefresh()
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete, contentDescription = "Delete Invoice",
+                            tint = MaterialTheme.colors.error
+                        )
+                    }
                 }
             }
         }

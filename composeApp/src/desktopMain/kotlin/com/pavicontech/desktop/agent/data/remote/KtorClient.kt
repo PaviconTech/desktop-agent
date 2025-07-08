@@ -11,6 +11,7 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -35,6 +36,17 @@ object KtorClient {
             install(Logging) {
                 logger = Logger.SIMPLE
                 level = LogLevel.HEADERS
+            }
+
+            install(HttpRequestRetry) {
+                retryOnServerErrors(maxRetries = 3)
+                retryIf(maxRetries = 3) { request, response ->
+                    response.status.value in 500..599 // Handles 500, 502, 503, 504 etc.
+                }
+                retryOnException(maxRetries = 3, retryOnTimeout = true)
+                delayMillis { retry -> // exponential backoff: 500ms, 1000ms, 1500ms...
+                    retry * 500L
+                }
             }
 
             engine {

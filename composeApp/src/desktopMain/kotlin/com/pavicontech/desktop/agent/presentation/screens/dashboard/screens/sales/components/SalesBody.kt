@@ -3,6 +3,7 @@ package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sal
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pavicontech.desktop.agent.domain.model.Sale
@@ -16,7 +17,7 @@ fun SalesBody(
     isLoading: Boolean,
     onRefresh: () -> Unit,
     onViewClick: (Sale) -> Unit,
-    onCreditNoteClick: (Sale) -> Unit
+    saleDto: SnapshotStateList<com.pavicontech.desktop.agent.data.remote.dto.response.getSales.Sale>
 ) {
     Column(
         modifier = Modifier
@@ -24,11 +25,11 @@ fun SalesBody(
 
     ) {
         SalesTable(
+            saleDto = saleDto,
             sales = sales,
             isLoading = isLoading,
             onRefresh = onRefresh,
             onViewClick = onViewClick,
-            onCreditNoteClick = onCreditNoteClick
         )
     }
 }
