@@ -4,6 +4,7 @@ package com.pavicontech.desktop.agent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -58,10 +59,30 @@ fun App(width: Dp, height: Dp) {
                     hostState = snackbarHostState,
                     modifier = Modifier
                         .fillMaxWidth(0.2f)
-                        .offset(
-                            x = width-380.dp , y = -(height-100.dp)
+                        .padding(top = 16.dp, end = 8.dp)
+                        .offset(x = width * 0.8f, y = -(height * 0.85f))
+                ){
+                    val snackbarData = it
+                    // Get the event from ObserveAsEvents
+                    val event = SnackbarController.getCurrentEvent()
+
+                    // Use color from event if provided, otherwise determine from message
+                    val snackbarColor = event?.color ?: SnackbarController.getEventColor(snackbarData.message)
+
+                    Surface(
+                        modifier = Modifier.fillMaxWidth().padding(8.dp),
+                        elevation = 8.dp,
+                        shape = MaterialTheme.shapes.medium,
+                        color = snackbarColor,
+                        contentColor = MaterialTheme.colors.onPrimary
+                    ) {
+                        Text(
+                            text = snackbarData.message,
+                            modifier = Modifier.padding(8.dp),
+                            maxLines = 3
                         )
-                )
+                    }
+                }
             },
             modifier = Modifier.fillMaxSize()
         ) {

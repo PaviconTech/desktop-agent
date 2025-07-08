@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.data.remote.dto.response.getSales
 
+import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.CreditNoteReq
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -62,4 +63,52 @@ data class Sale(
     val trdInvcNo: Int,
     val updatedAt: String,
     val userId: Int
+)
+
+
+fun Sale.toCrediNoteReq() = CreditNoteReq(
+    cfmDt = cfmDt,
+    custEmail = custNm ?: "",
+    custNm = custNm ?: "",
+    custTel = custTin ?: "",
+    custTin = custTin ?: "",
+    custType = "NEW",
+    invcNo = invcNo.toString(),
+    itemList = items.map {
+        it.toCreditNoteItem()
+    },
+    modrId = "Admin",
+    modrNm = "Admin",
+    orgInvcNo = orgInvcNo,
+    pmtTyCd = pmtTyCd,
+    prchrAcptcYn = prchrAcptcYn ?: "N",
+    rcptTyCd = rcptTyCd,
+    regrId = "Admin",
+    regrNm = "Admin",
+    remark = remark ?: "",
+    rfdRsnCd = rfdRsnCd ?: "",
+    salesDt = salesDt,
+    salesSttsCd = salesSttsCd,
+    salesTyCd = salesTyCd,
+    stockRlsDt = stockRlsDt,
+    taxAmtA = taxAmtA.toInt(),
+    taxAmtB = taxAmtB.toInt(),
+    taxAmtC = taxAmtC.toInt(),
+    taxAmtD = taxAmtD.toInt(),
+    taxAmtE = taxAmtE.toInt(),
+    taxRtA = taxRtA.toInt(),
+    taxRtB = taxRtB.toInt(),
+    taxRtC = taxRtC.toInt(),
+    taxRtD = taxRtD.toInt(),
+    taxRtE = taxRtE.toInt(),
+    taxblAmtA = taxblAmtA.toInt(),
+    taxblAmtB = taxblAmtB.toInt(),
+    taxblAmtC = taxblAmtC.toInt(),
+    taxblAmtD = taxblAmtD.toInt(),
+    taxblAmtE = taxblAmtE.toInt(),
+    totAmt = totAmt.toInt(),
+    totItemCnt = totItemCnt,
+    totTaxAmt = totTaxAmt.toInt(),
+    totTaxblAmt = totTaxblAmt.toInt(),
+    trdInvcNo = trdInvcNo.toString(),
 )

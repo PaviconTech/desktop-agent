@@ -4,7 +4,9 @@ import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.remote.dto.request.AddItemReq
+import com.pavicontech.desktop.agent.data.remote.dto.request.AdjustStockReq
 import com.pavicontech.desktop.agent.data.remote.dto.response.AddItemRes
+import com.pavicontech.desktop.agent.data.remote.dto.response.adjustStock.AdjustStockRes
 import com.pavicontech.desktop.agent.data.remote.dto.response.getInvoices.GetInvoicesRes
 import com.pavicontech.desktop.agent.data.remote.dto.response.getItems.GetItemsRes
 import com.pavicontech.desktop.agent.data.remote.dto.response.pullClassificationCodes.PullClassificationCodes
@@ -79,4 +81,15 @@ class ItemsRepositoryImpl(private val api: HttpClient) : ItemsRepository {
             Json.decodeFromString(it)
         }
     }
+
+    override suspend fun adjustStock(body: AdjustStockReq, token: String): AdjustStockRes = withContext(Dispatchers.IO) {
+        return@withContext api.post(urlString = "${Constants.ETIMS_BACKEND}/stock/adjust"){
+            headers { header("Authorization", "Bearer $token") }
+            setBody(body)
+        }.bodyAsText().let {
+            it.logger(Type.INFO)
+            Json.decodeFromString(it)
+        }
+    }
+
 }

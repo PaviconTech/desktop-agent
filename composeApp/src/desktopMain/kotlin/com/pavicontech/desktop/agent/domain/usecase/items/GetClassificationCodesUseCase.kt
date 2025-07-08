@@ -6,7 +6,7 @@ import com.pavicontech.desktop.agent.data.local.database.repository.ItemLocalRep
 import com.pavicontech.desktop.agent.domain.repository.ItemsRepository
 
 class GetClassificationCodesUseCase(
-    private val itemsLocalRepository: ItemLocalRepository
+    private val itemsLocalRepository: ItemLocalRepository,
 
 ) {
     suspend operator fun invoke(): List<ClassificationCode>? = try {

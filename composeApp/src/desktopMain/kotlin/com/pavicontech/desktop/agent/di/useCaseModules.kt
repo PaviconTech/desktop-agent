@@ -13,6 +13,7 @@ import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFileUseCas
 import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFolderUseCase
 import com.pavicontech.desktop.agent.domain.usecase.invoices.GetFilteredInvoicesUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.AddItemUseCase
+import com.pavicontech.desktop.agent.domain.usecase.items.AdjustStockUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.GetClassificationCodesUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.GetItemCodesListUseCase
 import com.pavicontech.desktop.agent.domain.usecase.items.GetItemsUseCase
@@ -34,6 +35,7 @@ import com.pavicontech.desktop.agent.domain.usecase.sales.ExtractInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.GenerateQRBitmap
 import com.pavicontech.desktop.agent.domain.usecase.sales.GetEtimsSalesUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintOutOptionUseCase
+import com.pavicontech.desktop.agent.domain.usecase.sales.GetAllCreditNotesUseCase
 import org.koin.dsl.module
 
 
@@ -76,4 +78,7 @@ val useCaseModules = module {
     single { SaveHtmlAsPdfUseCase() }
     single { GenerateHtmlReceipt80MMUseCase(get()) }
     single { InvoiceNumberChecker() }
+
+    single { AdjustStockUseCase(get(), get()) }
+    single { GetAllCreditNotesUseCase(get(), get()) }
 }

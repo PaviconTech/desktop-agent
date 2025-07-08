@@ -73,10 +73,7 @@ import kotlin.io.path.pathString
 
 @Composable
 fun InvoiceRow(
-    index: Int,
-    invoice: Invoice,
-    onRefresh:()->Unit,
-    modifier: Modifier = Modifier
+    index: Int, invoice: Invoice, onRefresh: () -> Unit, modifier: Modifier = Modifier
 ) {
     val deleteInvoiceUseCase: DeleteInvoiceUseCase = koinInject()
     val extractionColor = when (invoice.extractionStatus) {
@@ -105,8 +102,7 @@ fun InvoiceRow(
     var selectedFile by remember { mutableStateOf<File?>(null) }
     var selectedPath by remember { mutableStateOf<String?>(null) }
     var watchFolder: String? by remember { mutableStateOf(null) }
-    val selectedFilter by keyValueStorage.observe(Constants.INVOICE_STATUS_FILTER)
-        .collectAsState("ALL")
+    val selectedFilter by keyValueStorage.observe(Constants.INVOICE_STATUS_FILTER).collectAsState("ALL")
 
     LaunchedEffect(Unit) {
         watchFolder = keyValueStorage.get(Constants.WATCH_FOLDER) ?: ""
@@ -116,18 +112,13 @@ fun InvoiceRow(
 
 
     ShowInvoice(
-        file = selectedFile,
-        showDialogBox = isDialogBoxVisible,
-        onDismiss = {
+        file = selectedFile, showDialogBox = isDialogBoxVisible, onDismiss = {
             isDialogBoxVisible = false
             selectedFile = null
-        }
-    )
+        })
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 16.dp),
+        modifier = modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 16.dp),
         shape = RoundedCornerShape(4.dp),
         elevation = 4.dp
     ) {
@@ -142,7 +133,8 @@ fun InvoiceRow(
                     text = "#$index",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    modifier = Modifier.weight(0.05f)
+                    modifier = Modifier
+                        .width(50.dp)
 
                 )
 
@@ -151,16 +143,16 @@ fun InvoiceRow(
                     text = invoice.fileName,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .weight(0.2f)
-                        .width(300.dp),
+                    modifier = Modifier.weight(0.2f).width(300.dp),
                     maxLines = 1
                 )
 
                 // 3. Extraction Status
-                Row (
-                    verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(0.35f)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .width(400.dp)
+                        .padding(end = 8.dp)
+                        //.weight(0.35f)
                 ) {
                     StatusBadge(
                         "Extraction",
@@ -172,8 +164,7 @@ fun InvoiceRow(
 
                             selectedFile = path?.toFile()
                             isDialogBoxVisible = true
-                        }
-                    )
+                        })
                     Spacer(Modifier.width(4.dp))
 
                     // 4. ETIMS Status
@@ -184,7 +175,8 @@ fun InvoiceRow(
                         viewInvoice = invoice.etimsStatus == EtimsStatus.SUCCESSFUL,
                         onViewInvoice = {
 
-                            selectedFile = Path(Constants.FISCALIZED_RECEIPTS_PATH.pathString, invoice.fileName) .toFile()
+                            selectedFile =
+                                Path(Constants.FISCALIZED_RECEIPTS_PATH.pathString, invoice.fileName).toFile()
                             isDialogBoxVisible = true
                         },
                         isRetryLoading = isLoading,
@@ -193,19 +185,14 @@ fun InvoiceRow(
                             scope.launch {
                                 retryInvoice(
                                     file = Directory(
-                                        fullDirectory = path?.toFile()?.path ?: "",
-                                        path = Constants.WATCH_FOLDER,
-                                        fileName = invoice.fileName
-                                    ),
-                                    isLoading = { isLoading = it },
-                                    onSuccess = {
-                                        onRefresh()
-                                    },
-                                    onError = {}
-                                )
+                                    fullDirectory = path?.toFile()?.path ?: "",
+                                    path = Constants.WATCH_FOLDER,
+                                    fileName = invoice.fileName
+                                ), isLoading = { isLoading = it }, onSuccess = {
+                                    onRefresh()
+                                }, onError = {})
                             }
-                        }
-                    )
+                        })
                 }
 
                 // 5. Items
@@ -216,11 +203,14 @@ fun InvoiceRow(
                     if (!showMoreItems) {
                         if (invoice.items.isNotEmpty()) {
                             val it = invoice.items.first()
-                            Column {
+                            Column(
+                                modifier = Modifier.width(200.dp)
+                            ) {
                                 Text(
-                                    text = "${it.itemDescription} • Qty ${it.quantity} • KES ${it.amount}",
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.width(300.dp)
+                                    text = """
+                                        ${it.itemDescription}
+                                        Qty ${it.quantity} • KES ${it.amount}
+                                    """.trimIndent(), fontSize = 12.sp, modifier = Modifier.fillMaxWidth()
 
                                 )
                                 TextButton(
@@ -263,9 +253,7 @@ fun InvoiceRow(
                     modifier = Modifier.weight(0.2f)
                 ) {
                     Text(
-                        text = "Total Amount",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        text = "Total Amount", fontWeight = FontWeight.Bold, fontSize = 14.sp
                     )
                     val totalAmount = invoice.items.sumOf { it.amount * it.quantity }
                     val totalTax = invoice.items.sumOf { it.taxAmount }
@@ -280,33 +268,33 @@ fun InvoiceRow(
 
                 // 8 & 9. Created/Updated
                 Column(
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.weight(0.2f)
+                    horizontalAlignment = Alignment.Start, modifier = Modifier.weight(0.2f).width(200.dp)
                 ) {
                     Text(
                         text = "Created: $createdDate",
                         fontSize = 11.sp,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = "Updated: $updatedDate",
                         fontSize = 11.sp,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        modifier = Modifier.fillMaxWidth()
+
                     )
                 }
 
                 IconButton(
-                    onClick ={
+                    onClick = {
                         scope.launch {
                             deleteInvoiceUseCase(invoice.fileName, invoice.invoiceNumber)
                             onRefresh()
                         }
-                    }
-                ) {
+                    }) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Invoice"
+                        imageVector = Icons.Default.Delete, contentDescription = "Delete Invoice"
                     )
                 }
             }
@@ -316,9 +304,7 @@ fun InvoiceRow(
 
 @Composable
 fun ShowInvoice(
-    file: File?,
-    showDialogBox: Boolean,
-    onDismiss: () -> Unit
+    file: File?, showDialogBox: Boolean, onDismiss: () -> Unit
 ) {
     var image: ImageBitmap? by remember(file) { mutableStateOf(null) }
     val isPdf = remember(file) { file?.extension?.lowercase() == "pdf" }
@@ -336,10 +322,8 @@ fun ShowInvoice(
 
     if (showDialogBox) {
         Dialog(
-            onDismissRequest = onDismiss,
-            properties = DialogProperties(
-                dismissOnBackPress = true,
-                dismissOnClickOutside = true
+            onDismissRequest = onDismiss, properties = DialogProperties(
+                dismissOnBackPress = true, dismissOnClickOutside = true
             )
         ) {
             image?.let {
@@ -358,7 +342,6 @@ fun ShowInvoice(
 }
 
 
-
 @Composable
 fun StatusBadge(
     label: String,
@@ -371,64 +354,55 @@ fun StatusBadge(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier
-            .width(200.dp)
-            .wrapContentHeight()
-            .clip(RoundedCornerShape(8.dp))
-            .background(color.copy(alpha = 0.1f))
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+        modifier = modifier.width(200.dp).wrapContentHeight().clip(RoundedCornerShape(8.dp))
+            .background(color.copy(alpha = 0.1f)).padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "$label:",
-            fontSize = 11.sp,
-            color = color,
-            fontWeight = FontWeight.Medium
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = status,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(0.7f)
 
-        if(viewInvoice) {
+        ) {
+            Text(
+                text = "$label:",
+                fontSize = 10.sp,
+                color = color,
+                fontWeight = FontWeight.Medium,
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = status, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = color
+            )
+        }
+
+        if (viewInvoice) {
             TextButton(
-                onClick = onViewInvoice,
-                colors = ButtonDefaults.outlinedButtonColors(
+                onClick = onViewInvoice, colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = Color.Transparent
-                )
+                ), modifier = Modifier.weight(0.3f)
             ) {
-                Text(text = "view")
+                Text(
+                    text = "view",
+                    fontSize = 10.sp,
+                    )
             }
         }
-        if(!viewInvoice) {
+        if (!viewInvoice) {
             if (isRetryLoading) {
                 CircularProgressIndicator()
             } else {
                 TextButton(
-                    onClick = onRetry,
-                    colors = ButtonDefaults.outlinedButtonColors(
+                    onClick = onRetry, colors = ButtonDefaults.outlinedButtonColors(
                         backgroundColor = Color.Transparent
                     )
                 ) {
                     Text(
-                        text = "retry",
-                        textDecoration = TextDecoration.Underline
+                        text = "retry", textDecoration = TextDecoration.Underline
                     )
                 }
             }
         }
     }
 }
-
-
-
-
-
-
-
 
 
 fun String.toLocalFormattedString(): String {

@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.domain.model
 
+import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.CreditNoteReq
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.Receipt
 
 data class Sale(
@@ -17,3 +18,4 @@ data class Sale(
     val tax: Double,
     val createdAt: String,
 )
+

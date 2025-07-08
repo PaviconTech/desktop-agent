@@ -14,11 +14,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pavicontech.desktop.agent.common.Resource
+import com.pavicontech.desktop.agent.data.remote.dto.response.getSales.toCrediNoteReq
 import com.pavicontech.desktop.agent.domain.model.Sale
+import com.pavicontech.desktop.agent.domain.usecase.sales.CreateCreditNoteUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.GetEtimsSalesUseCase
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.SaleDetailsDialog
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.SalesBody
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.SalesUpperSection
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -26,16 +30,22 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun SalesScreen() {
     val getEtimsSalesUseCase: GetEtimsSalesUseCase = koinInject()
+    val creditNoteUseCase: CreateCreditNoteUseCase = koinInject()
+    val scope = rememberCoroutineScope()
+
     val sales = remember { mutableStateListOf<Sale>() }
     var refresh by remember { mutableStateOf("") }
     var searchQuery by remember { mutableStateOf("") }
     var isSaleLoading by remember { mutableStateOf(false) }
+    var salesDto = remember { mutableStateListOf<com.pavicontech.desktop.agent.data.remote.dto.response.getSales.Sale>() }
 
 
     LaunchedEffect(refresh) {
         isSaleLoading = true
         sales.clear()
-        getEtimsSalesUseCase()?.let { sales.addAll(it) }
+        val sale = getEtimsSalesUseCase()
+        sale?.second?.let { sales.addAll(it) }
+        sale?.first?.let { salesDto.addAll(it) }
         isSaleLoading = false
     }
 
@@ -75,8 +85,25 @@ fun SalesScreen() {
             onRefresh = { refresh = LocalDateTime.now().format(formatter) },
             onViewClick = {
             },
-            onCreditNoteClick = {
-                // Handle credit note click
+            onCreditNoteClick = { saleCredit->
+                val saleBody = salesDto.first { it.id.toString() == saleCredit.id }
+                scope.launch {
+                    creditNoteUseCase(body = saleBody.toCrediNoteReq()).collect { result->
+                        when(result){
+                            is Resource.Loading -> {
+                                println(result.message)
+                            }
+                            is Resource.Success -> {
+                                println(result.data)
+                            }
+                            is Resource.Error -> {
+                                println(result.message)
+                                println(result.data)
+                            }
+                        }
+                    }
+                }
+                println(saleBody)
             }
         )
     }

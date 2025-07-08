@@ -1,7 +1,6 @@
 package com.pavicontech.desktop.agent.data.remote.dto.response.getItems
 
 
-import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.CreateCreditNoteItem
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -103,43 +102,5 @@ data class Item(
     }
 
 
-    fun toCreateCreditNoteItem(
-        qty:Int,
-        prc:Int,
-        dcRt:Int,
-        dcAmt:Int,
-        splyAmt:Int,
-        taxblAmt:Int,
-        taxAmt:Int,
-        totAmt:Int,
-    ): CreateCreditNoteItem {
-        return CreateCreditNoteItem(
-            itemSeq = 0,
-            itemCd = itemCategory?.category,
-            itemClsCd = itemClassificationCode,
-            itemNm = itemName,
-            bcd = "$barcode",
-            pkgUnitCd =packagingUnit ,
-            qtyUnitCd = quantityUnit,
-            qty = "$qty"    ,
-            prc =  "$prc",
-            splyAmt = "$splyAmt",
-            dcRt =  "$dcRt",
-            dcAmt = "$dcAmt" ,
-            isrcRt = null,
-            isrcAmt = null,
-            isrccCd = null,
-            isrccNm = null,
-            taxTyCd = taxCode,
-            taxblAmt = "$taxblAmt",
-            taxAmt =  "$taxAmt",
-            totAmt = "$totAmt",
-            description = "null",
-            id = "$id",
-            itemId = id,
-            itemCodeDf = itemCodeDf,
-
-            )
-    }
 
 }

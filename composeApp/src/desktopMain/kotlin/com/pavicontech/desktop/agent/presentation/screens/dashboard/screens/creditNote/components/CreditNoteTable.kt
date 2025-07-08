@@ -1,4 +1,4 @@
-package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components
+package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.creditNote.components
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -34,44 +33,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pavicontech.desktop.agent.domain.model.Sale
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import androidx.compose.ui.unit.sp
+import com.pavicontech.desktop.agent.data.remote.dto.response.getAllCreditNotes.Credit
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.components.toLocalFormattedString
 
 
 @Composable
-fun SalesTable(
-    sales: List<Sale>,
+fun CreditNoteTable(
+    creditNotes: List<Credit>,
     isLoading: Boolean,
     onRefresh: () -> Unit,
-    onViewClick: (Sale) -> Unit,
-    onCreditNoteClick: (Sale) -> Unit
+    onViewClick: (Credit) -> Unit,
 ) {
 
+// -- Inside SalesTable --
     val headers = listOf(
-        "No.", "Date", "Cust. Name", "KRA PIN", "REF No.",
-        "Invoice No.", "Status", "Items",
-        "Amount", "Tax", "Action"
+        "No.", "Invoice No.", "Original Invoice No.", "Items", "Amount",
+        "Tax", "Credit Note Date", "Action"
     )
 
     val weights = listOf(
-        0.5f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0.7f, 0.8f
+        0.5f, 1f, 1f, 1f, 1f, 1f, 1f, 1.5f
     )
 
+
     Column(modifier = Modifier.fillMaxWidth()) {
-        SalesTableHeader(headers, weights, onRefresh = onRefresh)
-        SalesTableBody(
-            sales = sales.toList(),
+        CreditNoteTableHeader(headers, weights, onRefresh = onRefresh)
+        CreditNoteTableBody(
+            creditNotes = creditNotes.toList(),
             weights = weights,
             isLoading = isLoading,
             onViewClick = onViewClick,
-            onCreditNoteClick = onCreditNoteClick
         )
     }
 }
 
 @Composable
-fun SalesTableHeader(
+fun CreditNoteTableHeader(
     items: List<String>,
     weights: List<Float>,
     onRefresh: () -> Unit
@@ -129,12 +127,11 @@ fun SalesTableHeader(
 
 
 @Composable
-fun SalesTableBody(
+fun CreditNoteTableBody(
     isLoading: Boolean,
-    sales: List<Sale>,
+    creditNotes: List<Credit>,
     weights: List<Float>,
-    onViewClick: (Sale) -> Unit,
-    onCreditNoteClick: (Sale) -> Unit
+    onViewClick: (Credit) -> Unit,
 ) {
     val listState = rememberLazyListState()
 
@@ -147,12 +144,11 @@ fun SalesTableBody(
                 .padding(end = 12.dp, start = 8.dp)
         ) {
             if (!isLoading) {
-                itemsIndexed(sales) { index, sale ->
-                    SaleTableItem(
-                        sale = sale,
+                itemsIndexed(creditNotes) { index, sale ->
+                    CreditNoteTableItem(
+                        creditNote = sale,
                         index = index,
                         weights = weights,
-                        onCreditNoteClick = onCreditNoteClick,
                         onViewClick = onViewClick
                     )
                 }
@@ -186,64 +182,85 @@ fun SalesTableBody(
 
 
 @Composable
-fun SaleTableItem(
-    sale: Sale,
+fun CreditNoteTableItem(
+    creditNote: Credit,
     index: Int,
     weights: List<Float>,
-    onCreditNoteClick: (Sale) -> Unit,
-    onViewClick: (Sale) -> Unit
+    onViewClick: (Credit) -> Unit
 ) {
 
     var showDialog by remember { mutableStateOf(false) }
-    val selectedSale = remember { mutableStateOf<Sale?>(null) }
 
-    if (showDialog) {
-        SaleDetailsDialog(
-            sale = sale,
-            onDismiss = {
-                showDialog = false
-            }
-        )
-    }
+
+        CreditNoteDialog(
+            sale = creditNote,
+            isVisible = showDialog,
+            onDismiss = { showDialog = false }
+                )
+
+
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 6.dp)
     ) {
-        Text(text = "${index + 1}", modifier = Modifier.weight(weights[0]))
         Text(
-            text = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-            modifier = Modifier.weight(weights[1])
+            text = "${index + 1}",
+            modifier = Modifier.weight(weights[0]),
+            fontSize = 14.sp
         )
-        Text(text = sale.customerName, modifier = Modifier.weight(weights[2]))
-        Text(text = sale.kraPin, modifier = Modifier.weight(weights[3]))
-        Text(text = sale.referenceNumber, modifier = Modifier.weight(weights[4]))
-        Text(text = sale.invoiceNumber, modifier = Modifier.weight(weights[5]))
-        Text(text = sale.status, modifier = Modifier.weight(weights[6]))
-        Text(text = "${sale.itemsCount}", modifier = Modifier.weight(weights[7]))
-        Text(text = "KES %.2f".format(sale.amount), modifier = Modifier.weight(weights[8]))
-        Text(text = "KES %.2f".format(sale.tax), modifier = Modifier.weight(weights[9]))
-
+        Text(
+            text = creditNote.invcNo.toString(),
+            modifier = Modifier.weight(weights[1]),
+            fontSize = 14.sp
+        )
+        Text(
+            text = creditNote.orgInvcNo.toString(),
+            modifier = Modifier.weight(weights[2]),
+            fontSize = 14.sp
+        )
+        Text(
+            text = "${creditNote.items.size}",
+            modifier = Modifier.weight(weights[3]),
+            fontSize = 14.sp
+        )
+        Text(
+            text = creditNote.totAmt,
+            modifier = Modifier.weight(weights[4]),
+            fontSize = 14.sp
+        )
+        Text(
+            text = creditNote.totTaxAmt,
+            modifier = Modifier.weight(weights[5]),
+            fontSize = 14.sp
+        )
+        Text(
+            text = creditNote.createdAt.toLocalFormattedString(),
+            modifier = Modifier.weight(weights[6]),
+            fontSize = 14.sp
+        )
         Row(
-            modifier = Modifier
-                .width(280.dp),
+            modifier = Modifier.weight(weights[7]),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(
-                onClick = { onCreditNoteClick(sale) },
-                modifier = Modifier.width(180.dp)
+                onClick = { showDialog = true },
+                modifier = Modifier.weight(0.4f)
             ) {
-                Text("Credit Note")
-            }
-            TextButton(
-                onClick = { selectedSale.value = sale; showDialog = true },
-                modifier = Modifier.width(80.dp)
-            ) {
-                Text("View")
+                Text("View", fontSize = 12.sp)
             }
         }
     }
 }
+
+
+
+
+
+
+
+
+

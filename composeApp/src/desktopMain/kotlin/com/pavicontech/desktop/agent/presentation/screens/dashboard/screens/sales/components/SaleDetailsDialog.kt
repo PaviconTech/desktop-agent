@@ -144,7 +144,7 @@ fun SaleDetailsDialog(
                             text = "Intrl Data: ${sale.intrlData ?: ""}",
                             style = MaterialTheme.typography.body2,
 
-                        )
+                            )
 
                     }
                 }

@@ -6,9 +6,9 @@ import com.pavicontech.desktop.agent.common.utils.generateTimestamp
 import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 
-import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.Receipt
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleReq
+import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.Receipt
 import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.CreateSaleRes
 import com.pavicontech.desktop.agent.domain.repository.SalesRepository
 

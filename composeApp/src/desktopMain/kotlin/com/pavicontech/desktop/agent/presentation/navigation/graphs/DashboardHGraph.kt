@@ -14,6 +14,7 @@ import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardSc
 import com.pavicontech.desktop.agent.presentation.navigation.screens.Graphs
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.items.ItemsScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.ProfileScreen
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.creditNote.CreditNoteScreenScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.SalesScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.SettingsScreen
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.StatusScreen
@@ -46,7 +47,7 @@ fun NavGraphBuilder.dashboardGraph(navController: NavHostController) {
         composable<DashboardScreens.CreditNotes>(
             enterTransition = { slideInVertically( initialOffsetY = { it }, animationSpec = tween(600, easing = FastOutSlowInEasing)) },
             exitTransition = { slideOutVertically( targetOffsetY = { -it }, animationSpec = tween(600, easing = LinearOutSlowInEasing)) }
-        ) { Text("CreditNOtes") }
+        ) { CreditNoteScreenScreen() }
 
         composable<DashboardScreens.Customers>(
             enterTransition = { slideInVertically( initialOffsetY = { it }, animationSpec = tween(600, easing = FastOutSlowInEasing)) },

@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.data.remote.dto.response.getSales
 
+import com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.Item
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -29,4 +30,32 @@ data class Item(
     val taxblAmt: String,
     val totAmt: String,
     val updatedAt: String
-)
+){
+    fun toCreditNoteItem() = com.pavicontech.desktop.agent.data.remote.dto.request.createCreditNoteSale.Item(
+        bcd = bcd,
+        createdAt = createdAt,
+        dcAmt = dcAmt.toIntOrNull() ?: 0,
+        dcRt = dcRt.toIntOrNull() ?: 0,
+        deletedAt = deletedAt,
+        id = id,
+        itemCd = itemCd,
+        itemClsCd = itemClsCd,
+        itemId = itemId,
+        itemNm = itemNm,
+        itemNmDef = itemNmDef,
+        itemSeq = itemSeq,
+        pkg = pkg.toIntOrNull() ?: 0,
+        pkgUnitCd = pkgUnitCd,
+        prc = prc.toIntOrNull() ?: 0,
+        qty = qty.toIntOrNull() ?: 0,
+        qtyUnitCd = qtyUnitCd,
+        salesId = salesId,
+        splyAmt = splyAmt.toIntOrNull() ?: 0,
+        status = status,
+        taxAmt = taxAmt.toIntOrNull() ?: 0,
+        taxTyCd = taxTyCd,
+        taxblAmt = taxblAmt.toIntOrNull() ?: 0,
+        totAmt = totAmt.toIntOrNull() ?: 0,
+        updatedAt = updatedAt
+    )
+}

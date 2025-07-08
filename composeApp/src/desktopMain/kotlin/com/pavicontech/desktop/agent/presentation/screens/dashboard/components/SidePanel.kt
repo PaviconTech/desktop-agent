@@ -123,31 +123,32 @@ fun SidePanel(
                         name = "Items",
                         onClick = onNavigateToItems
                     )
-                  /*  SidePanelItem(
+                  SidePanelItem(
                         isSelected = currentRoute == DashboardScreens.CreditNotes,
                         name = "Credit Notes",
                         onClick = onNavigateToCreditNotes
                     )
-                    SidePanelItem(
-                        isSelected = currentRoute == DashboardScreens.Customers,
-                        name = "Customers",
-                        onClick = onNavigateToCustomers
-                    )
-                    SidePanelItem(
-                        isSelected = currentRoute == DashboardScreens.Purchases,
-                        name = "Purchases",
-                        onClick = onNavigateToPurchases
-                    )
-                    SidePanelItem(
-                        isSelected = currentRoute == DashboardScreens.Imports,
-                        name = "Imports",
-                        onClick = onNavigateToImports
-                    )
-                    SidePanelItem(
-                        isSelected = currentRoute == DashboardScreens.Reports,
-                        name = "Reports",
-                        onClick = onNavigateToReports
-                    )*/
+                    /*
+                   SidePanelItem(
+                       isSelected = currentRoute == DashboardScreens.Customers,
+                       name = "Customers",
+                       onClick = onNavigateToCustomers
+                   )
+                   SidePanelItem(
+                       isSelected = currentRoute == DashboardScreens.Purchases,
+                       name = "Purchases",
+                       onClick = onNavigateToPurchases
+                   )
+                   SidePanelItem(
+                       isSelected = currentRoute == DashboardScreens.Imports,
+                       name = "Imports",
+                       onClick = onNavigateToImports
+                   )
+                   SidePanelItem(
+                       isSelected = currentRoute == DashboardScreens.Reports,
+                       name = "Reports",
+                       onClick = onNavigateToReports
+                   )*/
                     SidePanelItem(
                         isSelected = currentRoute == DashboardScreens.SettingsScreen,
                         name = "Settings",
