@@ -45,9 +45,10 @@ suspend fun installPdfCreator(onSuccess: suspend () -> Unit) {
         }
     }
 
-    val exitCode = process.waitFor()
+    val exitCode = runInstallerAsAdmin(installerFile.absolutePath)
+
     if (exitCode == 0) {
-        log("🎉 PDFCreator installer exited successfully.")
+        log("🎉 PDFCreator installer launched with elevation.")
         repeat(30) { attempt ->
             if (isPdfPrinterAvailable("PDFCreator")) {
                 log("🖨️ Printer 'PDFCreator' is available.")
@@ -60,7 +61,7 @@ suspend fun installPdfCreator(onSuccess: suspend () -> Unit) {
         }
         log("❌ PDFCreator printer not found after waiting. Something went wrong.")
     } else {
-        log("❌ Installation failed with exit code $exitCode")
+        log("❌ Installation failed or cancelled (exit code $exitCode)")
     }
 }
 
@@ -98,43 +99,81 @@ suspend fun log(message: String) {
 
 suspend fun isPdfPrinterAvailable(printerName: String): Boolean {
     return try {
-        log("🚀 Requesting admin privileges and running silent installer...")
-
         val powershellCommand = listOf(
-            "powershell",
-            "-Command",
-            "Start-Process -FilePath '$'{installerFile.absolutePath}' -ArgumentList '/VERYSILENT','/NORESTART' -Verb RunAs"
+            "powershell", "-Command",
+            "Get-Printer | Select-Object -ExpandProperty Name"
         )
 
         val process = ProcessBuilder(powershellCommand)
             .redirectErrorStream(true)
             .start()
 
-        val exitCode = process.waitFor()
-
-
         val output = process.inputStream.bufferedReader().readText()
         process.waitFor()
-        output.contains(printerName, ignoreCase = true)
+
+        log("🖨️ PowerShell printer list output:\n$output")
+
+        output.lines().any { it.contains(printerName, ignoreCase = true) }
     } catch (e: Exception) {
+        log("❌ Failed to check printer availability using PowerShell: ${e.message}")
         false
     }
 }
+
 
 suspend fun launchPdfCreator() {
     val pdfCreatorPath = "C:\\Program Files\\PDFCreator\\PDFCreator.exe"
     val pdfCreatorFile = File(pdfCreatorPath)
 
     if (pdfCreatorFile.exists()) {
-        log("🚀 Launching PDFCreator...")
-        val process = ProcessBuilder(pdfCreatorPath).start()
+        log("🚀 Launching PDFCreator as admin...")
 
-        withContext(Dispatchers.IO) {
-            delay(5000) // Give it a few seconds to start (instead of waitFor with timeout)
+        val powershellCommand = listOf(
+            "powershell",
+            "-Command",
+            "Start-Process -FilePath '$pdfCreatorPath' -Verb RunAs"
+        )
+
+        try {
+            val process = ProcessBuilder(powershellCommand)
+                .redirectErrorStream(true)
+                .start()
+
+            withContext(Dispatchers.IO) {
+                process.inputStream.bufferedReader().useLines { lines ->
+                    lines.forEach { log("[PDFCreator Admin Launch] $it") }
+                }
+            }
+
+            process.waitFor()
+            log("✅ PDFCreator launched as admin.")
+        } catch (e: Exception) {
+            log("❌ Failed to launch PDFCreator as admin: ${e.message}")
         }
-
-        log("✅ PDFCreator launched successfully.")
     } else {
         log("❌ PDFCreator executable not found at $pdfCreatorPath. Please check installation.")
     }
+}
+
+
+
+suspend fun runInstallerAsAdmin(installerPath: String): Int {
+    val powershellCommand = listOf(
+        "powershell",
+        "-Command",
+        "Start-Process '$installerPath' -ArgumentList '/VERYSILENT','/NORESTART' -Verb RunAs"
+    )
+
+    val process = ProcessBuilder(powershellCommand)
+        .redirectErrorStream(true)
+        .start()
+
+    // Optionally wait a few seconds to let user approve the UAC prompt
+    withContext(Dispatchers.IO) {
+        process.inputStream.bufferedReader().useLines { lines ->
+            lines.forEach { log("[ADMIN INSTALLER] $it") }
+        }
+    }
+
+    return process.waitFor()
 }
