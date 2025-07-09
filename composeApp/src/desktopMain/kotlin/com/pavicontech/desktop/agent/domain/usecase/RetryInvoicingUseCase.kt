@@ -170,7 +170,8 @@ class RetryInvoicingUseCase(
                 body = InvoiceReq(
                     fileName = fileName,
                     file = filePath.fileToByteArray(),
-                    invoiceWords = getInvoiceWords
+                    invoiceWords = getInvoiceWords,
+                    bussinessPin = businessInfo.kraPin
                 )
             )
             """
@@ -240,12 +241,7 @@ class RetryInvoicingUseCase(
         }
     }
 
-    private suspend fun extractAndSubmitInvoice(fullPath: String, fileName: String) {
 
-        pdfExtractorRepository.extractInvoiceData(
-            InvoiceReq(file = fullPath.fileToByteArray(), fileName = fileName)
-        )
-    }
 
 
     private suspend fun filterItems(

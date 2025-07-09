@@ -52,7 +52,8 @@ class ExtractInvoiceUseCase(
                 body = InvoiceReq(
                     fileName = fileName,
                     file = filePath.fileToByteArray(),
-                    invoiceWords = getInvoiceWords
+                    invoiceWords = getInvoiceWords,
+                    bussinessPin = businessInfo.kraPin
                 )
             )
             println(extractionResult)

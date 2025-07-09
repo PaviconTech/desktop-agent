@@ -179,10 +179,4 @@ class SubmitInvoicesUseCase(
         )
     }
 
-    private suspend fun extractAndSubmitInvoice(fullPath: String, fileName: String) {
-
-        pdfExtractorRepository.extractInvoiceData(
-            InvoiceReq(file = fullPath.fileToByteArray(), fileName = fileName)
-        )
-    }
 }
