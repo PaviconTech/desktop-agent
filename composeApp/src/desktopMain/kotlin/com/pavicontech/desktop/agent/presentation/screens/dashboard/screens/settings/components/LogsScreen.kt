@@ -5,14 +5,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -23,12 +26,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pavicontech.desktop.agent.common.utils.LogManager
+import desktopagent.composeapp.generated.resources.Res
+import desktopagent.composeapp.generated.resources.sic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.painterResource
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
@@ -155,42 +161,40 @@ fun LogsScreen() {
                 }
 
                 // Copy logs button
-                Button(
+                IconButton(
                     onClick = { copyLogsToClipboard() },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.primary.copy(alpha = 0.1f),
-                        contentColor = MaterialTheme.colors.primary
-                    ),
-                    elevation = ButtonDefaults.elevation(0.dp, 0.dp),
                     modifier = Modifier.height(36.dp)
+                        .clip(CircleShape)
+                        .background(color = MaterialTheme.colors.primary.copy(alpha = 0.1f),)
+
                 ) {
-                    // No icon for copy button
-                    // Using text only
-                    Spacer(Modifier.width(4.dp))
-                    Text("Copy")
+                    Icon(
+                        painter = painterResource(Res.drawable.sic),
+                        contentDescription = "Clear Logs",
+                        tint = MaterialTheme.colors.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
 
                 // Clear logs button
-                Button(
+                IconButton(
                     onClick = { clearLogs() },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.error.copy(alpha = 0.1f),
-                        contentColor = MaterialTheme.colors.error
-                    ),
-                    elevation = ButtonDefaults.elevation(0.dp, 0.dp),
+
                     modifier = Modifier.height(36.dp)
+                        .clip(CircleShape)
+                        .background(color = MaterialTheme.colors.error.copy(alpha = 0.1f),)
+
                 ) {
                     Icon(
-                        Icons.Default.Clear,
+                        Icons.Default.Delete,
                         contentDescription = "Clear Logs",
+                        tint = MaterialTheme.colors.error,
                         modifier = Modifier.size(18.dp)
                     )
-                    Spacer(Modifier.width(4.dp))
-                    Text("Clear")
                 }
 
                 // Refresh button
-                Button(
+               /* Button(
                     onClick = { isLoading = true },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = MaterialTheme.colors.primary.copy(alpha = 0.1f),
@@ -206,7 +210,7 @@ fun LogsScreen() {
                     )
                     Spacer(Modifier.width(4.dp))
                     Text("Refresh")
-                }
+                }*/
             }
         }
 

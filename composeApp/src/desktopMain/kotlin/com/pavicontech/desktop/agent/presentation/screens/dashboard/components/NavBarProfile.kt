@@ -65,7 +65,7 @@ fun NavBarProfile(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Row(
+        /*Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -89,7 +89,7 @@ fun NavBarProfile(
                 )
             }
 
-        }
+        }*/
     }
 }
 
