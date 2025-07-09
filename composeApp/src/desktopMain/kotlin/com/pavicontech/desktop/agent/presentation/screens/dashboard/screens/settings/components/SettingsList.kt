@@ -5,12 +5,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -34,19 +38,40 @@ import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFolderUseC
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SettingsList(
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
+    onNavigateToLogs:()-> Unit,
+    onNavigateToPrintoutConfigurations:()-> Unit,
 ) {
     var isPrintOutConfigExpanded by remember { mutableStateOf(false) }
 
     Column {
         PrinterOutConfiguration(
             isPrintOutConfigExpanded = isPrintOutConfigExpanded,
-            onExpandClick = {isPrintOutConfigExpanded = it},
+            onExpandClick = {
+                isPrintOutConfigExpanded = it
+                onNavigateToPrintoutConfigurations()
+
+            },
             content = {content()}
         )
         SelectWatchFolderSetting()
         SelectPrinter()
+        Surface(
+            onClick = onNavigateToLogs,
+            modifier = Modifier.fillMaxWidth()
+                .height(40.dp)
+        ) {
+           Text(
+               text = "4. Logs",
+               color = MaterialTheme.colors.primary,
+               fontWeight = FontWeight.Bold,
+               style = MaterialTheme.typography.body1,
+               modifier = Modifier.fillMaxWidth()
+                   .padding(horizontal = 16.dp, vertical = 8.dp),
+           )
+        }
     }
 }

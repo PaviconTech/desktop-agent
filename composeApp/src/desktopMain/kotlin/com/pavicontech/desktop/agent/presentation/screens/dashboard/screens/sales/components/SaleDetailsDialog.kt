@@ -293,6 +293,7 @@ private fun bindSaleToInvoice(
     date:String,
     onSuccess:(File)->Unit = {},
 ) {
+
     val scope = rememberCoroutineScope()
     val insertQrCodeToInvoiceUseCase: InsertQrCodeToInvoiceUseCase = koinInject()
     val generateQrCode: GenerateQrCodeUseCase = koinInject()
@@ -338,21 +339,25 @@ private fun bindSaleToInvoice(
             null
         }
 
-        kraInfoCoordinates?.let { kra ->
-            qrCodeCoordinates?.let { qr ->
-                insertQrCodeToInvoiceUseCase.invoke(
-                    inputPdf = inputFile,
-                    outPutPdf = outPutFile.toFile(),
-                    qrCodeImage = qrCode,
-                    kraInfoText = receiptText,
-                    coordinates = listOf(kra, qr),
-                    onSuccess = {
-                        onSuccess(outPutFile.toFile())
-                        outPutFile.toFile()
-                        println("Success Binding")
-                    }
-                )
+        try {
+            kraInfoCoordinates?.let { kra ->
+                qrCodeCoordinates?.let { qr ->
+                    insertQrCodeToInvoiceUseCase.invoke(
+                        inputPdf = inputFile,
+                        outPutPdf = outPutFile.toFile(),
+                        qrCodeImage = qrCode,
+                        kraInfoText = receiptText,
+                        coordinates = listOf(kra, qr),
+                        onSuccess = {
+                            onSuccess(outPutFile.toFile())
+                            outPutFile.toFile()
+                            println("Success Binding")
+                        }
+                    )
+                }
             }
+        }catch (e: Exception){
+            e.printStackTrace()
         }
     }
 

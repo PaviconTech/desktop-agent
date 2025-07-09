@@ -22,7 +22,9 @@ import org.koin.compose.koinInject
 
 @Composable
 fun SideColumnBody(
-    onSelectFile: @Composable () -> Unit
+    onSelectFile: @Composable () -> Unit,
+    onNavigateToLogs:()-> Unit,
+    onNavigateToPrintoutConfigurations:()-> Unit,
 ) {
     Surface(
         elevation = 8.dp,
@@ -31,9 +33,11 @@ fun SideColumnBody(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            SettingsList {
-                SelectPrintOptions()
-            }
+            SettingsList(
+                content = {       SelectPrintOptions() },
+                onNavigateToLogs = onNavigateToLogs,
+                onNavigateToPrintoutConfigurations = onNavigateToPrintoutConfigurations,
+            )
         }
     }
 }

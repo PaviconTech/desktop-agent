@@ -23,12 +23,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun CreditNoteUpperSection(searchQuery:String, onSearchQueryChange: (String) -> Unit) {
-    val brush = Brush.linearGradient(
-        listOf(
-            MaterialTheme.colors.primary,
-            MaterialTheme.colors.secondary,
-        )
-    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()

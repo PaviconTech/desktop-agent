@@ -7,15 +7,38 @@ import java.time.LocalDateTime
 object LogManager {
 
     private val logFile: File by lazy {
-
         val home = System.getProperty("user.home")
         val path = Paths.get(home, "Documents", "DesktopAgent" )
-        val dir = File(path.toFile(), ".coinx/logs")
+        val dir = File(path.toFile(), ".etimsSync/logs")
         dir.mkdirs()
         File(dir, "app.log")
     }
 
     private lateinit var logWriter: PrintWriter
+
+    // Expose the log file for the LogsScreen
+    fun retrieveLogFile(): File = logFile
+
+    // Log level methods
+    fun logInfo(message: String) {
+        log("INFO", message)
+    }
+
+    fun logWarning(message: String) {
+        log("WARNING", message)
+    }
+
+    fun logError(message: String) {
+        log("ERROR", message)
+    }
+
+    fun logDebug(message: String) {
+        log("DEBUG", message)
+    }
+
+    private fun log(level: String, message: String) {
+        println("[${LocalDateTime.now()}] [$level] $message")
+    }
 
     fun init() {
         try {

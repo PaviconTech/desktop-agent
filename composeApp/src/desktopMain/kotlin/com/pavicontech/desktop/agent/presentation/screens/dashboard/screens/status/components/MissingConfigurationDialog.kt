@@ -28,6 +28,7 @@ fun MissingConfigurationDialog(
     onNavigateToSettings: () -> Unit
 ) {
     val keyValueStorage: KeyValueStorage = koinInject()
+    val printOutSize = keyValueStorage.observe(Constants.PRINTOUT_SIZE).collectAsState(null)
 
     var invoiceWatchFolderPathConfiguration by remember { mutableStateOf<String?>(null) }
     var qrCodeCoordinatesConfiguration by remember { mutableStateOf<String?>(null) }
@@ -58,7 +59,7 @@ fun MissingConfigurationDialog(
         }
     }
 
-    if (isDialogVisible) {
+    if (isDialogVisible && printOutSize.value != "80mm") {
         DialogWindow(
             onCloseRequest = { isDialogVisible = false },
             title = "Missing Configuration",

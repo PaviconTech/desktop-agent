@@ -72,7 +72,10 @@ fun ItemsScreen() {
         onDismissRequest = {
             showAddNewItem = !showAddNewItem
         },
-        isShown = showAddNewItem
+        isShown = showAddNewItem,
+        onRefresh = {
+            refresh = LocalDateTime.now().format(formatter)
+        }
     )
 
     Column(

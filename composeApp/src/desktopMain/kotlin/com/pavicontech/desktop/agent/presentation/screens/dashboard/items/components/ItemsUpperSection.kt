@@ -65,28 +65,13 @@ fun ItemsUpperSection(
         //Spacer(modifier = Modifier.height(8.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            /*Row(
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                Box(
-                    modifier = Modifier
-                        .clip(shape = RoundedCornerShape(4.dp))
-                        .background(MaterialTheme.colors.secondary)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "Export",
-                        color = MaterialTheme.colors.onSecondary,
-                        modifier = Modifier.align(Alignment.Center),
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
                 Box(
                     modifier = Modifier
                         .clip(shape = RoundedCornerShape(4.dp))
@@ -100,20 +85,7 @@ fun ItemsUpperSection(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Box(
-                    modifier = Modifier
-                        .clip(shape = RoundedCornerShape(4.dp))
-                        .background(MaterialTheme.colors.secondary)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "Batch Upload",
-                        color = MaterialTheme.colors.onSecondary,
-                        modifier = Modifier.align(Alignment.Center),
-                    )
-                }
-            }*/
+            }
             Column {
                 Text(
                     text = "Search:",
