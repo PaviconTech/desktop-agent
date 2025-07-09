@@ -29,7 +29,9 @@ fun NavGraphBuilder.dashboardGraph(navController: NavHostController) {
             enterTransition = { slideInVertically( initialOffsetY = { it }, animationSpec = tween(600, easing = FastOutSlowInEasing)) },
             exitTransition = { slideOutVertically( targetOffsetY = { -it }, animationSpec = tween(600, easing = LinearOutSlowInEasing)) }
         ) {
-            StatusScreen()
+            StatusScreen(
+                onNavigateToSettings = {navController.navigate(DashboardScreens.SettingsScreen) { navController.popBackStack() } }
+            )
         }
 
         composable<DashboardScreens.Sales>(

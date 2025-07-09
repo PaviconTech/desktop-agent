@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +20,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenuState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -32,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,11 +54,19 @@ import com.pavicontech.desktop.agent.data.remote.dto.response.getSales.Item
 import com.pavicontech.desktop.agent.data.remote.dto.response.signIn.BussinessInfo
 import com.pavicontech.desktop.agent.domain.model.Sale
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
+import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFileUseCase
+import com.pavicontech.desktop.agent.domain.usecase.receipt.GenerateQrCodeUseCase
+import com.pavicontech.desktop.agent.domain.usecase.receipt.InsertQrCodeToInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.GenerateQRBitmap
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.components.BoxCoordinates
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.components.toLocalFormattedString
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.io.files.Path
 import kotlinx.serialization.json.Json
 import org.koin.compose.koinInject
+import java.io.File
+import java.nio.file.Paths
 
 @Composable
 fun SaleDetailsDialog(
@@ -61,11 +74,25 @@ fun SaleDetailsDialog(
     onDismiss: () -> Unit
 ) {
     val generateQRBitmap: GenerateQRBitmap = koinInject()
+    val selectFileUseCase: SelectFileUseCase = koinInject()
+    val scope = rememberCoroutineScope()
+
     val keyValueStorage: KeyValueStorage = koinInject()
 
     var pin by remember { mutableStateOf("") }
     var bhfid by remember { mutableStateOf("") }
     var qrUrl by remember { mutableStateOf("") }
+    var bindingInvoice by remember { mutableStateOf<File?>(null) }
+    var bindedInvoice by remember { mutableStateOf<File?>(null) }
+    var viewbindedInvoice by remember { mutableStateOf(false) }
+
+
+    ViewBindedInvoice(
+        file = bindedInvoice,
+        show = viewbindedInvoice,
+        onDismiss = {viewbindedInvoice = false}
+    )
+
 
     LaunchedEffect(Unit) {
         keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.let {
@@ -74,6 +101,21 @@ fun SaleDetailsDialog(
             bhfid = loaded.branchId
             qrUrl = "${Constants.ETIMS_QR_URL}$pin$bhfid${sale.receiptSign}"
         }
+    }
+
+    bindingInvoice?.let {
+        bindSaleToInvoice(
+            inputFile = it,
+            businessPin = pin,
+            bhfId = bhfid,
+            rcptSign = sale.receiptSign ?: "",
+            intrlData = sale.intrlData ?: "",
+            date = sale.createdAt.toLocalFormattedString(),
+            onSuccess = {file ->
+                viewbindedInvoice = true
+                bindedInvoice = file
+            }
+        )
     }
 
     DialogWindow(
@@ -101,6 +143,20 @@ fun SaleDetailsDialog(
                     Column {
                         Text("Sale Details", style = MaterialTheme.typography.h5)
                         Text("Invoice No: ${sale.invoiceNumber}", style = MaterialTheme.typography.subtitle2)
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    bindingInvoice = selectFileUseCase.invoke()
+                                    bindingInvoice?.let {
+
+                                    }
+                                    println(bindingInvoice)
+                                }
+                            },
+                            border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary)
+                        ){
+                            Text(text = "Bind Invoice to Sale")
+                        }
                     }
                     Image(
                         bitmap = generateQRBitmap(qrUrl),
@@ -226,3 +282,79 @@ fun InfoRow(label: String, value: String, highlight: Boolean = false) {
         )
     }
 }
+
+@Composable
+private fun bindSaleToInvoice(
+    inputFile: File,
+    businessPin: String,
+    bhfId: String,
+    rcptSign:String,
+    intrlData:String,
+    date:String,
+    onSuccess:(File)->Unit = {},
+) {
+    val scope = rememberCoroutineScope()
+    val insertQrCodeToInvoiceUseCase: InsertQrCodeToInvoiceUseCase = koinInject()
+    val generateQrCode: GenerateQrCodeUseCase = koinInject()
+    val keyValueStorage: KeyValueStorage = koinInject()
+
+
+    var qrCodeCoordinates by remember { mutableStateOf<BoxCoordinates?>(null) }
+    var kraInfoCoordinates by remember { mutableStateOf<BoxCoordinates?>(null) }
+
+    val userHome = System.getProperty("user.home")
+    val qrPath = Paths.get(userHome, "Documents", "Receipts", "BindingInvoice", "qr-code.png")
+
+    val receiptDir = Paths.get(userHome, "Documents", "DesktopAgent", "FiscalizedReceipts")
+    receiptDir.toFile().mkdirs() // ✅ Ensure directory exists
+    val outPutFile = receiptDir.resolve(inputFile.name)
+
+
+// ✅ Ensure directory exists
+    val qrCode = generateQrCode.invoke(
+        path = qrPath,
+        businessPin = businessPin,
+        bhfId = bhfId,
+        rcptSign = rcptSign
+    )
+
+
+    val receiptText = """
+                        INTRLDATA: $intrlData
+                        RCPTSIGN : $rcptSign
+                        VSDC DATE: $date
+                    """.trimIndent()
+
+    LaunchedEffect(inputFile){
+
+        qrCodeCoordinates = try {
+            BoxCoordinates.fromJson(keyValueStorage.get(Constants.QR_CODE_COORDINATES) ?: "")
+        } catch (e: Exception) {
+            null
+        }
+        kraInfoCoordinates = try {
+            BoxCoordinates.fromJson(keyValueStorage.get(Constants.KRA_INFO_COORDINATES) ?: "")
+        } catch (e: Exception) {
+            null
+        }
+
+        kraInfoCoordinates?.let { kra ->
+            qrCodeCoordinates?.let { qr ->
+                insertQrCodeToInvoiceUseCase.invoke(
+                    inputPdf = inputFile,
+                    outPutPdf = outPutFile.toFile(),
+                    qrCodeImage = qrCode,
+                    kraInfoText = receiptText,
+                    coordinates = listOf(kra, qr),
+                    onSuccess = {
+                        onSuccess(outPutFile.toFile())
+                        outPutFile.toFile()
+                        println("Success Binding")
+                    }
+                )
+            }
+        }
+    }
+
+}
+

@@ -1,9 +1,13 @@
 package com.pavicontech.desktop.agent.data.remote.dto.response.getAllCreditNotes
 
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
 @Serializable
 data class Credit(
     @SerialName("businessId") val businessId: Int,
@@ -12,7 +16,7 @@ data class Credit(
     @SerialName("cnclReqDt") val cnclReqDt: String? = null,
     @SerialName("createdAt") val createdAt: String,
     @SerialName("CreditNoteReceipt") val creditNoteReceipt: String? = null,
-    @SerialName("creditNoteReceiptId") val creditNoteReceiptId: String? = null,
+    @SerialName("creditNoteReceiptId") val creditNoteReceiptId: Int? = null,
     @SerialName("curRcptNo") val curRcptNo: String? = null,
     @SerialName("custNm") val custNm: String? = null,
     @SerialName("custTin") val custTin: String? = null,

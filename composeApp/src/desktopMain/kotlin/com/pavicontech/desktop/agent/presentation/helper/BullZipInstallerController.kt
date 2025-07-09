@@ -11,6 +11,12 @@ import kotlin.system.measureTimeMillis
 val logChannel = Channel<String>(Channel.UNLIMITED)
 
 suspend fun installPdfCreator(onSuccess: suspend () -> Unit) {
+    if (isPdfPrinterAvailable("PDFCreator")) {
+        log("✅ PDFCreator is already installed and printer is available.")
+        launchPdfCreator()
+        onSuccess()
+        return
+    }
     val installerUrl = "https://cdn.download.pdfforge.org/pdfcreator/6.0.1/PDFCreator-6_0_1-Setup.exe"
     val tempDir = System.getProperty("java.io.tmpdir")
     val installerFile = File(tempDir, "PDFCreatorInstaller.exe")
@@ -90,11 +96,22 @@ suspend fun log(message: String) {
     logChannel.send("[${System.currentTimeMillis()}] $message")
 }
 
-fun isPdfPrinterAvailable(printerName: String): Boolean {
+suspend fun isPdfPrinterAvailable(printerName: String): Boolean {
     return try {
-        val process = ProcessBuilder("powershell", "-Command", "Get-Printer -Name '$printerName'")
+        log("🚀 Requesting admin privileges and running silent installer...")
+
+        val powershellCommand = listOf(
+            "powershell",
+            "-Command",
+            "Start-Process -FilePath '$'{installerFile.absolutePath}' -ArgumentList '/VERYSILENT','/NORESTART' -Verb RunAs"
+        )
+
+        val process = ProcessBuilder(powershellCommand)
             .redirectErrorStream(true)
             .start()
+
+        val exitCode = process.waitFor()
+
 
         val output = process.inputStream.bufferedReader().readText()
         process.waitFor()
