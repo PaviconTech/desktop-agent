@@ -13,11 +13,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.pavicontech.desktop.agent.presentation.components.MaintenanceDialog
-import com.pavicontech.desktop.agent.presentation.components.UpdateDialog
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.components.UpdateDialog
 import com.pavicontech.desktop.agent.presentation.helper.ObserveAsEvents
 import com.pavicontech.desktop.agent.presentation.helper.SnackbarController
 import com.pavicontech.desktop.agent.presentation.navigation.graphs.MainNavGraph
-import com.pavicontech.desktop.agent.presentation.screens.signIn.components.SignInScreen
 import com.pavicontech.desktop.agent.presentation.theme.AppTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

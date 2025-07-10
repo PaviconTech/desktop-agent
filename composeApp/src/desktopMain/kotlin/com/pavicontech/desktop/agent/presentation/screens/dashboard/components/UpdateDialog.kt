@@ -1,37 +1,31 @@
-package com.pavicontech.desktop.agent.presentation.components
+package com.pavicontech.desktop.agent.presentation.screens.dashboard.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
-import com.pavicontech.desktop.agent.common.BuildConfig
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.ConfigCatClient
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.data.remote.dto.response.signIn.BussinessInfo
-import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.awt.Desktop
 import java.net.URI
 
 @Composable
 fun UpdateDialog(
-    currentVersion: String = BuildConfig.VERSION
+    currentVersion: String = Constants.VERSION
 ) {
     val keyValueStorage: KeyValueStorage = koinInject()
     val configClient = ConfigCatClient

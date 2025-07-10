@@ -16,7 +16,7 @@ import kotlin.coroutines.coroutineContext
 object ConfigCatClient {
 
     // initialize once
-    private val client = ConfigCatClient(BuildConfig.CONFIGCAT_SDK_KEY) {
+    private val client = ConfigCatClient(Constants.CONFIG_CAT_KEY) {
         logLevel = LogLevel.INFO
         // Optional polling setup: auto-poll every 60s (default)
     }

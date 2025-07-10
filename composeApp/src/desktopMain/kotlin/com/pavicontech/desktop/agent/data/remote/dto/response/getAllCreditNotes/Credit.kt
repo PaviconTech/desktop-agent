@@ -15,7 +15,7 @@ data class Credit(
     @SerialName("cnclDt") val cnclDt: String? = null,
     @SerialName("cnclReqDt") val cnclReqDt: String? = null,
     @SerialName("createdAt") val createdAt: String,
-    @SerialName("CreditNoteReceipt") val creditNoteReceipt: String? = null,
+   // @SerialName("CreditNoteReceipt") val creditNoteReceipt: String? = null,
     @SerialName("creditNoteReceiptId") val creditNoteReceiptId: Int? = null,
     @SerialName("curRcptNo") val curRcptNo: String? = null,
     @SerialName("custNm") val custNm: String? = null,

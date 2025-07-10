@@ -44,6 +44,7 @@ import com.pavicontech.desktop.agent.common.Resource
 import com.pavicontech.desktop.agent.data.remote.dto.response.getSales.toCrediNoteReq
 import com.pavicontech.desktop.agent.domain.model.Sale
 import com.pavicontech.desktop.agent.domain.usecase.sales.CreateCreditNoteUseCase
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.components.toLocalFormattedString
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
@@ -230,7 +231,7 @@ fun SaleTableItem(
     ) {
         Text(text = "${index + 1}", modifier = Modifier.weight(weights[0]))
         Text(
-            text = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            text = sale.createdAt.toLocalFormattedString(),
             modifier = Modifier.weight(weights[1])
         )
         Text(text = sale.customerName, modifier = Modifier.weight(weights[2]))

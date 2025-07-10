@@ -451,6 +451,7 @@ fun String.toLocalFormattedString(): String {
         val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm:ss a")
         localDateTime.format(formatter)
     } catch (e: Exception) {
+        e.printStackTrace()
         this
     }
 }

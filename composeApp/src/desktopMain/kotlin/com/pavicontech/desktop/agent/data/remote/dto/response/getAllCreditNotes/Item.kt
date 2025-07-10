@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Item(
-    @SerialName("bcd") val bcd: String,
+    @SerialName("bcd") val bcd: String? = null,
     @SerialName("createdAt") val createdAt: String,
     @SerialName("creditNoteId") val creditNoteId: Int,
     @SerialName("dcAmt") val dcAmt: String,
@@ -15,7 +15,7 @@ data class Item(
     @SerialName("id") val id: Int,
     @SerialName("itemCd") val itemCd: String,
     @SerialName("itemClsCd") val itemClsCd: String,
-    @SerialName("itemId") val itemId: Int,
+    @SerialName("itemId") val itemId: Int? = null,
     @SerialName("itemNm") val itemNm: String,
     @SerialName("itemNmDef") val itemNmDef: String,
     @SerialName("itemSeq") val itemSeq: Int,

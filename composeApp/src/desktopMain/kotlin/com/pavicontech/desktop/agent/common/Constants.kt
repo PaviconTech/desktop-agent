@@ -7,7 +7,6 @@ object Constants {
     //const val ETIMS_BACKEND = "https://etims.pavicontech.com/api"
     //LIVE
     const val ETIMS_BACKEND = "https://erp.pavicontech.com/api"
-    //const val ETIMS_BACKEND = "https://fe2e-2c0f-fe38-201d-8637-9928-921-56b7-5c08.ngrok-free.app"
     const val ETIMS_AI_BACKEND = "https://ai.pavicontech.com/pdf-extractor"
     //DEMO_QR
     //const val ETIMS_QR_URL = "https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
@@ -19,7 +18,12 @@ object Constants {
     val FISCALIZED_RECEIPTS_PATH = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "FiscalizedReceipts")
     val INVOICE_WATCH_FOLDER = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "InvoiceWatch")
 
-    // Local Storage Key Values
+
+    //Live
+    val CONFIG_CAT_KEY="configcat-sdk-1/j7_dCKqm_06Pn7CKUHM0iw/bYn4gNkNCUWp3Fn1IqusWg"
+    //DEMO
+    //val CONFIG_CAT_KEY="configcat-sdk-1/j7_dCKqm_06Pn7CKUHM0iw/JixiAYMDqkOA-FCMOugj8Q"
+    const val VERSION="1.2.5"
     const val INSTALLATION_PROCESS_STATUS = "INSTALLATION_PROCESS_STATUS"
     const val AUTH_TOKEN = "auth_token"
     const val AUTH_TOKEN_EXPIRY = "auth_token_expiry"
