@@ -1,5 +1,10 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+val appVersion = providers.gradleProperty("appVersion").get()
+val configCatSdkKey = providers.gradleProperty("configCatSdkKey").get()
+val generatedSrcDir = layout.buildDirectory.dir("generated/source/buildConfig")
+
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
@@ -20,6 +25,7 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
+            kotlin.srcDir(generatedSrcDir) // 👈 ADD THIS LINE
             dependencies {
                 val voyagerVersion = "1.1.0-beta02"
 
@@ -68,7 +74,10 @@ kotlin {
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
 
 
-                implementation("com.github.hkirk:java-html2image:0.9")            }
+                implementation("com.github.hkirk:java-html2image:0.9")
+                val configcatVersion = "5.0.1"
+                implementation("com.configcat:configcat-kotlin-client:${configcatVersion}")
+            }
         }
 
         val desktopMain by getting {
@@ -80,7 +89,27 @@ kotlin {
     }
 }
 
+tasks.register("generateBuildConfig") {
+    val outputFile = generatedSrcDir.map { it.file("com/pavicontech/desktop/agent/common/BuildConfig.kt") }
 
+    outputs.file(outputFile)
+
+    doLast {
+        outputFile.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(
+                """
+                package com.pavicontech.desktop.agent.common
+
+                object BuildConfig {
+                    const val VERSION = "$appVersion"
+                    const val CONFIGCAT_SDK_KEY = "$configCatSdkKey"
+                }
+                """.trimIndent()
+            )
+        }
+    }
+}
 
 compose.desktop {
     application {
@@ -107,7 +136,7 @@ compose.desktop {
             // 👇 Correct this:
             packageName = "Etims Sync" // Use a simple internal name (lowercase, hyphenated)
 
-            packageVersion = "1.0.0"
+            packageVersion = appVersion
             description = "Empower your business with an AI-driven virtual printer that integrates effortlessly with your ERP and KRA eTIMS for smart, compliant invoicing."
             vendor = "Pavicon Technologies"
 

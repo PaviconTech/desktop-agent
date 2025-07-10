@@ -284,7 +284,7 @@ fun InfoRow(label: String, value: String, highlight: Boolean = false) {
 }
 
 @Composable
-private fun bindSaleToInvoice(
+ fun bindSaleToInvoice(
     inputFile: File,
     businessPin: String,
     bhfId: String,

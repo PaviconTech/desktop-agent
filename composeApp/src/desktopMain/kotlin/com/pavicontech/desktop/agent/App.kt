@@ -12,6 +12,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.pavicontech.desktop.agent.presentation.components.MaintenanceDialog
+import com.pavicontech.desktop.agent.presentation.components.UpdateDialog
 import com.pavicontech.desktop.agent.presentation.helper.ObserveAsEvents
 import com.pavicontech.desktop.agent.presentation.helper.SnackbarController
 import com.pavicontech.desktop.agent.presentation.navigation.graphs.MainNavGraph
@@ -27,6 +29,8 @@ fun App(width: Dp, height: Dp) {
     val navHostController = rememberNavController()
 
     AppTheme {
+        MaintenanceDialog(){}
+        UpdateDialog()
         val screenSize = LocalDensity.current.run {
             LocalDensity.current.density
         }

@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.creditNote.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,8 +29,14 @@ import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.data.remote.dto.response.getAllCreditNotes.Credit
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
+import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFileUseCase
 import com.pavicontech.desktop.agent.domain.usecase.sales.GenerateQRBitmap
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.ViewBindedInvoice
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sales.components.bindSaleToInvoice
+import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.components.toLocalFormattedString
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import java.io.File
 
 @Composable
 fun CreditNoteDialog(
@@ -38,10 +46,37 @@ fun CreditNoteDialog(
 ) {
     val generateQRBitmap: GenerateQRBitmap = koinInject()
     val keyValueStorage: KeyValueStorage = koinInject()
+    val selectFileUseCase: SelectFileUseCase = koinInject()
+    val scope = rememberCoroutineScope()
 
     var pin by remember { mutableStateOf("") }
     var bhfid by remember { mutableStateOf("") }
     var qrUrl by remember { mutableStateOf("") }
+
+    var bindingInvoice by remember { mutableStateOf<File?>(null) }
+    var bindedInvoice by remember { mutableStateOf<File?>(null) }
+    var viewbindedInvoice by remember { mutableStateOf(false) }
+
+    ViewBindedInvoice(
+        file = bindedInvoice,
+        show = viewbindedInvoice,
+        onDismiss = {viewbindedInvoice = false}
+    )
+
+    bindingInvoice?.let {
+        bindSaleToInvoice(
+            inputFile = it,
+            businessPin = pin,
+            bhfId = bhfid,
+            rcptSign = sale.rcptSign ?: "",
+            intrlData = sale.intrlData ?: "",
+            date = sale.createdAt.toLocalFormattedString(),
+            onSuccess = {file ->
+                viewbindedInvoice = true
+                bindedInvoice = file
+            }
+        )
+    }
 
     LaunchedEffect(Unit) {
         keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.let {
@@ -77,6 +112,20 @@ fun CreditNoteDialog(
                     Column {
                         Text("Credit Note Details", style = MaterialTheme.typography.h5)
                         Text("Generated for invoice: ${sale.invcNo}", style = MaterialTheme.typography.subtitle2)
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    bindingInvoice = selectFileUseCase.invoke()
+                                    bindingInvoice?.let {
+                                       // viewbindedInvoice = true
+                                    }
+                                    println(bindingInvoice)
+                                }
+                            },
+                            border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary)
+                        ){
+                            Text(text = "Bind Credit note to Invoice")
+                        }
                     }
 
                     Image(

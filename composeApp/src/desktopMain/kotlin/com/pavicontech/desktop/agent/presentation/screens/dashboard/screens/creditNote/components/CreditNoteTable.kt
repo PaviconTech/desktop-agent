@@ -134,6 +134,16 @@ fun CreditNoteTableBody(
     onViewClick: (Credit) -> Unit,
 ) {
     val listState = rememberLazyListState()
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedCreditNote by remember { mutableStateOf<Credit?>(null) }
+    selectedCreditNote?.let {
+        CreditNoteDialog(
+            sale =it ,
+            isVisible = showDialog,
+            onDismiss = { showDialog = false }
+        )
+    }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         // LazyColumn with scrollbar
@@ -149,7 +159,11 @@ fun CreditNoteTableBody(
                         creditNote = sale,
                         index = index,
                         weights = weights,
-                        onViewClick = onViewClick
+                        onViewClick = {
+                            selectedCreditNote = it
+                            onViewClick(it)
+                            showDialog = true
+                        }
                     )
                 }
             }
@@ -189,14 +203,9 @@ fun CreditNoteTableItem(
     onViewClick: (Credit) -> Unit
 ) {
 
-    var showDialog by remember { mutableStateOf(false) }
 
 
-        CreditNoteDialog(
-            sale = creditNote,
-            isVisible = showDialog,
-            onDismiss = { showDialog = false }
-                )
+
 
 
 
@@ -247,7 +256,7 @@ fun CreditNoteTableItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(
-                onClick = { showDialog = true },
+                onClick = { onViewClick(creditNote) },
                 modifier = Modifier.weight(0.4f)
             ) {
                 Text("View", fontSize = 12.sp)
