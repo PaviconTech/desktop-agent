@@ -17,7 +17,7 @@ object ConfigCatClient {
 
     // initialize once
     private val client = ConfigCatClient(Constants.CONFIG_CAT_KEY) {
-        logLevel = LogLevel.INFO
+        logLevel = LogLevel.OFF
         // Optional polling setup: auto-poll every 60s (default)
     }
 
