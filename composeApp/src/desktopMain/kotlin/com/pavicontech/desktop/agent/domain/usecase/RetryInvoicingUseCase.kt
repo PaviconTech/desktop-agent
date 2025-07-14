@@ -97,7 +97,12 @@ class RetryInvoicingUseCase(
             onSuccess = { extractedData, saleItems, taxableAmount, _, invoiceItems, _ ->
                 "items: $saleItems".logger(Type.INFO)
 
-                val saleResult = createSaleUseCase.invoke(saleItems, taxableAmount)
+                val saleResult = createSaleUseCase.invoke(
+                    items = saleItems,
+                    taxableAmount = taxableAmount,
+                    customerName = extractedData.data?.customerName,
+                    customerPin = extractedData.data?.customerPin
+                    )
 
                 val updatedStatus = if (saleResult.status) EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
                 val getPrintOutSize= keyValueStorage.get(Constants.PRINTOUT_SIZE)
