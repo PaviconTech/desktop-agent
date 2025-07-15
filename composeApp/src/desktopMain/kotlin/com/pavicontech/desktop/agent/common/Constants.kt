@@ -4,24 +4,24 @@ import java.nio.file.Paths
 
 object Constants {
     //DEMO
-    //const val ETIMS_BACKEND = "https://sbx.pavicontech.com/api"
+    const val ETIMS_BACKEND = "https://sbx.pavicontech.com/api"
     //const val ETIMS_BACKEND = "https://58401cdbb988.ngrok-free.app"
     //LIVE
-    const val ETIMS_BACKEND = "https://erp.pavicontech.com/api"
+    //const val ETIMS_BACKEND = "https://erp.pavicontech.com/api"
     const val ETIMS_AI_BACKEND = "https://ai.pavicontech.com/pdf-extractor"
     //DEMO_QR
-    //const val ETIMS_QR_URL = "https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
+    const val ETIMS_QR_URL = "https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
     //LIVE_QR
-    const val ETIMS_QR_URL = "https://etims.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
+    //const val ETIMS_QR_URL = "https://etims.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
     private val HOME_PATH = System.getProperty("user.home")
     val FISCALIZED_RECEIPTS_PATH = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "FiscalizedReceipts")
     val INVOICE_WATCH_FOLDER = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "InvoiceWatch")
 
 
     //Live
-    val CONFIG_CAT_KEY="configcat-sdk-1/j7_dCKqm_06Pn7CKUHM0iw/bYn4gNkNCUWp3Fn1IqusWg"
+    //val CONFIG_CAT_KEY="configcat-sdk-1/j7_dCKqm_06Pn7CKUHM0iw/bYn4gNkNCUWp3Fn1IqusWg"
     //DEMO
-    //const val CONFIG_CAT_KEY="configcat-sdk-1/j7_dCKqm_06Pn7CKUHM0iw/JixiAYMDqkOA-FCMOugj8Q"
+    const val CONFIG_CAT_KEY="configcat-sdk-1/j7_dCKqm_06Pn7CKUHM0iw/JixiAYMDqkOA-FCMOugj8Q"
     const val VERSION="1.2.5"
     const val INSTALLATION_PROCESS_STATUS = "INSTALLATION_PROCESS_STATUS"
     const val AUTH_TOKEN = "auth_token"
