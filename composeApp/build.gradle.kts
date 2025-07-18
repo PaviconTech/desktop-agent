@@ -77,6 +77,8 @@ kotlin {
                 implementation("com.github.hkirk:java-html2image:0.9")
                 val configcatVersion = "5.0.1"
                 implementation("com.configcat:configcat-kotlin-client:${configcatVersion}")
+                implementation("org.apache.commons:commons-text:1.13.1")
+
             }
         }
 

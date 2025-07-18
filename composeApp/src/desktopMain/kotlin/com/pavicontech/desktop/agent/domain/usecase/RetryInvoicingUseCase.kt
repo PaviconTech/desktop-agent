@@ -26,6 +26,7 @@ import com.pavicontech.desktop.agent.domain.usecase.sales.ExtractInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintOutOptionUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintReceiptUseCase
 import kotlinx.coroutines.*
+import org.apache.commons.text.similarity.LevenshteinDistance
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Paths
@@ -249,7 +250,7 @@ class RetryInvoicingUseCase(
 
 
 
-    private suspend fun filterItems(
+  /*  private suspend fun filterItems(
         extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
     ): List<CreateSaleItem> {
         val storedItems = localItemsRepository.getAllItems()
@@ -292,6 +293,65 @@ class RetryInvoicingUseCase(
 
         return  items
 
+    }*/
+
+
+
+
+    private suspend fun filterItems(
+        extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
+    ): List<CreateSaleItem> {
+        val storedItems = localItemsRepository.getAllItems()
+        val levenshtein = LevenshteinDistance(3) // Set threshold (3 is usually good)
+
+        val items = extractedItems.mapNotNull { extracted ->
+            val cleanedExtracted = extracted.itemDescription.trim().lowercase()
+
+            // 1. Try exact match
+            var matchedStoredItem = storedItems.find {
+                it.itemName.trim().equals(cleanedExtracted, ignoreCase = true)
+            }
+
+            // 2. If no exact match, try fuzzy match
+            if (matchedStoredItem == null) {
+                matchedStoredItem = storedItems.minByOrNull {
+                    levenshtein.apply(cleanedExtracted, it.itemName.trim().lowercase())
+                }?.takeIf {
+                    levenshtein.apply(cleanedExtracted, it.itemName.trim().lowercase()) <= 3
+                }
+
+                if (matchedStoredItem != null) {
+                    "🟡 Fuzzy matched '${extracted.itemDescription}' to '${matchedStoredItem.itemName}'".logger(Type.WARN)
+                } else {
+                    "❌ Could not match item '${extracted.itemDescription}'".logger(Type.WARN)
+                }
+            }else {
+                "Item Matched: ${matchedStoredItem.itemName}".logger(Type.INFO)
+            }
+
+            val taxAmount = when (extracted.taxType) {
+                "A", "C", "D" -> 0
+                "E" -> ((0.08) * extracted.amount.toInt() * extracted.quantity.toInt()).toInt()
+                "B" -> ((0.16) * extracted.amount.toInt() * extracted.quantity.toInt()).toInt()
+                else -> 0
+            }
+
+            val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
+
+            matchedStoredItem?.toCreateSaleItem(
+                qty = extracted.quantity.toInt(),
+                prc = extracted.amount.toInt(),
+                dcRt = 0,
+                dcAmt = 0,
+                splyAmt = itemAmount,
+                taxblAmt = itemAmount - taxAmount,
+                taxAmt = taxAmount,
+                totAmt = itemAmount
+            )
+        }
+
+        "✅ Sending ${items.size} items for sale.".logger(Type.INFO)
+        return items
     }
 
 

@@ -52,7 +52,7 @@ fun UpdateDialog(
 
         DialogWindow(
 
-            onCloseRequest = {}, // Update is mandatory
+            onCloseRequest = {showDialog = !showDialog  }, // Update is mandatory
             title = "Mandatory Software Update",
             state = rememberDialogState(width = 640.dp, height = 440.dp),
             resizable = false
