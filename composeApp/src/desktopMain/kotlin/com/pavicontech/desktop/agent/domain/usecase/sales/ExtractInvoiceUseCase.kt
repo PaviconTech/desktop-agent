@@ -49,8 +49,11 @@ class ExtractInvoiceUseCase(
             "Selected printer: '$printerName'".logger(Type.INFO)
             val getInvoiceWords = keyValueStorage.get(Constants.INVOICE_NO_PREFIX)
             val getPrintOutSize = keyValueStorage.get(Constants.PRINTOUT_SIZE)
+            val storedItems = localItemsRepository.getAllItems()
+
             val extractionResult = pdfExtractorRepository.extractInvoiceData(
                 body = InvoiceReq(
+                    items = storedItems.map { it.itemName },
                     fileName = fileName,
                     file = filePath.fileToByteArray(),
                     invoiceWords = getInvoiceWords,
@@ -85,7 +88,7 @@ class ExtractInvoiceUseCase(
                 if (getPrintOutSize == "80mm") {
                     loadImageFromFile(image)?.let {
                         SaveHtmlAsPdfUseCase().printImageFromBufferedImage(
-                            image =it,
+                            image = it,
                             printerName = printerName ?: ""
                         )
                     }
@@ -151,27 +154,29 @@ class ExtractInvoiceUseCase(
     }
 
 
-/*    private suspend fun filterItems(
+    private suspend fun filterItems(
         extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
     ): List<CreateSaleItem> {
         val storedItems = localItemsRepository.getAllItems()
 
-        val items =  extractedItems.mapNotNull { extracted ->
+        val items = extractedItems.mapNotNull { extracted ->
             val matchedStoredItem = storedItems.find {
                 it.itemName.trim().equals(extracted.itemDescription.trim(), ignoreCase = true)
             }
 
-            val taxAmount = when(extracted.taxType){
+            val taxAmount = when (extracted.taxType) {
                 "A" -> 0
                 "C" -> 0
                 "E" -> {
                     val amount = extracted.amount.toInt() * extracted.quantity.toInt()
                     ((0.08) * amount).toInt()
                 }
+
                 "B" -> {
                     val amount = extracted.amount.toInt() * extracted.quantity.toInt()
                     ((0.16) * amount).toInt()
                 }
+
                 "D" -> 0
 
                 else -> 0
@@ -183,7 +188,7 @@ class ExtractInvoiceUseCase(
                 dcRt = 0,
                 dcAmt = 0,
                 splyAmt = itemAmount,
-                taxblAmt = itemAmount-taxAmount,
+                taxblAmt = itemAmount - taxAmount,
                 taxAmt = taxAmount,
                 totAmt = itemAmount
             )
@@ -191,64 +196,6 @@ class ExtractInvoiceUseCase(
         "Sending items for sale: $items".logger(Type.INFO)
         "Items: $items".logger(Type.DEBUG)
 
-        return  items
-    }*/
-
-
-
-    private suspend fun filterItems(
-        extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
-    ): List<CreateSaleItem> {
-        val storedItems = localItemsRepository.getAllItems()
-        val levenshtein = LevenshteinDistance(3) // Set threshold (3 is usually good)
-
-        val items = extractedItems.mapNotNull { extracted ->
-            val cleanedExtracted = extracted.itemDescription.trim().lowercase()
-
-            // 1. Try exact match
-            var matchedStoredItem = storedItems.find {
-                it.itemName.trim().equals(cleanedExtracted, ignoreCase = true)
-            }
-
-            // 2. If no exact match, try fuzzy match
-            if (matchedStoredItem == null) {
-                matchedStoredItem = storedItems.minByOrNull {
-                    levenshtein.apply(cleanedExtracted, it.itemName.trim().lowercase())
-                }?.takeIf {
-                    levenshtein.apply(cleanedExtracted, it.itemName.trim().lowercase()) <= 3
-                }
-
-                if (matchedStoredItem != null) {
-                    "🟡 Fuzzy matched '${extracted.itemDescription}' to '${matchedStoredItem.itemName}'".logger(Type.WARN)
-                } else {
-                    "❌ Could not match item '${extracted.itemDescription}'".logger(Type.WARN)
-                }
-            }else {
-                "Item Matched: ${matchedStoredItem.itemName}".logger(Type.INFO)
-            }
-
-            val taxAmount = when (extracted.taxType) {
-                "A", "C", "D" -> 0
-                "E" -> ((0.08) * extracted.amount.toInt() * extracted.quantity.toInt()).toInt()
-                "B" -> ((0.16) * extracted.amount.toInt() * extracted.quantity.toInt()).toInt()
-                else -> 0
-            }
-
-            val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
-
-            matchedStoredItem?.toCreateSaleItem(
-                qty = extracted.quantity.toInt(),
-                prc = extracted.amount.toInt(),
-                dcRt = 0,
-                dcAmt = 0,
-                splyAmt = itemAmount,
-                taxblAmt = itemAmount - taxAmount,
-                taxAmt = taxAmount,
-                totAmt = itemAmount
-            )
-        }
-
-        "✅ Sending ${items.size} items for sale.".logger(Type.INFO)
         return items
     }
 

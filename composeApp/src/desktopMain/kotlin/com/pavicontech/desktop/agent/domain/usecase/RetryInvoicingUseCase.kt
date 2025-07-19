@@ -89,12 +89,14 @@ class RetryInvoicingUseCase(
         val fileName = fileData.fileName.replaceAfterLast('.', "pdf")
         println("Retry file: $fileName")
         val filePath = fileData.fullDirectory.replaceAfterLast('.', "pdf")
+        val storedItems = localItemsRepository.getAllItems()
 
 
         retryExtractInvoice(
             filePath = filePath,
             fileName = fileName,
             businessInfo = businessInfo,
+            storedItems = storedItems.map { it.itemName },
             onSuccess = { extractedData, saleItems, taxableAmount, _, invoiceItems, _ ->
                 "items: $saleItems".logger(Type.INFO)
 
@@ -162,6 +164,7 @@ class RetryInvoicingUseCase(
 
 
     private suspend fun retryExtractInvoice(
+        storedItems: List<String>,
         filePath: String,
         fileName: String,
         businessInfo: BusinessInformation,
@@ -177,7 +180,8 @@ class RetryInvoicingUseCase(
                     fileName = fileName,
                     file = filePath.fileToByteArray(),
                     invoiceWords = getInvoiceWords,
-                    bussinessPin = businessInfo.kraPin
+                    bussinessPin = businessInfo.kraPin,
+                    items = storedItems
                 )
             )
             """
@@ -250,7 +254,7 @@ class RetryInvoicingUseCase(
 
 
 
-  /*  private suspend fun filterItems(
+  private suspend fun filterItems(
         extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
     ): List<CreateSaleItem> {
         val storedItems = localItemsRepository.getAllItems()
@@ -293,65 +297,6 @@ class RetryInvoicingUseCase(
 
         return  items
 
-    }*/
-
-
-
-
-    private suspend fun filterItems(
-        extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
-    ): List<CreateSaleItem> {
-        val storedItems = localItemsRepository.getAllItems()
-        val levenshtein = LevenshteinDistance(3) // Set threshold (3 is usually good)
-
-        val items = extractedItems.mapNotNull { extracted ->
-            val cleanedExtracted = extracted.itemDescription.trim().lowercase()
-
-            // 1. Try exact match
-            var matchedStoredItem = storedItems.find {
-                it.itemName.trim().equals(cleanedExtracted, ignoreCase = true)
-            }
-
-            // 2. If no exact match, try fuzzy match
-            if (matchedStoredItem == null) {
-                matchedStoredItem = storedItems.minByOrNull {
-                    levenshtein.apply(cleanedExtracted, it.itemName.trim().lowercase())
-                }?.takeIf {
-                    levenshtein.apply(cleanedExtracted, it.itemName.trim().lowercase()) <= 3
-                }
-
-                if (matchedStoredItem != null) {
-                    "🟡 Fuzzy matched '${extracted.itemDescription}' to '${matchedStoredItem.itemName}'".logger(Type.WARN)
-                } else {
-                    "❌ Could not match item '${extracted.itemDescription}'".logger(Type.WARN)
-                }
-            }else {
-                "Item Matched: ${matchedStoredItem.itemName}".logger(Type.INFO)
-            }
-
-            val taxAmount = when (extracted.taxType) {
-                "A", "C", "D" -> 0
-                "E" -> ((0.08) * extracted.amount.toInt() * extracted.quantity.toInt()).toInt()
-                "B" -> ((0.16) * extracted.amount.toInt() * extracted.quantity.toInt()).toInt()
-                else -> 0
-            }
-
-            val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
-
-            matchedStoredItem?.toCreateSaleItem(
-                qty = extracted.quantity.toInt(),
-                prc = extracted.amount.toInt(),
-                dcRt = 0,
-                dcAmt = 0,
-                splyAmt = itemAmount,
-                taxblAmt = itemAmount - taxAmount,
-                taxAmt = taxAmount,
-                totAmt = itemAmount
-            )
-        }
-
-        "✅ Sending ${items.size} items for sale.".logger(Type.INFO)
-        return items
     }
 
 
