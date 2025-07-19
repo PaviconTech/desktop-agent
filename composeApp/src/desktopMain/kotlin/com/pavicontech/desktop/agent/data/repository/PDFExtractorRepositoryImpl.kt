@@ -38,7 +38,7 @@ class PDFExtractorRepositoryImpl(
                 formData {
                     append("pin", body.bussinessPin)
                     append("fileName", body.fileName)
-                    append("itemsList", Json.encodeToString(body.items))
+                    append("itemsList", body.items.toString())
                     body.invoiceWords?.let {
                         append("invoiceWords", it)
                     }
