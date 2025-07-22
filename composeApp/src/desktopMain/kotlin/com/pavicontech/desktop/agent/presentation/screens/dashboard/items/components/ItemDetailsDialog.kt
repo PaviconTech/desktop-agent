@@ -188,7 +188,7 @@ fun ItemDetailsDialog(
                                 )
                                 EditableField(
                                     label = "Country of Origin", 
-                                    value = originCountry, 
+                                    value = originCountry ?: "",
                                     onValueChange = { originCountry = it },
                                     isEditable = isEditMode,
                                     modifier = Modifier.weight(1f).onEnterNext()
@@ -219,14 +219,14 @@ fun ItemDetailsDialog(
                             ) {
                                 EditableField(
                                     label = "Packaging Type", 
-                                    value = packagingType, 
+                                    value = packagingType ?: "",
                                     onValueChange = { packagingType = it },
                                     isEditable = isEditMode,
                                     modifier = Modifier.weight(1f).onEnterNext()
                                 )
                                 EditableField(
                                     label = "Quantity Type", 
-                                    value = quantityType, 
+                                    value = quantityType ?: "",
                                     onValueChange = { quantityType = it },
                                     isEditable = isEditMode,
                                     modifier = Modifier.weight(1f).onEnterNext()

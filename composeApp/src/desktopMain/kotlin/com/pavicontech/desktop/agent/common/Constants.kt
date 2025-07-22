@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 object Constants {
     //DEMO
-    const val ETIMS_BACKEND = "https://sbx.pavicontech.com/api"
+    const val ETIMS_BACKEND = "https://malin-sbx.ubuniworks.com"
     //const val ETIMS_BACKEND = "https://58401cdbb988.ngrok-free.app"
     //LIVE
     //const val ETIMS_BACKEND = "https://erp.pavicontech.com/api"

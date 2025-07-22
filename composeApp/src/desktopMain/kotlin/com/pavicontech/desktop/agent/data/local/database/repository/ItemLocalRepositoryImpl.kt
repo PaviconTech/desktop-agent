@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 import com.pavicontech.desktop.agent.data.local.database.entries.*
+import com.pavicontech.desktop.agent.data.remote.dto.response.pullCodesRes.KraResult
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.items.components.ItemsBody
 
 import org.jetbrains.exposed.sql.*
@@ -62,7 +63,7 @@ class ItemLocalRepositoryImpl : ItemLocalRepository {
 
     override suspend fun insertCodes(codes: PullCodesRes) = withContext(Dispatchers.IO) {
         transaction {
-            codes.clsList.forEach { cls ->
+            codes.kraResult.clsList.forEach { cls ->
                 Codes.insertIgnore {
                     it[cdCls] = cls.cdCls
                     it[cdClsNm] = cls.cdClsNm
@@ -125,9 +126,11 @@ class ItemLocalRepositoryImpl : ItemLocalRepository {
             }
 
             PullCodesRes(
-                clsList = clsMap.map { (k, v) ->
-                    v.copy(dtlList = dtlsMap[k] ?: emptyList())
-                }
+                kraResult = KraResult(
+                    clsMap.map { (k, v) ->
+                        v.copy(dtlList = dtlsMap[k] ?: emptyList())
+                    }
+                )
             )
         }
     }
@@ -150,11 +153,11 @@ class ItemLocalRepositoryImpl : ItemLocalRepository {
                     it[itemCodeDf] = item.itemCodeDf
                     it[itemName] = item.itemName
                     it[itemType] = item.itemType
-                    it[originCountry] = item.originCountry
-                    it[packagingUnit] = item.packagingUnit
+                    it[originCountry] = item.originCountry ?: ""
+                    it[packagingUnit] = item.packagingUnit ?: ""
                     it[picture] = item.picture
                     it[price] = item.price
-                    it[quantityUnit] = item.quantityUnit
+                    it[quantityUnit] = item.quantityUnit ?: ""
                     it[status] = item.status
                     it[taxCode] = item.taxCode
                     it[updatedAt] = item.updatedAt

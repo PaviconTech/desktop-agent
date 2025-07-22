@@ -1,13 +1,17 @@
 package com.pavicontech.desktop.agent.data.remote.dto.response.pullClassificationCodes
 
 import com.pavicontech.desktop.agent.data.local.database.entries.ClassificationCode
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
 @Serializable
 data class PullClassificationCodes(
-    val itemClsList: List<ItemCls>
+    val kraResult: KraResult
 ){
-    fun toClassificationCodes(): List<ClassificationCode> = itemClsList.map {
+    fun toClassificationCodes(): List<ClassificationCode> = kraResult.itemClsList.map {
         ClassificationCode(
             itemClsCd = it.itemClsCd,
             itemClsLvl = it.itemClsLvl,
@@ -18,3 +22,9 @@ data class PullClassificationCodes(
         )
     }
 }
+
+
+@Serializable
+data class KraResult(
+    val itemClsList:List<ItemCls>
+)

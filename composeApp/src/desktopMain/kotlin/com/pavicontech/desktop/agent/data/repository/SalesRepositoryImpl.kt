@@ -42,9 +42,8 @@ class SalesRepositoryImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             CreateSaleRes(
-                status = false,
+                result = "",
                 kraResult = null,
-                message = e.message ?: "",
             )
         }
 
@@ -77,7 +76,7 @@ class SalesRepositoryImpl(
         api.get(urlString = "${Constants.ETIMS_BACKEND}/sales"){
             header("Authorization", "Bearer $token")
         }.bodyAsText().let {
-            //it.logger(Type.DEBUG)
+            it.logger(Type.DEBUG)
             Json.decodeFromString(it)
         }
     }
@@ -86,7 +85,7 @@ class SalesRepositoryImpl(
         api.get(urlString = "${Constants.ETIMS_BACKEND}/credit"){
             header("Authorization", "Bearer $token")
         }.bodyAsText().let {
-            //it.logger(Type.DEBUG)
+            it.logger(Type.DEBUG)
             Json.decodeFromString(it)
         }
 

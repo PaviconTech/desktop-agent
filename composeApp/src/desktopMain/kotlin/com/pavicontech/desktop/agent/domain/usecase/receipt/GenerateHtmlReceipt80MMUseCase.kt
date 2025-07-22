@@ -2,7 +2,7 @@ package com.pavicontech.desktop.agent.domain.usecase.receipt
 
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.logger
-import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.Result
+import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.KraResult
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.domain.model.ExtractedInvoiceData
 import qrcode.QRCode
@@ -28,7 +28,7 @@ class GenerateHtmlReceipt80MMUseCase(
         bhfId: String,
         rcptSign: String,
         businessInfo: BusinessInformation,
-        kraResult: Result?
+        kraResult: KraResult?
     ): String {
         val userHome = System.getProperty("user.home")
         val qrPath = Paths.get(userHome, "Documents", "Receipts", "qr-code.png")

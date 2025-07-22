@@ -4,7 +4,6 @@ import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.common.utils.Type
 import com.pavicontech.desktop.agent.common.utils.logger
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
-import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.Result
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.components.BoxCoordinates
 import java.nio.file.Paths
@@ -14,6 +13,7 @@ import java.util.UUID
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
 import SaveHtmlAsPdfUseCase
+import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.KraResult
 
 
 class PrintOutOptionUseCase(
@@ -43,7 +43,7 @@ class PrintOutOptionUseCase(
         htmlContent80mm: String,
         fileName: String,
         filePath: String,
-        kraResult: Result,
+        kraResult: KraResult,
         businessInfo: BusinessInformation
     ) {
         val option = keyValueStorage.get(Constants.PRINT_OUT_OPTIONS) ?: "default"
@@ -85,7 +85,7 @@ class PrintOutOptionUseCase(
                     fileNamePrefix = fileName,
                     businessPin = businessInfo.kraPin,
                     bhfId = businessInfo.branchId,
-                    rcptSign = kraResult.rcptSign,
+                    rcptSign = kraResult.rcptSign ?: "",
                     onSuccess = { qrCode ->
                         filePath.logger(Type.DEBUG)
                         val inPutPdf = Path(filePath).toFile()

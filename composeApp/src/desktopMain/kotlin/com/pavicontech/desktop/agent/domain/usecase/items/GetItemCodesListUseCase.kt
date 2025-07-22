@@ -12,7 +12,7 @@ class GetItemCodesListUseCase(
     suspend operator fun invoke(): PullCodesRes?{
         return try {
             val res =itemLocalRepository.getAllCodes()
-            res.clsList.forEach { it.cdClsNm.logger(Type.DEBUG) }
+            res.kraResult.clsList.forEach { it.cdClsNm.logger(Type.DEBUG) }
             res
         }catch (e:Exception){
             e.printStackTrace()

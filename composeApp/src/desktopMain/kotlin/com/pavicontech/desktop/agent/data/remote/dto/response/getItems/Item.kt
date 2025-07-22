@@ -2,12 +2,16 @@ package com.pavicontech.desktop.agent.data.remote.dto.response.getItems
 
 
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
 @Serializable
 data class Item(
-    @SerialName("barcode")
+    @SerialName("bcd")
     val barcode: String? = null,
     @SerialName("batchNumber")
     val batchNumber: String? = null,
@@ -23,36 +27,21 @@ data class Item(
     val id: Int,
     @SerialName("ItemCategory")
     val itemCategory: ItemCategory? = null,
-    @SerialName("itemCategoryId")
-    val itemCategoryId: Int? = null,
-    @SerialName("itemClassificationCode")
-    val itemClassificationCode: String,
-    @SerialName("itemCode")
-    val itemCode: String,
-    @SerialName("itemCodeDf")
-    val itemCodeDf: String,
-    @SerialName("itemName")
-    val itemName: String,
-    @SerialName("itemType")
-    val itemType: String,
-    @SerialName("originCountry")
-    val originCountry: String,
-    @SerialName("packagingUnit")
-    val packagingUnit: String,
-    @SerialName("picture")
-    val picture:  String? = null,
-    @SerialName("price")
-    val price: String,
-    @SerialName("quantityUnit")
-    val quantityUnit: String,
-    @SerialName("status")
-    val status: String,
-    @SerialName("taxCode")
-    val taxCode: String,
-    @SerialName("updatedAt")
-    val updatedAt: String,
-    @SerialName("userId")
-    val userId: Int
+    @SerialName("itemCategoryId") val itemCategoryId: Int? = null,
+    @SerialName("itemClsCd") val itemClassificationCode: String,
+    @SerialName("itemCd") val itemCode: String,
+    @SerialName("itemCdDf") val itemCodeDf: String,
+    @SerialName("itemNm") val itemName: String,
+    @SerialName("itemTyCd") val itemType: String,
+    @SerialName("orgnNatCd") val originCountry: String? = null,
+    @SerialName("pkgUnitCd") val packagingUnit: String? = null,
+    @SerialName("picture") val picture:  String? = null,
+    @SerialName("dftPrc") val price: String,
+    @SerialName("qtyUnitCd") val quantityUnit: String? = null,
+    @SerialName("status") val status: String,
+    @SerialName("taxTyCd") val taxCode: String,
+    @SerialName("updatedAt") val updatedAt: String,
+    @SerialName("userId") val userId: Int
 ){
     fun toCreateSaleItem(
         qty:Int,
@@ -71,7 +60,7 @@ data class Item(
             itemNm = itemName,
             bcd = "$barcode",
             pkgUnitCd =packagingUnit ,
-            qtyUnitCd = quantityUnit,
+            qtyUnitCd = quantityUnit ?: "",
             qty = "$qty"    ,
             prc =  "$prc",
             splyAmt = "$splyAmt",

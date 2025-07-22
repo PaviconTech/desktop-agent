@@ -116,7 +116,7 @@ private fun AddNewItemForm(
         scope.launch {
             getCodes()?.let { res ->
                 fun pull(name: String) =
-                    res.clsList.firstOrNull { it.cdClsNm == name }?.dtlList ?: emptyList()
+                    res.kraResult.clsList.firstOrNull { it.cdClsNm == name }?.dtlList ?: emptyList()
                 taxTypes += pull("Taxation Type").distinctBy(Dtl::cd)
                 countries += pull("Country").distinctBy(Dtl::cd)
                 quantityUnits += pull("Quantity Unit").distinctBy(Dtl::cd)
@@ -451,9 +451,11 @@ private fun AddNewItemForm(
                                 addingState = AddItemState(isLoading = true)
                                 val res = addItem.invoke(
                                     AddItemReq(
+                                        itemClassDefinition = selClassification?.itemClsCd ?: "",
                                         itemName = itemName,
                                         itemClassificationCode = selClassification?.itemClsCd ?: "",
                                         itemStdNm = itemName,
+                                        itemCode = itemCode,
                                         itemType = selItemType?.cd ?: "",
                                         originCountry = selCountry?.cd ?: "",
                                         packagingUnit = selPackagingUnit?.cd ?: "",

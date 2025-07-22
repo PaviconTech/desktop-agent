@@ -30,12 +30,12 @@ data class Sale(
     val prchrAcptcYn: String? = null,
     val rcptSign: String? = null,
     val rcptTyCd: String,
-    val receipt: String? = null,
+    val receipt: Receipt? = null,
     val remark: String? = null,
     val resultDt: String? = null,
     val rfdDt: String? = null,
     val rfdRsnCd: String? = null,
-    val saleReceiptId: String? = null,
+    val saleReceiptId: Int? = null,
     val salesDt: String,
     val salesSttsCd: String,
     val salesTyCd: String,
@@ -66,9 +66,25 @@ data class Sale(
     val totTaxblAmt: String,
     val trdInvcNo: Int,
     val updatedAt: String,
-    val userId: Int
+    val userId: Int,
 )
 
+
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
+@Serializable
+data class Receipt(
+    val id: Int,
+    val custTin: Int? = null,
+   // val salesDt: String,
+    //val salesId: Int,
+    //val salesSttsCd: String,
+    //val salesTyCd: String,
+    //val trdInvcNo: Int,
+    //val curRcptNo: String? = null,
+    //val rcptSign: String? = null,
+    //val rcptTyCd: String,
+)
 
 fun Sale.toCrediNoteReq() = CreditNoteReq(
     cfmDt = cfmDt,

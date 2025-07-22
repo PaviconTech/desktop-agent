@@ -22,7 +22,7 @@ data class GetSalesRes(
                 kraPin = it.custTin ?: "",
                 referenceNumber = it.rcptTyCd ?: "",
                 invoiceNumber = it.invcNo.toString(),
-                etimsReceiptNumber = it.receipt ?: "",
+                etimsReceiptNumber = it.rcptSign ?: "",
                 status = it.rcptTyCd ?: "",
                 itemsCount = it.totItemCnt,
                 amount = it.totAmt.toDoubleOrNull() ?: 0.0,

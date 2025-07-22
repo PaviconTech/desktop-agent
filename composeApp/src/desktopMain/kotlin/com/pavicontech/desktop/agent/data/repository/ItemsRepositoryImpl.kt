@@ -33,7 +33,7 @@ class ItemsRepositoryImpl(private val api: HttpClient) : ItemsRepository {
             try {
                 Json.decodeFromString<GetItemsRes>(it).also { itemsRes ->
                     "Items count: ${itemsRes.items.size}".logger(Type.INFO)
-                    println(itemsRes)
+                    //println(itemsRes)
                 }
             }catch (e:Exception){
                 it.logger(Type.INFO)
@@ -78,7 +78,8 @@ class ItemsRepositoryImpl(private val api: HttpClient) : ItemsRepository {
             }
             setBody(item)
         }.bodyAsText().let {
-            Json.decodeFromString(it)
+            it.logger(Type.INFO)
+            Json.decodeFromString<AddItemRes>(it)
         }
     }
 

@@ -107,7 +107,7 @@ class RetryInvoicingUseCase(
                     customerPin = extractedData.data?.customerPin
                     )
 
-                val updatedStatus = if (saleResult.status) EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
+                val updatedStatus = if (saleResult.result == "000") EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
                 val getPrintOutSize= keyValueStorage.get(Constants.PRINTOUT_SIZE)
 
                 invoiceRepository.updateInvoice(
@@ -129,24 +129,24 @@ class RetryInvoicingUseCase(
                     fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png") else fileName
                 )
 
-                if (saleResult.status) {
+                if (saleResult.result == "000") {
                     val htmlContent = generateHtmlReceipt(
                         data = extractedData.toExtractedData(),
                         businessInfo = businessInfo,
                         businessPin = businessInfo.kraPin,
                         bhfId = businessInfo.branchId,
-                        rcptSign = saleResult.kraResult?.result?.rcptSign ?: "No Receipt Sign"
+                        rcptSign = saleResult.kraResult?.rcptSign ?: "No Receipt Sign"
                     )
                     val htmlContent80mm = generateHtmlReceipt80MMUseCase(
                         data = extractedData.toExtractedData(),
                         businessInfo = businessInfo,
                         businessPin = businessInfo.kraPin,
                         bhfId = businessInfo.branchId,
-                        kraResult = saleResult.kraResult?.result,
-                        rcptSign = saleResult.kraResult?.result?.rcptSign ?: "No Receipt Sign"
+                        kraResult = saleResult.kraResult,
+                        rcptSign = saleResult.kraResult?.rcptSign ?: "No Receipt Sign"
                     )
 
-                    saleResult.kraResult?.result?.let {
+                    saleResult.kraResult?.let {
                         printOutOptionUseCase(
                             kraResult = it,
                             htmlContent80mm = htmlContent80mm,

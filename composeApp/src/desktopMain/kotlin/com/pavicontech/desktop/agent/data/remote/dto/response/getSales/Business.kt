@@ -1,6 +1,7 @@
 package com.pavicontech.desktop.agent.data.remote.dto.response.getSales
 
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
@@ -8,8 +9,8 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 @JsonIgnoreUnknownKeys
 @Serializable
 data class Business(
-    val branchId: String,
-    val id: Int,
-    val name: String,
-    val pin: String
+    @SerialName("bhfId") val branchId: String,
+    @SerialName("id") val id: Int,
+    @SerialName("branch") val name: String,
+    @SerialName("pin") val pin: String
 )
