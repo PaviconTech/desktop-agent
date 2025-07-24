@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.presentation.screens.splashScreen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -17,7 +18,10 @@ import androidx.compose.ui.unit.dp
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.domain.usecase.GetUserSessionStatus
+import desktopagent.composeapp.generated.resources.Res
+import desktopagent.composeapp.generated.resources.taxpoint_black
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -87,15 +91,10 @@ fun SplashScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Etims",
-                    style = MaterialTheme.typography.h1,
-                    color = MaterialTheme.colors.onBackground
-                )
-                Text(
-                    text = "Sync",
-                    style = MaterialTheme.typography.h1,
-                    color = MaterialTheme.colors.secondary
+                Image(
+                    painter = painterResource(Res.drawable.taxpoint_black),
+                    contentDescription = "Taxpoint Logo",
+                    modifier = Modifier.size(100.dp)
                 )
             }
         }

@@ -22,7 +22,7 @@ object Constants {
     //val CONFIG_CAT_KEY="configcat-sdk-1/j7_dCKqm_06Pn7CKUHM0iw/bYn4gNkNCUWp3Fn1IqusWg"
     //DEMO
     const val CONFIG_CAT_KEY="configcat-sdk-1/j7_dCKqm_06Pn7CKUHM0iw/JixiAYMDqkOA-FCMOugj8Q"
-    const val VERSION="1.2.8"
+    const val VERSION="1.2.5"
     const val INSTALLATION_PROCESS_STATUS = "INSTALLATION_PROCESS_STATUS"
     const val AUTH_TOKEN = "auth_token"
     const val AUTH_TOKEN_EXPIRY = "auth_token_expiry"

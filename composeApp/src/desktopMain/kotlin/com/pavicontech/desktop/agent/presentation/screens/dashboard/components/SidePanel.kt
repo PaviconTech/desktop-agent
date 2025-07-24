@@ -1,5 +1,6 @@
 package com.pavicontech.desktop.agent.presentation.screens.dashboard.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -22,6 +23,7 @@ import com.pavicontech.desktop.agent.presentation.navigation.screens.DashboardSc
 import desktopagent.composeapp.generated.resources.Res
 import desktopagent.composeapp.generated.resources.logout
 import desktopagent.composeapp.generated.resources.sic
+import desktopagent.composeapp.generated.resources.taxpoint_black
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
@@ -66,15 +68,10 @@ fun SidePanel(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                 ) {
-                    Text(
-                        text = "Etims",
-                        style = MaterialTheme.typography.h1,
-                        color = MaterialTheme.colors.primary
-                    )
-                    Text(
-                        text = "Sync",
-                        style = MaterialTheme.typography.h1,
-                        color = MaterialTheme.colors.secondary
+                    Image(
+                        painter = painterResource(Res.drawable.taxpoint_black),
+                        contentDescription = "Taxpoint Logo",
+                        modifier = Modifier.size(100.dp)
                     )
                 }
 

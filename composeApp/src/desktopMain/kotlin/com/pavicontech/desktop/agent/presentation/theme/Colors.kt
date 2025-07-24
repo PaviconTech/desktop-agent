@@ -5,18 +5,19 @@ import androidx.compose.ui.graphics.Color
 
 // Modernized color palette
 val PaviconColors = lightColors(
-    primary = Color(0xFF1B3A6B),           // Refined Navy Blue (softer, more approachable)
-    primaryVariant = Color(0xFF0F2550),    // Darker Navy for depth
-    secondary = Color(0xFFF57C00),         // Vibrant Orange (Material Orange 600)
-    secondaryVariant = Color(0xFFEF6C00),  // Slightly deeper orange for accents
+    primary = Color(0xFF001F3F),           // Deep Navy Blue
+    primaryVariant = Color(0xFF001530),    // Darker Navy for depth
 
-    background = Color(0xFFF8FAFC),        // Light blue-gray for modern warmth
-    surface = Color(0xFFFFFFFF),           // Clean white for cards and dialogs
-    error = Color(0xFFD32F2F),             // Softer red for errors (Material Red 700)
+    secondary = Color(0xFF4CAF50),         // Modern Fern Green (Material Green 500)
+    secondaryVariant = Color(0xFF388E3C),  // Deeper Forest Green (Material Green 700)
+
+    background = Color(0xFFF5F7F6),        // Soft cool gray with greenish undertone
+    surface = Color(0xFFFFFFFF),           // Clean white for cards/dialogs
+    error = Color(0xFFD32F2F),             // Material Red 700
 
     onPrimary = Color(0xFFFFFFFF),         // White text/icons on navy
-    onSecondary = Color(0xFFFFFFFF),       // Near-black for contrast on orange
+    onSecondary = Color(0xFFFFFFFF),       // White text/icons on green
     onBackground = Color(0xFF1C2526),      // Dark gray for readability
-    onSurface = Color(0xFF1C2526),         // Consistent with onBackground
+    onSurface = Color(0xFF1C2526),         // Same as onBackground
     onError = Color(0xFFFFFFFF)            // White text on error
 )
