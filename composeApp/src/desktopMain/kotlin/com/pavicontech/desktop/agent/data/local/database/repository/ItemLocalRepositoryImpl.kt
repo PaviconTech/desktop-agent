@@ -134,8 +134,9 @@ class ItemLocalRepositoryImpl : ItemLocalRepository {
 
     override suspend fun insertAllItemsItem(items: List<Item>) = withContext(Dispatchers.IO) {
         transaction {
+            Items.deleteAll()
             items.forEach { item ->
-                Items.insertIgnore {
+                val count =Items.insertIgnore {
                     it[id] = item.id
                     it[barcode] = item.barcode
                     it[batchNumber] = item.batchNumber
@@ -159,7 +160,8 @@ class ItemLocalRepositoryImpl : ItemLocalRepository {
                     it[taxCode] = item.taxCode
                     it[updatedAt] = item.updatedAt
                     it[userId] = item.userId
-                }
+                }.insertedCount
+                println(count)
             }
         }
     }

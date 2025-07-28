@@ -51,6 +51,8 @@ class ExtractInvoiceUseCase(
             val getPrintOutSize = keyValueStorage.get(Constants.PRINTOUT_SIZE)
             val storedItems = localItemsRepository.getAllItems()
 
+          "Items Local: ${storedItems.map { it.itemName }}".logger(Type.INFO)
+
             val extractionResult = pdfExtractorRepository.extractInvoiceData(
                 body = InvoiceReq(
                     items = storedItems.map { it.itemName },
