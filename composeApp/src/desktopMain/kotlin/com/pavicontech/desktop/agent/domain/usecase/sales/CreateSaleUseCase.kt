@@ -75,6 +75,7 @@ class CreateSaleUseCase(
         )
         "Total Item Count: ${createSaleReq.totItemCnt}".logger(Type.INFO)
         "Total Item list size: ${createSaleReq.itemList.size}".logger(Type.INFO)
+        "Total Item list names: ${createSaleReq.itemList.map { it.itemNm }}".logger(Type.INFO)
         return repository.createSale(body = createSaleReq, token)
     }
 

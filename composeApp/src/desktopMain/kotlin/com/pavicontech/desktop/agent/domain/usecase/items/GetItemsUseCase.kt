@@ -19,6 +19,7 @@ class GetItemsUseCase(
             val response = repository.getItems(token)
             if (response.status){
                 localItemsRepository.insertAllItemsItem(response.items)
+                keyValueStorage.set(Constants.ITEMS_LIST,response.toItemListString() )
                 SnackbarController.sendEvent(
                     event = SnackbarEvent(
                         message = "Items Synced Successfully"
