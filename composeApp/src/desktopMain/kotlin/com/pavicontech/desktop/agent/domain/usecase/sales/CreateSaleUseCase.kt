@@ -11,6 +11,8 @@ import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSa
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.Receipt
 import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.CreateSaleRes
 import com.pavicontech.desktop.agent.domain.repository.SalesRepository
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class CreateSaleUseCase(
     private val repository: SalesRepository,
@@ -33,7 +35,7 @@ class CreateSaleUseCase(
             pmtTyCd = "01",
             salesSttsCd = "02",
             cfmDt = generateTimestamp(),
-            salesDt = "20230328",
+            salesDt = getCurrentDateFormatted(),
             stockRlsDt = generateTimestamp(),
             cnclReqDt = null,
             cnclDt = null,
@@ -82,6 +84,11 @@ class CreateSaleUseCase(
 
 
 
+    fun getCurrentDateFormatted(): String {
+        val today = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+        return today.format(formatter)
+    }
 
 
 }
