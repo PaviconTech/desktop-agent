@@ -11,7 +11,7 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 data class KraResult(
     @SerialName("IntrlData") val intrlData: String? = null,
     @SerialName("MrcNo")val mrcNo: String,
-    @SerialName("RcptNo") val rcptNo: Int,
+    //@SerialName("RcptNo") val rcptNo: Int,
     @SerialName("RcptSign") val rcptSign: String? = null,
     @SerialName("SdcId") val sdcId: String,
     @SerialName("TotRcptNo") val totRcptNo: Int,

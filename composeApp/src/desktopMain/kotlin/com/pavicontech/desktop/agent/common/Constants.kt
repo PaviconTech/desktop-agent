@@ -4,15 +4,15 @@ import java.nio.file.Paths
 
 object Constants {
     //DEMO
-    const val ETIMS_BACKEND = "https://malin-sbx.ubuniworks.com"
+    //const val ETIMS_BACKEND = "https://malin-sbx.ubuniworks.com"
     //const val ETIMS_BACKEND = "https://58401cdbb988.ngrok-free.app"
     //LIVE
-    //const val ETIMS_BACKEND = "https://erp.pavicontech.com/api"
+    const val ETIMS_BACKEND = " https://malin.ubuniworks.com"
     const val ETIMS_AI_BACKEND = "https://ai.pavicontech.com/pdf-extractor"
     //DEMO_QR
-    const val ETIMS_QR_URL = "https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
+    //const val ETIMS_QR_URL = "https://etims-sbx.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
     //LIVE_QR
-    //const val ETIMS_QR_URL = "https://etims.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
+    const val ETIMS_QR_URL = "https://etims.kra.go.ke/common/link/etims/receipt/indexEtimsReceiptData?Data="
     private val HOME_PATH = System.getProperty("user.home")
     val FISCALIZED_RECEIPTS_PATH = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "FiscalizedReceipts")
     val INVOICE_WATCH_FOLDER = Paths.get(HOME_PATH, "Documents", "DesktopAgent", "InvoiceWatch")
@@ -38,6 +38,7 @@ object Constants {
     const val  WATCH_FOLDER = "watch_folder"
     const val SELECTED_PRINTER = "selected_printer"
     const  val ITEM_CODE_LIST = "item_code_list"
+    const  val ITEMS_LIST = "item_list"
     const val PRINTOUT_SIZE = "printout_size"
     const val INVOICE_NO_PREFIX = "invoice_no_prefix"
     const val INVOICE_NO_LIST = "invoice_no_list"

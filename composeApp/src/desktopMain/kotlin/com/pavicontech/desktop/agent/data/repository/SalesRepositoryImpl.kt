@@ -31,7 +31,7 @@ class SalesRepositoryImpl(
         "Creating sale".logger(Type.DEBUG)
         Json.encodeToString(body).logger(Type.INFO)
 
-        val responseText = api.post("${Constants.ETIMS_BACKEND}/sales") {
+        val responseText = api.post("${Constants.ETIMS_BACKEND}/sales/vscu") {
             header("Authorization", "Bearer $token")
             setBody(body)
         }.bodyAsText()

@@ -15,4 +15,7 @@ data class GetItemsRes(
     val status: Boolean
 ){
     fun toItemListString() = Json.encodeToString(items)
+    companion object{
+        fun fromJson(json: String) = Json.decodeFromString<List<Item>>(json)
+    }
 }

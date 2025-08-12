@@ -23,6 +23,7 @@ import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintOutOptionUseCas
 import kotlinx.coroutines.*
 import java.io.File
 import java.time.Instant
+import java.util.UUID
 import kotlin.io.path.pathString
 
 class SubmitInvoicesUseCase(
@@ -117,7 +118,9 @@ class SubmitInvoicesUseCase(
                     items = saleItems,
                     taxableAmount = taxableAmount,
                     customerName = extractedData.data?.customerName,
-                    customerPin = extractedData.data?.customerPin
+                    customerPin = extractedData.data?.customerPin,
+                    invoiceNumber = extractedData.data?.invoiceNumber ?: UUID.randomUUID().toString(),
+
                 )
 
                 val updatedStatus = if (saleResult.result == "000") EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED

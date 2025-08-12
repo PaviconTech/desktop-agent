@@ -14,6 +14,7 @@ import com.pavicontech.desktop.agent.data.local.database.repository.ItemLocalRep
 import com.pavicontech.desktop.agent.data.remote.dto.request.InvoiceReq
 import com.pavicontech.desktop.agent.data.remote.dto.request.createSale.CreateSaleItem
 import com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.ExtractInvoiceRes
+import com.pavicontech.desktop.agent.data.remote.dto.response.getItems.GetItemsRes
 import com.pavicontech.desktop.agent.domain.model.BusinessInformation
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import com.pavicontech.desktop.agent.domain.repository.ItemsRepository
@@ -31,6 +32,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Paths
 import java.time.Instant
+import java.util.UUID
 import javax.imageio.ImageIO
 import kotlin.io.path.pathString
 import kotlin.jvm.functions.FunctionN
@@ -104,7 +106,8 @@ class RetryInvoicingUseCase(
                     items = saleItems,
                     taxableAmount = taxableAmount,
                     customerName = extractedData.data?.customerName,
-                    customerPin = extractedData.data?.customerPin
+                    customerPin = extractedData.data?.customerPin,
+                    invoiceNumber = extractedData.data?.invoiceNumber ?: UUID.randomUUID().toString(),
                     )
 
                 val updatedStatus = if (saleResult.result == "000") EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
@@ -252,51 +255,65 @@ class RetryInvoicingUseCase(
     }
 
 
-
-
-  private suspend fun filterItems(
+    private suspend fun filterItems(
         extractedItems: List<com.pavicontech.desktop.agent.data.remote.dto.response.extractInvoice.Item>
     ): List<CreateSaleItem> {
-        val storedItems = localItemsRepository.getAllItems()
+        val itemsLocal = keyValueStorage.get(Constants.ITEMS_LIST) ?: ""
+        val storedItems = GetItemsRes.fromJson(itemsLocal)
 
-
-        val items =  extractedItems.mapNotNull { extracted ->
-            val matchedStoredItem = storedItems.find {
-                it.itemName.trim().equals(extracted.itemDescription.trim(), ignoreCase = true)
-            }
-
-            val taxAmount = when(extracted.taxType){
-                "A" -> 0
-                "C" -> 0
-                "E" -> {
-                    val amount = extracted.amount.toInt() * extracted.quantity.toInt()
-                    ((0.08) * amount).toInt()
-                }
-                "B" -> {
-                    val amount = extracted.amount.toInt() * extracted.quantity.toInt()
-                    ((0.16) * amount).toInt()
-                }
-                "D" -> 0
-
-                else -> 0
-            }
-            val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
-            matchedStoredItem?.toCreateSaleItem(
-                qty = extracted.quantity.toInt(),
-                prc = extracted.amount.toInt(),
-                dcRt = 0,
-                dcAmt = 0,
-                splyAmt = itemAmount,
-                taxblAmt = itemAmount-taxAmount,
-                taxAmt = taxAmount,
-                totAmt = itemAmount
-            )
+        // Log all stored items
+        storedItems.forEach {
+            "Stored item: '${it.itemName}'".logger(Type.TRACE)
         }
-        "Sending items for sale: $items".logger(Type.INFO)
+
+        // Function to normalize text for matching
+        fun normalize(text: String): String {
+            return text.lowercase()
+                .replace("[^a-z0-9]".toRegex(), "") // remove everything except letters and digits
+                .trim()
+        }
+
+        val items = extractedItems.mapNotNull { extracted ->
+            val normalizedExtracted = normalize(extracted.itemDescription)
+            "Trying to match extracted item: '${extracted.itemDescription}' → [$normalizedExtracted]".logger(Type.DEBUG)
+
+            // Try to find a match from stored items
+            val matchedStoredItem = storedItems.find {
+                val normalizedStored = normalize(it.itemName)
+                "Comparing [${it.itemName}] → [$normalizedStored] with [${extracted.itemDescription}] → [$normalizedExtracted]".logger(Type.TRACE)
+                normalizedStored == normalizedExtracted
+            }
+
+            // If matched, continue to convert to CreateSaleItem
+            if (matchedStoredItem != null) {
+                val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
+
+                val taxAmount = when (extracted.taxType) {
+                    "E" -> ((0.08) * itemAmount).toInt()
+                    "B" -> ((0.16) * itemAmount).toInt()
+                    else -> 0
+                }
+
+                matchedStoredItem.toCreateSaleItem(
+                    qty = extracted.quantity.toInt(),
+                    prc = extracted.amount.toInt(),
+                    dcRt = 0,
+                    dcAmt = 0,
+                    splyAmt = itemAmount,
+                    taxblAmt = itemAmount - taxAmount,
+                    taxAmt = taxAmount,
+                    totAmt = itemAmount
+                )
+            } else {
+                "No match found for extracted item: '${extracted.itemDescription}'".logger(Type.WARN)
+                null
+            }
+        }
+
+        "Sending ${items.size} items for sale".logger(Type.INFO)
         "Items: $items".logger(Type.DEBUG)
 
-        return  items
-
+        return items
     }
 
 
