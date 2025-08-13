@@ -136,7 +136,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
 
             // 👇 Correct this:
-            packageName = "Etims Sync" // Use a simple internal name (lowercase, hyphenated)
+            packageName = "Taxpoint" // Use a simple internal name (lowercase, hyphenated)
 
             packageVersion = appVersion
             description = "Empower your business with an AI-driven virtual printer that integrates effortlessly with your ERP and KRA eTIMS for smart, compliant invoicing."
@@ -150,7 +150,7 @@ compose.desktop {
 
             // 👉 Set .ico file for Windows installer and shortcut
             windows {
-                menuGroup = "Pavicon Technologies"
+                menuGroup = "Ubuni Works"
                 upgradeUuid = "12345678-90ab-cdef-1234-567890abcdef" // change to your UUID
                 shortcut = true
                 iconFile.set(project.file("src/desktopMain/resources/icon.ico"))
