@@ -115,15 +115,17 @@ class SubmitInvoicesUseCase(
             onSuccess = { extractedData, saleItems, taxableAmount, _, invoiceItems, _ ->
 
                 val saleResult = createSaleUseCase.invoke(
+                    businessPin = businessInfo.kraPin,
+                    branchId = businessInfo.branchId,
                     items = saleItems,
                     taxableAmount = taxableAmount,
                     customerName = extractedData.data?.customerName,
                     customerPin = extractedData.data?.customerPin,
-                    invoiceNumber = extractedData.data?.invoiceNumber ?: UUID.randomUUID().toString(),
+                    invoiceNumber = extractedData.data?.invoiceNumber?.let { "$it${(10..10000).random().toString()}"  } ?: UUID.randomUUID().toString(),
 
                 )
 
-                val updatedStatus = if (saleResult.result == "000") EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
+                val updatedStatus = if (saleResult.status) EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
                 "ETIMS STATUS: $updatedStatus".logger(Type.DEBUG)
                 val getPrintOutSize = keyValueStorage.get(Constants.PRINTOUT_SIZE)
 
@@ -145,7 +147,7 @@ class SubmitInvoicesUseCase(
                     fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png") else fileName
                 )
 
-                if (saleResult.result == "000") {
+                if (saleResult.status) {
                     val htmlContent = generateHtmlReceipt(
                         data = extractedData.toExtractedData(),
                         businessInfo = businessInfo,

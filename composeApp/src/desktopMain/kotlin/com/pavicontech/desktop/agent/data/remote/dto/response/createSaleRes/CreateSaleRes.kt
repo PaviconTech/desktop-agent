@@ -10,6 +10,6 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 @JsonIgnoreUnknownKeys
 @Serializable
 data class CreateSaleRes(
-    @SerialName("ResultCd") val result: String,
-    @SerialName("Data") val kraResult: KraResult? = null,
+    @SerialName("status") val status: Boolean,
+    @SerialName("result") val kraResult: KraResult? = null,
 )

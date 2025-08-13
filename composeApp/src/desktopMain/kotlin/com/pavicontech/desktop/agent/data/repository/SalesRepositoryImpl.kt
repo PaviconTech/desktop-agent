@@ -42,7 +42,7 @@ class SalesRepositoryImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             CreateSaleRes(
-                result = "",
+                status = false,
                 kraResult = null,
             )
         }
