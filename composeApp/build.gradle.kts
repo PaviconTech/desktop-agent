@@ -113,6 +113,24 @@ tasks.register("generateBuildConfig") {
     }
 }
 
+
+tasks.register<Jar>("fatJar") {
+    archiveBaseName.set("composeApp-desktop-fat")
+    archiveVersion.set(appVersion)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes["Main-Class"] = "com.pavicontech.desktop.agent.MainKt"
+    }
+
+    from(sourceSets["desktopMain"].output)
+    dependsOn(configurations["desktopRuntimeClasspath"])
+    from({
+        configurations["desktopRuntimeClasspath"].map { if (it.isDirectory) it else zipTree(it) }
+    })
+}
+
+
 compose.desktop {
     application {
         mainClass = "com.pavicontech.desktop.agent.MainKt"
