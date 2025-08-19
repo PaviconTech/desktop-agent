@@ -10,6 +10,7 @@
     import com.pavicontech.desktop.agent.domain.InitUseCases
     import desktopagent.composeapp.generated.resources.Res
     import desktopagent.composeapp.generated.resources.kra
+    import desktopagent.composeapp.generated.resources.taxpoint_black
     import kotlinx.coroutines.CoroutineScope
     import kotlinx.coroutines.Dispatchers
     import kotlinx.coroutines.launch
@@ -73,7 +74,7 @@
                 title = "Etims Sync",
                 visible = isVisible,
                 state = windowState,
-                icon = painterResource(Res.drawable.kra)
+                icon = painterResource(Res.drawable.taxpoint_black)
             ) {
                 App(width = windowState.size.width, height = windowState.size.height)
             }
