@@ -61,7 +61,7 @@ class SalesRepositoryImpl(
         } catch (e: Exception) {
             CreditNoteRes(
                 status = false,
-                kraResult = null,
+                //kraResult = null,
                 message = e.message ?: "",
             )
         }
