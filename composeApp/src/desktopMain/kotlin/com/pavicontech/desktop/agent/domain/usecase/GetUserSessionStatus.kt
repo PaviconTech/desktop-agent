@@ -9,10 +9,6 @@ class GetUserSessionStatus(
     private val keyValueStorage: KeyValueStorage
 ) {
     suspend operator fun invoke(): Boolean  = withContext(Dispatchers.IO) {
-        keyValueStorage.get(Constants.AUTH_TOKEN)?.let {
-            keyValueStorage.get(Constants.AUTH_TOKEN_EXPIRY)?.let { tokenExpiry ->
-                tokenExpiry.toLong() > System.currentTimeMillis()
-            } == true
-        } == true
+        keyValueStorage.get(Constants.AUTH_TOKEN)?.isNotBlank() ?: false
     }
 }

@@ -112,7 +112,8 @@ class RetryInvoicingUseCase(
                     invoiceNumber = extractedData.data?.invoiceNumber?.let { "$it${(10..10000).random().toString()}"  } ?: UUID.randomUUID().toString(),
                     )
 
-                val updatedStatus = if (saleResult.status) EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
+                val updatedStatus = if (saleResult.status == "000") EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
+                println(saleResult)
                 val getPrintOutSize= keyValueStorage.get(Constants.PRINTOUT_SIZE)
 
                 invoiceRepository.updateInvoice(
@@ -134,13 +135,11 @@ class RetryInvoicingUseCase(
                     fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png") else fileName
                 )
 
-                if (saleResult.status) {
+                if (saleResult.status == "000") {
                     val htmlContent = generateHtmlReceipt(
                         data = extractedData.toExtractedData(),
                         businessInfo = businessInfo,
-                        businessPin = businessInfo.kraPin,
-                        bhfId = businessInfo.branchId,
-                        rcptSign = saleResult.kraResult?.rcptSign ?: "No Receipt Sign"
+                        qrUrl = saleResult.kraResult?.qrUrl ?: "No etims url",
                     )
                     val htmlContent80mm = generateHtmlReceipt80MMUseCase(
                         data = extractedData.toExtractedData(),

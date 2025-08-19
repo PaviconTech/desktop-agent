@@ -66,8 +66,7 @@ fun CreditNoteDialog(
     bindingInvoice?.let {
         bindSaleToInvoice(
             inputFile = it,
-            businessPin = pin,
-            bhfId = bhfid,
+            qrUrl = "",
             rcptSign = sale.rcptSign ?: "",
             intrlData = sale.intrlData ?: "",
             date = sale.createdAt.toLocalFormattedString(),

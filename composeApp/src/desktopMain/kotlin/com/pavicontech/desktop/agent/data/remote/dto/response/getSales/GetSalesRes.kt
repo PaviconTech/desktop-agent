@@ -14,6 +14,7 @@ data class GetSalesRes(
 ){
     fun toSale(): List<com.pavicontech.desktop.agent.domain.model.Sale> {
         return sales.map {
+            println(it.qrurl)
             com.pavicontech.desktop.agent.domain.model.Sale(
                 id = it.id.toString(),
                 intrlData = it.intrlData,
@@ -28,7 +29,8 @@ data class GetSalesRes(
                 amount = it.totAmt.toDoubleOrNull() ?: 0.0,
                 tax = it.totTaxAmt.toDoubleOrNull() ?: 0.0,
                 createdAt = it.createdAt,
-                items = it.items
+                items = it.items,
+                qrUrl = it.qrurl ?: "No etims url"
             )
         }
 

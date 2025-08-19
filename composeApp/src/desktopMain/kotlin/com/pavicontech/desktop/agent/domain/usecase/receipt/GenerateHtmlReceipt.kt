@@ -15,9 +15,7 @@ class GenerateHtmlReceipt(
 
     operator fun invoke(
         data: ExtractedInvoiceData,
-        businessPin:String,
-        bhfId:String,
-        rcptSign:String,
+        qrUrl: String,
         businessInfo: BusinessInformation
     ): String {
         val userHome = System.getProperty("user.home")
@@ -25,9 +23,7 @@ class GenerateHtmlReceipt(
 
         val qrImagePath = generateQrCode.invoke(
             path = qrPath,
-            businessPin = businessPin,
-            bhfId = bhfId,
-            rcptSign = rcptSign
+            data = qrUrl
         ).toURI().toString()
         val logoUrl = escapeHtml(businessInfo.businessLogo ?: "")
         return """

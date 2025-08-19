@@ -125,7 +125,7 @@ class SubmitInvoicesUseCase(
 
                 )
 
-                val updatedStatus = if (saleResult.status) EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
+                val updatedStatus = if (saleResult.status == "000") EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
                 "ETIMS STATUS: $updatedStatus".logger(Type.DEBUG)
                 val getPrintOutSize = keyValueStorage.get(Constants.PRINTOUT_SIZE)
 
@@ -147,13 +147,11 @@ class SubmitInvoicesUseCase(
                     fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png") else fileName
                 )
 
-                if (saleResult.status) {
+                if (saleResult.status == "000") {
                     val htmlContent = generateHtmlReceipt(
                         data = extractedData.toExtractedData(),
                         businessInfo = businessInfo,
-                        businessPin = businessInfo.kraPin,
-                        bhfId = businessInfo.branchId,
-                        rcptSign = saleResult.kraResult?.rcptSign ?: "No Receipt Sign"
+                        qrUrl = saleResult.kraResult?.qrUrl ?: "No etims url",
                     )
 
                     val htmlContent80mm = generateHtmlReceipt80MMUseCase(

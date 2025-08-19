@@ -30,6 +30,7 @@ class GenerateQrCodeAndKraInfoUseCase(
         businessPin: String,
         bhfId: String,
         rcptSign:String,
+        qrUrl: String,
         onSuccess: suspend (qrCodeFile: File) -> Unit,
         onCleanUp: (qrCodeFile: File) -> Unit
     ) {
@@ -48,9 +49,7 @@ class GenerateQrCodeAndKraInfoUseCase(
         val qrCodeFile = File(path.toFile(), "$fileNamePrefix-qr.png")
         generateQrCodeImage.invoke(
             path = qrCodeFile.toPath(),
-            businessPin = businessPin,
-            bhfId = bhfId,
-            rcptSign = rcptSign
+            data = qrUrl
         )
         try {
             onSuccess(qrCodeFile)

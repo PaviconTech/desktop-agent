@@ -18,15 +18,13 @@ class GenerateQrCodeUseCase {
 
     operator fun invoke(
         path:Path,
-        businessPin: String,
-        bhfId: String,
-        rcptSign:String
+        data: String
     ): File {
         val qrCode = QRCode
             .ofRoundedSquares()
             .withColor(0xFF000000.toInt())
             .withSize(25)
-        .build("${Constants.ETIMS_QR_URL}$businessPin$bhfId$rcptSign")
+        .build(data)
 
         val pngBytes = qrCode
             .render()

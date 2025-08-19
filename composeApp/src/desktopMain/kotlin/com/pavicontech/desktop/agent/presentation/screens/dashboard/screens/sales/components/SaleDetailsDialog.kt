@@ -99,15 +99,13 @@ fun SaleDetailsDialog(
             val loaded = it.fromBusinessJson()
             pin = loaded.kraPin
             bhfid = loaded.branchId
-            qrUrl = "${Constants.ETIMS_QR_URL}$pin$bhfid${sale.receiptSign}"
         }
     }
 
     bindingInvoice?.let {
         bindSaleToInvoice(
             inputFile = it,
-            businessPin = pin,
-            bhfId = bhfid,
+            qrUrl = sale.qrUrl,
             rcptSign = sale.receiptSign ?: "",
             intrlData = sale.intrlData ?: "",
             date = sale.createdAt.toLocalFormattedString(),
@@ -159,7 +157,7 @@ fun SaleDetailsDialog(
                         }
                     }
                     Image(
-                        bitmap = generateQRBitmap(qrUrl),
+                        bitmap = generateQRBitmap(sale.qrUrl    ),
                         contentDescription = "QR Code",
                         modifier = Modifier.size(200.dp)
                     )
@@ -286,8 +284,7 @@ fun InfoRow(label: String, value: String, highlight: Boolean = false) {
 @Composable
  fun bindSaleToInvoice(
     inputFile: File,
-    businessPin: String,
-    bhfId: String,
+    qrUrl:String,
     rcptSign:String,
     intrlData:String,
     date:String,
@@ -314,9 +311,7 @@ fun InfoRow(label: String, value: String, highlight: Boolean = false) {
 // ✅ Ensure directory exists
     val qrCode = generateQrCode.invoke(
         path = qrPath,
-        businessPin = businessPin,
-        bhfId = bhfId,
-        rcptSign = rcptSign
+        data = qrUrl
     )
 
 

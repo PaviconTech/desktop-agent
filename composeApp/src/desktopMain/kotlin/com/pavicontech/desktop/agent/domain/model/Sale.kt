@@ -12,6 +12,7 @@ data class Sale(
     val invoiceNumber: String,
     val receiptSign:String? = null,
     val intrlData:String? = null,
+    val qrUrl:String,
     val etimsReceiptNumber: String,
     val status: String,
     val itemsCount: Int,

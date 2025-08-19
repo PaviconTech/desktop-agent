@@ -9,11 +9,14 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 @JsonIgnoreUnknownKeys
 @Serializable
 data class KraResult(
-    @SerialName("rcptNo") val rcptNo: Int,
-    @SerialName("intrlData") val intrlData: String? = null,
-    @SerialName("rcptSign") val rcptSign: String? = null,
-    @SerialName("totRcptNo") val totRcptNo: Int,
-    @SerialName("vsdcRcptPbctDate") val vsdcRcptPbctDate: String,
-    @SerialName("sdcId") val sdcId: String,
-    @SerialName("mrcNo")val mrcNo: String,
+    @SerialName("TotRcptNo") val totRcptNo: Int,
+    @SerialName("RcptNo") val rcptNo: Int,
+    @SerialName("IntrlData") val intrlData: String? = null,
+    @SerialName("RcptSign") val rcptSign: String? = null,
+    @SerialName("sdcDateTime") val sdcDateTime: String? = null,
+    @SerialName("VsdcRcptPbctDate") val vsdcRcptPbctDate: String,
+    @SerialName("invoiceNo") val invoiceNo: Int,
+    @SerialName("SdcId") val sdcId: String,
+    @SerialName("MrcNo")val mrcNo: String? = null,
+    @SerialName("Qrurl")val qrUrl: String,
 )
