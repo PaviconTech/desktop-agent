@@ -36,7 +36,7 @@ class CreateCreditNoteUseCase(
             SnackbarController.sendEvent(
                 event = SnackbarEvent(message = response.message)
             )
-            if (!response.status) return@flow emit(Resource.Error(message = response.message))
+            if (response.status != "000") return@flow emit(Resource.Error(message = response.message))
             return@flow emit(Resource.Success(message = response.message, data = response))
         }catch (e: Exception){
             SnackbarController.sendEvent(

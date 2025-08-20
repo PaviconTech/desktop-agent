@@ -49,9 +49,6 @@ fun CreditNoteDialog(
     val selectFileUseCase: SelectFileUseCase = koinInject()
     val scope = rememberCoroutineScope()
 
-    var pin by remember { mutableStateOf("") }
-    var bhfid by remember { mutableStateOf("") }
-    var qrUrl by remember { mutableStateOf("") }
 
     var bindingInvoice by remember { mutableStateOf<File?>(null) }
     var bindedInvoice by remember { mutableStateOf<File?>(null) }
@@ -66,7 +63,7 @@ fun CreditNoteDialog(
     bindingInvoice?.let {
         bindSaleToInvoice(
             inputFile = it,
-            qrUrl = "",
+            qrUrl = sale.qrUrl ?: "",
             rcptSign = sale.rcptSign ?: "",
             intrlData = sale.intrlData ?: "",
             date = sale.createdAt.toLocalFormattedString(),
@@ -77,14 +74,13 @@ fun CreditNoteDialog(
         )
     }
 
+/*
     LaunchedEffect(Unit) {
         keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.let {
             val loaded = it.fromBusinessJson()
-            pin = loaded.kraPin
-            bhfid = loaded.branchId
-            qrUrl = "${Constants.ETIMS_QR_URL}$pin$bhfid${sale.rcptSign}"
         }
     }
+*/
 
     DialogWindow(
         onCloseRequest = onDismiss,
@@ -128,7 +124,7 @@ fun CreditNoteDialog(
                     }
 
                     Image(
-                        bitmap = generateQRBitmap(qrUrl),
+                        bitmap = generateQRBitmap(sale.qrUrl ?: "No credit not url"),
                         contentDescription = "QR Code",
                         modifier = Modifier.size(200.dp)
                     )

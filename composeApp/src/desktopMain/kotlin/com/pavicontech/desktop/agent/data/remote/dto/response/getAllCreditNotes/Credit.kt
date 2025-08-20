@@ -26,6 +26,7 @@ data class Credit(
     @SerialName("invcNo") val invcNo: Int,
     @SerialName("items") val items: List<Item>,
     @SerialName("long_url") val longUrl: String? = null,
+    @SerialName("qrurl") val qrUrl: String? = null,
     @SerialName("orgInvcNo") val orgInvcNo: Int,
     @SerialName("PRINT") val pRINT: String,
     @SerialName("pmtTyCd") val pmtTyCd: String,

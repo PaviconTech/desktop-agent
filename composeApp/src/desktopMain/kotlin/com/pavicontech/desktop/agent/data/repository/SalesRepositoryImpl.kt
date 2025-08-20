@@ -60,8 +60,7 @@ class SalesRepositoryImpl(
             Json.decodeFromString(responseText)
         } catch (e: Exception) {
             CreditNoteRes(
-                status = false,
-                //kraResult = null,
+                status = "",
                 message = e.message ?: "",
             )
         }
@@ -82,8 +81,12 @@ class SalesRepositoryImpl(
         api.get(urlString = "${Constants.ETIMS_BACKEND}/credit"){
             header("Authorization", "Bearer $token")
         }.bodyAsText().let {
-            it.logger(Type.DEBUG)
-            Json.decodeFromString(it)
+           // it.logger(Type.DEBUG)
+            val creditNotes = Json.decodeFromString<GetAllCreditNotesRes>(it)
+            creditNotes.credit.forEach {
+                println("Credit note url: ${it.qrUrl}")
+            }
+            creditNotes
         }
 
     }
