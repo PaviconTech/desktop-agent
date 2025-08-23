@@ -5,9 +5,12 @@
     import androidx.compose.ui.unit.DpSize
     import androidx.compose.ui.unit.dp
     import androidx.compose.ui.window.*
+    import com.pavicontech.desktop.agent.common.Constants
     import com.pavicontech.desktop.agent.common.utils.LogManager
+    import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
     import com.pavicontech.desktop.agent.di.initKoin
     import com.pavicontech.desktop.agent.domain.InitUseCases
+    import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
     import desktopagent.composeapp.generated.resources.Res
     import desktopagent.composeapp.generated.resources.kra
     import desktopagent.composeapp.generated.resources.taxpoint_black
@@ -27,7 +30,11 @@
 
         application(exitProcessOnExit = false) {
             val initUseCases: InitUseCases = koinInject()
+            val keyValueStorage: KeyValueStorage = koinInject()
             CoroutineScope(Dispatchers.IO).launch {
+                val businessInfo = keyValueStorage.get(Constants.BUSINESS_INFORMATION)?.fromBusinessJson()
+                Constants.bussinesPin = businessInfo?.kraPin
+                Constants.branchId = businessInfo?.branchId
                 initUseCases()
             }
 

@@ -42,4 +42,8 @@ object Constants {
     const val PRINTOUT_SIZE = "printout_size"
     const val INVOICE_NO_PREFIX = "invoice_no_prefix"
     const val INVOICE_NO_LIST = "invoice_no_list"
+
+
+    var bussinesPin:String? = null
+    var branchId:String? = null
 }

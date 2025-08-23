@@ -9,7 +9,7 @@ import com.pavicontech.desktop.agent.data.remote.dto.response.getSales.GetSalesR
 
 interface SalesRepository {
     suspend fun createSale(body: CreateSaleReq, token: String): CreateSaleRes
-    suspend fun createCreditNote(body: CreditNoteReq, token: String):CreditNoteRes
+    suspend fun  createCreditNote(body: CreditNoteReq, token: String):CreditNoteRes
     suspend fun getSales(token: String): GetSalesRes
     suspend fun getAllCreditNotes(token: String): GetAllCreditNotesRes
 }
