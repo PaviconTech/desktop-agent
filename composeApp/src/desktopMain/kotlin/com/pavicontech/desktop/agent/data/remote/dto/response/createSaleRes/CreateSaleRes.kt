@@ -18,7 +18,7 @@ import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.*
 
-@OptIn(ExperimentalSerializationApi::class)
+
 @Serializable(with = CreateSaleResSerializer::class)
 @JsonIgnoreUnknownKeys
 data class CreateSaleRes(
@@ -29,29 +29,47 @@ data class CreateSaleRes(
 )
 
 
-@OptIn(ExperimentalSerializationApi::class)
 object CreateSaleResSerializer : KSerializer<CreateSaleRes> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CreateSaleRes") {
-        element<String>("ResultCd", isOptional = true)
-        element<String>("ResultDt", isOptional = true)
+        element<String>("ResultCd")
+        element<String>("ResultDt")
         element<String>("ResultMsg", isOptional = true)
         element<KraResult>("Data", isOptional = true)
     }
 
     override fun deserialize(decoder: Decoder): CreateSaleRes {
-        val input = decoder as? JsonDecoder ?: error("Can only deserialize with Json")
-        val element = input.decodeJsonElement() as JsonObject
+        val jsonDecoder = decoder as? JsonDecoder ?: error("Can only deserialize with Json")
+        val element = jsonDecoder.decodeJsonElement() as JsonObject
 
         return if ("ResultCd" in element) {
-            // Standard KRA response → decode directly
-            Json.decodeFromJsonElement(CreateSaleRes.serializer(), element)
-        } else {
-            // Alt response with "status", "message", "result"
-            val status = element["status"]?.jsonPrimitive?.booleanOrNull ?: false
+            // Standard KRA response
+            val dataObj = element["Data"]?.jsonObject
+            val kraResult = dataObj?.let {
+                KraResult(
+                    totRcptNo = it["TotRcptNo"]?.jsonPrimitive?.int ?: 0,
+                    rcptNo = it["RcptNo"]?.jsonPrimitive?.int ?: 0,
+                    intrlData = it["IntrlData"]?.jsonPrimitive?.contentOrNull,
+                    rcptSign = it["RcptSign"]?.jsonPrimitive?.contentOrNull,
+                    sdcDateTime = it["sdcDateTime"]?.jsonPrimitive?.contentOrNull,
+                    vsdcRcptPbctDate = it["VsdcRcptPbctDate"]?.jsonPrimitive?.content ?: "",
+                    invoiceNo = it["invoiceNo"]?.jsonPrimitive?.int ?: 0,
+                    sdcId = it["SdcId"]?.jsonPrimitive?.content ?: "",
+                    mrcNo = it["MrcNo"]?.jsonPrimitive?.contentOrNull,
+                    qrUrl = it["Qrurl"]?.jsonPrimitive?.content ?: ""
+                )
+            }
+            CreateSaleRes(
+                status = element["ResultCd"]?.jsonPrimitive?.content ?: "",
+                resultDt = element["ResultDt"]?.jsonPrimitive?.content ?: "",
+                resultMsg = element["ResultMsg"]?.jsonPrimitive?.contentOrNull,
+                kraResult = kraResult
+            )
+        } else if ("status" in element) {
+            // Alternative response
+            val statusBool = element["status"]?.jsonPrimitive?.booleanOrNull ?: false
             val message = element["message"]?.jsonPrimitive?.contentOrNull
-            val result = element["result"]?.jsonObject
-
-            val kraResult = result?.let {
+            val resultObj = element["result"]?.jsonObject
+            val kraResult = resultObj?.let {
                 KraResult(
                     totRcptNo = it["totRcptNo"]?.jsonPrimitive?.int ?: 0,
                     rcptNo = it["rcptNo"]?.jsonPrimitive?.int ?: 0,
@@ -59,25 +77,45 @@ object CreateSaleResSerializer : KSerializer<CreateSaleRes> {
                     rcptSign = it["rcptSign"]?.jsonPrimitive?.contentOrNull,
                     sdcDateTime = null,
                     vsdcRcptPbctDate = it["vsdcRcptPbctDate"]?.jsonPrimitive?.content ?: "",
-                    invoiceNo = it["rcptNo"]?.jsonPrimitive?.int ?: 0, // fallback
+                    invoiceNo = it["rcptNo"]?.jsonPrimitive?.int ?: 0,
                     sdcId = it["sdcId"]?.jsonPrimitive?.content ?: "",
                     mrcNo = it["mrcNo"]?.jsonPrimitive?.contentOrNull,
-                    qrUrl = "${Constants.ETIMS_QR_URL}${Constants.bussinesPin}${Constants.branchId}${it["rcptSign"]?.jsonPrimitive?.contentOrNull}"
+                    qrUrl = it["rcptSign"]?.jsonPrimitive?.contentOrNull ?: ""
                 )
             }
-
             CreateSaleRes(
-                status = if (status) "000" else "999",
+                status = if (statusBool) "000" else "999",
                 resultDt = "",
                 resultMsg = message,
                 kraResult = kraResult
             )
+        } else {
+            // Unknown format
+            CreateSaleRes()
         }
     }
 
     override fun serialize(encoder: Encoder, value: CreateSaleRes) {
-        Json.encodeToJsonElement(CreateSaleRes.serializer(), value).let { element ->
-            encoder.encodeSerializableValue(JsonObject.serializer(), element.jsonObject)
+        val obj = buildJsonObject {
+            put("ResultCd", value.status)
+            put("ResultDt", value.resultDt)
+            put("ResultMsg", value.resultMsg)
+            value.kraResult?.let { kr ->
+                put("Data", buildJsonObject {
+                    put("TotRcptNo", kr.totRcptNo)
+                    put("RcptNo", kr.rcptNo)
+                    put("IntrlData", kr.intrlData)
+                    put("RcptSign", kr.rcptSign)
+                    put("sdcDateTime", kr.sdcDateTime)
+                    put("VsdcRcptPbctDate", kr.vsdcRcptPbctDate)
+                    put("invoiceNo", kr.invoiceNo)
+                    put("SdcId", kr.sdcId)
+                    put("MrcNo", kr.mrcNo)
+                    put("Qrurl", kr.qrUrl)
+                })
+            }
         }
+
+        encoder.encodeSerializableValue(JsonObject.serializer(), obj)
     }
 }

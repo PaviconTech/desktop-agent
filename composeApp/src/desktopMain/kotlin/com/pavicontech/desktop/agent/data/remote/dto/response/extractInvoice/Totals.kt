@@ -9,15 +9,15 @@ data class Totals(
     @SerialName("otherAmounts")
     val otherAmounts: Map<String, Double?>? = null,
     @SerialName("subTotal")
-    val subTotal: Double,
+    val subTotal: Double?,
     @SerialName("totalAmount")
-    val totalAmount: Double,
+    val totalAmount: Double?,
     @SerialName("totalVat")
     val totalVat: Double? = null
 ){
     fun toTotals() = com.pavicontech.desktop.agent.data.local.database.entries.Totals(
-        subTotal = subTotal,
-        totalAmount = totalAmount,
+        subTotal = subTotal ?: 0.0,
+        totalAmount = totalAmount ?: 0.0,
         totalVat = totalVat ?: 0.0
     )
 

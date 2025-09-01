@@ -20,7 +20,7 @@ data class Item(
     val taxType: String? = null
 ){
     fun toItem() = com.pavicontech.desktop.agent.data.local.database.entries.Item(
-        amount = amount,
+        amount = amount ?: 0.0,
         itemDescription = itemDescription,
         quantity = quantity,
         taxAmount = taxAmount ?: 0.0,
