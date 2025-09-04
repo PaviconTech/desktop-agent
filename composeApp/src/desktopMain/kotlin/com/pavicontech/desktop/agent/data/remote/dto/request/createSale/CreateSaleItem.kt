@@ -17,7 +17,7 @@ data class CreateSaleItem(
     val pkg:Int,
     val qtyUnitCd:String,
     val prc: Double,
-    val splyAmt:Int,
+    val splyAmt:Double,
     val dcRt:Double,
     val dcAmt:Double,
     val isrccCd:String? = null,

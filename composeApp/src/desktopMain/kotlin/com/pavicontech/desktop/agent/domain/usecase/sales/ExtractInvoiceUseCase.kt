@@ -185,24 +185,13 @@ class ExtractInvoiceUseCase(
 
             // If matched, continue to convert to CreateSaleItem
             if (matchedStoredItem != null) {
-                val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
-
-                val taxAmount = when (extracted.taxType) {
-                    "E" -> ((0.08) * itemAmount).toInt()
-                    "B" -> ((0.16) * itemAmount).toInt()
-                    else -> 0
-                }
+                val itemAmount = extracted.amount * extracted.quantity
 
                 matchedStoredItem.toCreateSaleItem(
                     qty = extracted.quantity.toInt(),
-                    prc = extracted.amount.toInt(),
-                    dcRt = 0,
-                    dcAmt = 0,
-                    splyAmt = itemAmount,
-                    taxblAmt = itemAmount - taxAmount,
-                    taxAmt = taxAmount,
-                    totAmt = itemAmount
+                    prc = extracted.amount,
                 )
+
             } else {
                 "No match found for extracted item: '${extracted.itemDescription}'".logger(Type.WARN)
                 null

@@ -28,6 +28,14 @@ class CreateSaleUseCase(
         invoiceNumber: String?,
     ):CreateSaleRes {
         val token = keyValueStorage.get(Constants.AUTH_TOKEN) ?: ""
+        val totalTaxableAmount = items.sumOf { it.taxblAmt}
+        val totalTaxAmount = items.sumOf { it.taxAmt}
+        val totalAmount = items.sumOf { it.totAmt.toDoubleOrNull() ?: 0.0 }
+
+        "Total Taxable Amount: $totalTaxableAmount".logger(Type.INFO)
+        "Total Tax Amount: $totalTaxAmount".logger(Type.INFO)
+        "Total Amount: $totalAmount".logger(Type.INFO)
+
         val createSaleReq = CreateSaleReq(
             tin = businessPin,
             bhfId = branchId,
@@ -54,7 +62,7 @@ class CreateSaleUseCase(
             rfdRsnCd = "",
             totItemCnt = items.size,
             taxblAmtA = 0,
-            taxblAmtB = 0,
+            taxblAmtB = totalTaxableAmount,
             taxblAmtC = 0,
             taxblAmtD = 0,
             taxblAmtE = 0,
@@ -68,15 +76,16 @@ class CreateSaleUseCase(
             taxAmtC = 0,
             taxAmtD = 0,
             taxAmtE = 0,
-            totTaxblAmt = items.sumOf { it.taxblAmt},
-            totTaxAmt = items.sumOf { it.taxAmt},
-            totAmt = items.sumOf { it.totAmt.toDoubleOrNull() ?: 0.0 },
+            totTaxblAmt = totalTaxableAmount,
+            totTaxAmt = totalTaxAmount,
+            totAmt = totalAmount,
             prchrAcptcYn = "N",
             remark = "test2",
             regrId = "Admin",
             regrNm = "Admin",
             modrId = "Admin",
             modrNm = "Admin",
+            inclusiveYn = "Y",
             receipt = Receipt(
                 custTin = "",
                 custMblNo = "",

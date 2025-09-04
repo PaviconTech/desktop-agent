@@ -31,7 +31,7 @@ data class CreateSaleReq(
     val pmtTyCd: String,
     val rfdRsnCd: String,
     val taxblAmtA: Int,
-    val taxblAmtB: Int,
+    val taxblAmtB: Double,
     val taxblAmtC: Int,
     val taxblAmtD: Int,
     val taxblAmtE: Int,
@@ -55,6 +55,7 @@ data class CreateSaleReq(
     val regrNm: String,
     val modrId: String,
     val modrNm: String,
+    val inclusiveYn: String,
     val receipt: Receipt,
     val itemList: List<CreateSaleItem>
 

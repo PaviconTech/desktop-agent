@@ -287,7 +287,7 @@ class RetryInvoicingUseCase(
 
             // If matched, continue to convert to CreateSaleItem
             if (matchedStoredItem != null) {
-                val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
+             /*   val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
 
                 val taxAmount = when (extracted.taxType) {
                     "E" -> ((0.08) * itemAmount).toInt()
@@ -304,6 +304,18 @@ class RetryInvoicingUseCase(
                     taxblAmt = itemAmount - taxAmount,
                     taxAmt = taxAmount,
                     totAmt = itemAmount
+                )*/
+                val itemAmount = extracted.amount.toDouble() * extracted.quantity.toDouble()
+
+                val taxAmount = when (extracted.taxType) {
+                    "E" -> 0.08 * itemAmount
+                    "B" -> 0.16 * itemAmount
+                    else -> 0.0
+                }
+
+                matchedStoredItem.toCreateSaleItem(
+                    qty = extracted.quantity.toInt(),
+                    prc = extracted.amount,
                 )
             } else {
                 "No match found for extracted item: '${extracted.itemDescription}'".logger(Type.WARN)

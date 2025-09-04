@@ -43,16 +43,20 @@ data class Item(
     @SerialName("updatedAt") val updatedAt: String,
     @SerialName("userId") val userId: Int
 ){
+/*
     fun toCreateSaleItem(
         qty:Int,
-        prc:Int,
-        dcRt:Int,
-        dcAmt:Int,
-        splyAmt:Int,
-        taxblAmt:Int,
-        taxAmt:Int,
-        totAmt:Int,
+        prc:Double,
     ): CreateSaleItem {
+        fun calculateTax(amount: Double) = when (taxCode) {
+            "E" -> 0.08 * amount
+            "B" -> 0.16 * amount
+            else -> 0.0
+        }
+        val taxableAmt = ,
+        val taxAmount = ,
+        val totalAMount =
+
         return CreateSaleItem(
             itemSeq = 0,
             itemCd = itemCode,
@@ -63,7 +67,7 @@ data class Item(
             qtyUnitCd = quantityUnit ?: "",
             qty = qty ,
             pkg = qty,
-            prc =  prc.toDouble(),
+            prc =  prc,
             splyAmt = splyAmt,
             dcRt =  dcRt.toDouble(),
             dcAmt = dcAmt.toDouble() ,
@@ -72,22 +76,66 @@ data class Item(
             isrccCd = null,
             isrccNm = null,
             taxTyCd = taxCode,
-            taxblAmt = taxblAmt.toDouble(),
-            taxAmt =  calculateTax(taxblAmt.toDouble()),
-            totAmt = "${taxblAmt+calculateTax(taxblAmt.toDouble())}",
+            taxblAmt = taxblAmt,
+            taxAmt =  calculateTax(prc),
+            totAmt = "$totAmt",
             itemId = id,
             itemNmDef = itemCodeDf,
 
         )
-    }
 
-    private fun calculateTax(amount:Double):Double{
-        return when(taxCode){
-            "B" -> amount * 0.16
-            "E" -> amount * 0.08
+    }
+*/
+
+
+    fun toCreateSaleItem(
+        qty: Int,
+        prc: Double, // this is your VAT-exclusive unit price
+    ): CreateSaleItem {
+        val taxRate = when (taxCode) {
+            "E" -> 0.08
+            "B" -> 0.16
             else -> 0.0
         }
+
+        // Exclusive values
+        val exclAmount = prc * qty
+        val exclTax = exclAmount * taxRate
+
+        // Convert to inclusive for KRA
+        val inclAmount = exclAmount + exclTax
+        val inclUnitPrice = inclAmount / qty
+
+        return CreateSaleItem(
+            itemSeq = 0,
+            itemCd = itemCode,
+            itemClsCd = itemClassificationCode,
+            itemNm = itemName,
+            bcd = barcode,
+            pkgUnitCd = packagingUnit,
+            qtyUnitCd = quantityUnit ?: "",
+            qty = qty,
+            pkg = qty,
+            // IMPORTANT: Post inclusive unit price
+            prc = inclUnitPrice,
+            // Supply = taxable (exclusive)
+            splyAmt = exclAmount,
+            dcRt = 0.0,
+            dcAmt = 0.0,
+            isrcRt = null,
+            isrcAmt = null,
+            isrccCd = null,
+            isrccNm = null,
+            taxTyCd = taxCode,
+            taxblAmt = exclAmount,
+            taxAmt = exclTax,
+            // Total = inclusive (excl + VAT)
+            totAmt = "$inclAmount",
+            itemId = id,
+            itemNmDef = itemCodeDf,
+        )
     }
+
 
 
 
