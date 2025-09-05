@@ -120,7 +120,14 @@ class ExtractInvoiceUseCase(
                             extractionStatus = ExtractionStatus.SUCCESSFUL,
                             etimsStatus = null,
                             updatedAt = Instant.now().toString(),
-                            items = extractionResult.data?.items?.map { it.toItem() } ?: emptyList()
+                            items = extractionResult.data?.items?.map {
+                                it.toItem()
+                            }?.map { item ->
+                                val tax = (item.taxPercentage/100) * item.amount
+                                item.copy(
+                                    amount = tax+item.amount
+                                )
+                            } ?: emptyList()
                         )
                     )
 

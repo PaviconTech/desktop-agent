@@ -138,7 +138,12 @@ class SubmitInvoicesUseCase(
                         fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png") else fileName,
                         extractionStatus = ExtractionStatus.SUCCESSFUL,
                         etimsStatus = updatedStatus,
-                        items = invoiceItems
+                        items = invoiceItems.map { item ->
+                            val tax = (item.taxPercentage/100) * item.amount
+                            item.copy(
+                                amount = tax+item.amount
+                            )
+                        }
                     )
                 )
 
