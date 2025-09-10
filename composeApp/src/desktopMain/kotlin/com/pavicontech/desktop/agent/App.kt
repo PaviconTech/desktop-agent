@@ -28,8 +28,8 @@ fun App(width: Dp, height: Dp) {
     val navHostController = rememberNavController()
 
     AppTheme {
-        MaintenanceDialog(){}
-        UpdateDialog()
+      /*  MaintenanceDialog(){}
+        UpdateDialog()*/
         val screenSize = LocalDensity.current.run {
             LocalDensity.current.density
         }
