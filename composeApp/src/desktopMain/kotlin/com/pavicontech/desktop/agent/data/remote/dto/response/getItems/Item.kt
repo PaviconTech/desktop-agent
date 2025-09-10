@@ -6,6 +6,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @OptIn(ExperimentalSerializationApi::class)
 @JsonIgnoreUnknownKeys
@@ -43,54 +45,13 @@ data class Item(
     @SerialName("updatedAt") val updatedAt: String,
     @SerialName("userId") val userId: Int
 ){
-/*
-    fun toCreateSaleItem(
-        qty:Int,
-        prc:Double,
-    ): CreateSaleItem {
-        fun calculateTax(amount: Double) = when (taxCode) {
-            "E" -> 0.08 * amount
-            "B" -> 0.16 * amount
-            else -> 0.0
-        }
-        val taxableAmt = ,
-        val taxAmount = ,
-        val totalAMount =
 
-        return CreateSaleItem(
-            itemSeq = 0,
-            itemCd = itemCode,
-            itemClsCd = itemClassificationCode,
-            itemNm = itemName,
-            bcd = barcode,
-            pkgUnitCd =packagingUnit ,
-            qtyUnitCd = quantityUnit ?: "",
-            qty = qty ,
-            pkg = qty,
-            prc =  prc,
-            splyAmt = splyAmt,
-            dcRt =  dcRt.toDouble(),
-            dcAmt = dcAmt.toDouble() ,
-            isrcRt = null,
-            isrcAmt = null,
-            isrccCd = null,
-            isrccNm = null,
-            taxTyCd = taxCode,
-            taxblAmt = taxblAmt,
-            taxAmt =  calculateTax(prc),
-            totAmt = "$totAmt",
-            itemId = id,
-            itemNmDef = itemCodeDf,
-
-        )
-
-    }
-*/
 
 
     fun toCreateSaleItem(
         qty: Int,
-        prc: Double, // this is your VAT-exclusive unit price
+        prc: Double,                // VAT-exclusive unit price
+        dcRt: Double = 0.0          // discount rate in %
     ): CreateSaleItem {
         val taxRate = when (taxCode) {
             "E" -> 0.08
@@ -98,13 +59,19 @@ data class Item(
             else -> 0.0
         }
 
-        // Exclusive values
-        val exclAmount = prc * qty
-        val exclTax = exclAmount * taxRate
+        // --- Customer discount calculation ---
+        val dcAmtPerUnit = prc * (dcRt / 100)
+        val totalDiscount = dcAmtPerUnit * qty
+        val netUnitPrice = prc - dcAmtPerUnit
+        val taxblAmtCustomer = netUnitPrice * qty
+        val taxAmtCustomer = taxblAmtCustomer * taxRate
+        val splyAmtCustomer = taxblAmtCustomer + taxAmtCustomer
+        val totAmtCustomer = splyAmtCustomer
 
-        // Convert to inclusive for KRA
-        val inclAmount = exclAmount + exclTax
-        val inclUnitPrice = inclAmount / qty
+        // --- KRA calculation (ignores discounts) ---
+        val taxblAmtKra = prc * qty
+        val taxAmtKra = taxblAmtKra * taxRate
+        val totAmtKra = taxblAmtKra + taxAmtKra
 
         return CreateSaleItem(
             itemSeq = 0,
@@ -116,21 +83,22 @@ data class Item(
             qtyUnitCd = quantityUnit ?: "",
             qty = qty,
             pkg = qty,
-            // IMPORTANT: Post inclusive unit price
-            prc = inclUnitPrice,
-            // Supply = taxable (exclusive)
-            splyAmt = exclAmount,
-            dcRt = 0.0,
-            dcAmt = 0.0,
+
+            prc = prc.to2dp(),                        // unit price excl. VAT
+            splyAmt = splyAmtCustomer.to2dp(),        // what customer sees
+            dcRt = dcRt,                      // discount %
+            dcAmt = totalDiscount.to2dp(),            // total discount
+            taxTyCd = taxCode,
+
+            // 👉 Decide which values to pass depending on target (Invoice vs KRA)
+            taxblAmt = taxblAmtKra.to2dp(),           // send KRA value (no discount)
+            taxAmt = taxAmtKra.to2dp(),               // send KRA value (no discount)
+            totAmt = "${totAmtKra.to2dp()}",            // send KRA value (no discount)
+
             isrcRt = null,
             isrcAmt = null,
             isrccCd = null,
             isrccNm = null,
-            taxTyCd = taxCode,
-            taxblAmt = exclAmount,
-            taxAmt = exclTax,
-            // Total = inclusive (excl + VAT)
-            totAmt = "$inclAmount",
             itemId = id,
             itemNmDef = itemCodeDf,
         )
@@ -140,3 +108,8 @@ data class Item(
 
 
 }
+
+
+
+fun Double.to2dp(): Double =
+    BigDecimal(this).setScale(2, RoundingMode.HALF_UP).toDouble()

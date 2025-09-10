@@ -316,6 +316,7 @@ class RetryInvoicingUseCase(
                 matchedStoredItem.toCreateSaleItem(
                     qty = extracted.quantity.toInt(),
                     prc = extracted.amount,
+                    dcRt = extracted.discount?.div(extracted.amount) ?: 0.0,
                 )
             } else {
                 "No match found for extracted item: '${extracted.itemDescription}'".logger(Type.WARN)
