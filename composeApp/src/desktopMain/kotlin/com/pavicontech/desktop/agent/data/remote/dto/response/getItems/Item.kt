@@ -51,7 +51,8 @@ data class Item(
     fun toCreateSaleItem(
         qty: Int,
         prc: Double,                // VAT-exclusive unit price
-        dcRt: Double = 0.0          // discount rate in %
+        dcRt: Double = 0.0,
+        lineAMount: Double,
     ): CreateSaleItem {
         val taxRate = when (taxCode) {
             "E" -> 0.08
@@ -60,7 +61,7 @@ data class Item(
         }
 
         // --- Customer discount calculation ---
-        val dcAmtPerUnit = prc * (dcRt / 100)
+        val dcAmtPerUnit = lineAMount/qty
         val totalDiscount = dcAmtPerUnit * qty
         val netUnitPrice = prc - dcAmtPerUnit
         val taxblAmtCustomer = netUnitPrice * qty
@@ -72,8 +73,14 @@ data class Item(
         val taxblAmtKra = prc * qty
         val taxAmtKra = taxblAmtKra * taxRate
         val totAmtKra = taxblAmtKra + taxAmtKra
+        val price =  (prc*100)/84
+        val splyAmt = (price - dcAmtPerUnit) * qty
+        //val splyAmt = (((prc - dcAmtPerUnit) * 100 ) / 84) * qty
+        val taxableAmt = splyAmt/1.16
+        val taxAmt = splyAmt-taxableAmt
 
-        return CreateSaleItem(
+
+            return CreateSaleItem(
             itemSeq = 0,
             itemCd = itemCode,
             itemClsCd = itemClassificationCode,
@@ -83,17 +90,15 @@ data class Item(
             qtyUnitCd = quantityUnit ?: "",
             qty = qty,
             pkg = qty,
-
-            prc = prc.to2dp(),                        // unit price excl. VAT
-            splyAmt = splyAmtCustomer.to2dp(),        // what customer sees
+            prc = price,                         // unit price excl. VAT
+            splyAmt = splyAmt.to2dp(),        // what customer sees
             dcRt = dcRt,                      // discount %
             dcAmt = totalDiscount.to2dp(),            // total discount
             taxTyCd = taxCode,
-
             // 👉 Decide which values to pass depending on target (Invoice vs KRA)
-            taxblAmt = taxblAmtKra.to2dp(),           // send KRA value (no discount)
-            taxAmt = taxAmtKra.to2dp(),               // send KRA value (no discount)
-            totAmt = "${totAmtKra.to2dp()}",            // send KRA value (no discount)
+            taxblAmt = taxableAmt.to2dp(),           // send KRA value (no discount)
+            taxAmt = taxAmt.to2dp(),               // send KRA value (no discount)
+            totAmt = "${splyAmt.to2dp()}",            // send KRA value (no discount)
 
             isrcRt = null,
             isrcAmt = null,
