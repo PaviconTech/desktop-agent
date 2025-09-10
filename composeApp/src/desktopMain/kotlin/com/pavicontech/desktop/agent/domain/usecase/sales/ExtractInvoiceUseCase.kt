@@ -199,13 +199,7 @@ class ExtractInvoiceUseCase(
 
                 matchedStoredItem.toCreateSaleItem(
                     qty = extracted.quantity.toInt(),
-                    prc = extracted.amount.toInt(),
-                    dcRt = 0,
-                    dcAmt = 0,
-                    splyAmt = itemAmount,
-                    taxblAmt = itemAmount - taxAmount,
-                    taxAmt = taxAmount,
-                    totAmt = itemAmount
+                    prc = extracted.amount,
                 )
             } else {
                 "No match found for extracted item: '${extracted.itemDescription}'".logger(Type.WARN)

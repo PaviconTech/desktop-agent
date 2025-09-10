@@ -25,6 +25,14 @@ class CreateSaleUseCase(
         customerPin:String? = null
     ):CreateSaleRes {
         val token = keyValueStorage.get(Constants.AUTH_TOKEN) ?: ""
+        val totalTaxableAmount = items.sumOf { it.taxblAmt.toDoubleOrNull() ?: 0.0}
+        val totalTaxAmount = items.sumOf { it.taxAmt.toDoubleOrNull() ?: 0.0}
+        val totalAmount = items.sumOf { it.totAmt.toDoubleOrNull() ?: 0.0 }
+
+        "Total Taxable Amount: $totalTaxableAmount".logger(Type.INFO)
+        "Total Tax Amount: $totalTaxAmount".logger(Type.INFO)
+        "Total Amount: $totalAmount".logger(Type.INFO)
+
         val createSaleReq = CreateSaleReq(
             custNm = customerName,
             custTin = customerPin,
@@ -52,9 +60,9 @@ class CreateSaleUseCase(
             taxAmtC = "0",
             taxAmtD = "0",
             taxAmtE = "0",
-            totTaxblAmt = "${items.sumOf { it.taxblAmt.toDoubleOrNull() ?: 0.0 }}",
-            totTaxAmt = "${items.sumOf { it.taxAmt.toDoubleOrNull() ?: 0.0 }}",
-            totAmt = "${items.sumOf { it.totAmt.toDoubleOrNull() ?: 0.0 }}",
+            totTaxblAmt = "$totalTaxableAmount",
+            totTaxAmt = "$totalTaxAmount",
+            totAmt = "$totalAmount",
             prchrAcptcYn = "N",
             remark = "",
             regrId = "11999",

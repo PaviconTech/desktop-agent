@@ -12,7 +12,7 @@ data class CreateSaleItem(
     val itemClsCd:String,
     val itemNm:String,
     val itemCodeDf:String,
-    val bcd:String,
+    val bcd:String?,
     val pkgUnitCd:String,
     val qty:String,
     val qtyUnitCd:String,

@@ -17,7 +17,9 @@ data class Item(
     @SerialName("taxPercentage")
     val taxPercentage: Double? = null,
     @SerialName("taxType")
-    val taxType: String? = null
+    val taxType: String? = null,
+    val discount:Double? = null,
+    val discountPercentage:Double? = null
 ){
     fun toItem() = com.pavicontech.desktop.agent.data.local.database.entries.Item(
         amount = amount,
