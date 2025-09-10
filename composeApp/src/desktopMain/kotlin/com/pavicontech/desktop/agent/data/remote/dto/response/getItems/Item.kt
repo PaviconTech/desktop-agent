@@ -24,7 +24,7 @@ data class Item(
     @SerialName("currentStock")
     val currentStock: String,
     @SerialName("deletedAt")
-    val deletedAt:  String? = null,
+    val deletedAt: String? = null,
     @SerialName("id")
     val id: Int,
     @SerialName("ItemCategory")
@@ -37,15 +37,14 @@ data class Item(
     @SerialName("itemTyCd") val itemType: String,
     @SerialName("orgnNatCd") val originCountry: String? = null,
     @SerialName("pkgUnitCd") val packagingUnit: String? = null,
-    @SerialName("picture") val picture:  String? = null,
+    @SerialName("picture") val picture: String? = null,
     @SerialName("dftPrc") val price: String,
     @SerialName("qtyUnitCd") val quantityUnit: String? = null,
     @SerialName("status") val status: String,
     @SerialName("taxTyCd") val taxCode: String,
     @SerialName("updatedAt") val updatedAt: String,
     @SerialName("userId") val userId: Int
-){
-
+) {
 
 
     fun toCreateSaleItem(
@@ -61,7 +60,7 @@ data class Item(
         }
 
         // --- Customer discount calculation ---
-        val dcAmtPerUnit = lineAMount/qty
+        val dcAmtPerUnit = lineAMount / qty
         val totalDiscount = dcAmtPerUnit * qty
         val netUnitPrice = prc - dcAmtPerUnit
         val taxblAmtCustomer = netUnitPrice * qty
@@ -73,14 +72,14 @@ data class Item(
         val taxblAmtKra = prc * qty
         val taxAmtKra = taxblAmtKra * taxRate
         val totAmtKra = taxblAmtKra + taxAmtKra
-        val price =  (prc*100)/84
+        val price = (prc * 100) / 84
         val splyAmt = (price - dcAmtPerUnit) * qty
         //val splyAmt = (((prc - dcAmtPerUnit) * 100 ) / 84) * qty
-        val taxableAmt = splyAmt/1.16
-        val taxAmt = splyAmt-taxableAmt
+        val taxableAmt = splyAmt / 1.16
+        val taxAmt = splyAmt - taxableAmt
 
 
-            return CreateSaleItem(
+        return CreateSaleItem(
             itemSeq = 0,
             itemCd = itemCode,
             itemClsCd = itemClassificationCode,
@@ -110,10 +109,7 @@ data class Item(
     }
 
 
-
-
 }
-
 
 
 fun Double.to2dp(): Double =
