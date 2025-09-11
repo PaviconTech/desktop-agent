@@ -197,8 +197,6 @@ class ExtractInvoiceUseCase(
                 matchedStoredItem.toCreateSaleItem(
                     qty = extracted.quantity.toInt(),
                     prc = extracted.amount,
-                    dcRt = ((extracted.discount)?.div(extracted.quantity))?.div(extracted.amount) ?: 0.0,
-                    lineAMount = extracted.discount ?: 0.0
                 )
 
             } else {
