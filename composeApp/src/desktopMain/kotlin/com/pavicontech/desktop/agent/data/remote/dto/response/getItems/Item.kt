@@ -115,12 +115,17 @@ data class Item(
         val taxblAmtKra = prc * qty
         val taxAmtKra = taxblAmtKra * taxRate
         val totAmtKra = taxblAmtKra + taxAmtKra
-        val price = (prc * 100) / 84
-        val splyAmt = (price - dcAmtPerUnit) * qty
+        //val price = (prc * 100) / 84
+        //val splyAmt = (price - dcAmtPerUnit) * qty
         //val splyAmt = (((prc - dcAmtPerUnit) * 100 ) / 84) * qty
+        //val taxableAmt = splyAmt / 1.16
+        //val taxAmt = splyAmt - taxableAmt
+
+        //New code from line 75 - 79
+        val price = ((prc - dcAmtPerUnit) * 1.16) //Price of the item with VAT and already discounted
+        val splyAmt = price * qty
         val taxableAmt = splyAmt / 1.16
         val taxAmt = splyAmt - taxableAmt
-
 
         return CreateSaleItem(
             itemSeq = 0,
@@ -132,7 +137,7 @@ data class Item(
             qtyUnitCd = quantityUnit ?: "",
             qty = qty,
             pkg = qty,
-            prc = price.to2dp(),                         // unit price excl. VAT
+            prc = price,                         // unit price excl. VAT
             splyAmt = splyAmt.to2dp(),        // what customer sees
             dcRt = dcRt,                      // discount %
             dcAmt = totalDiscount.to2dp(),            // total discount
@@ -152,11 +157,7 @@ data class Item(
     }
 
 
-
-
 }
-
-
 
 
 fun Double.to2dp(): Double =
