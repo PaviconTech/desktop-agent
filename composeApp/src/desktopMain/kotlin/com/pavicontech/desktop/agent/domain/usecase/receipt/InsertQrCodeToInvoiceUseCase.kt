@@ -118,14 +118,14 @@ suspend fun convertInvoicePdfToSingleImageWithQr(
 
     val qrImage = ImageIO.read(qrImageFile)
 
-    val font = Font("Helvetica", Font.BOLD, 20)
+    val font = Font("Helvetica", Font.BOLD, 30)
     val fontMetrics = Canvas().getFontMetrics(font)
     val lines = kraInfoText.split("\n")
     val lineHeight = fontMetrics.height
     val textBlockHeight = lines.size * lineHeight
-    val padding = 20
+    val padding = 50
 
-    val qrSize = 200
+    val qrSize = 500
     val totalHeight = invoiceImage.height + qrSize + textBlockHeight + (2 * padding)
     val totalWidth: Int = invoiceImage.width
 

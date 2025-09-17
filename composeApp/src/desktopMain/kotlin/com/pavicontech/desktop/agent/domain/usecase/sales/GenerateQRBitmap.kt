@@ -13,7 +13,7 @@ class GenerateQRBitmap() {
         val qrCode = QRCode.Companion
             .ofRoundedSquares()
             .withColor(0xFF000000.toInt())
-            .withSize(25)
+            .withSize(300)
             .build(qrData)
 
         val pngBytes = qrCode

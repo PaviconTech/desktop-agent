@@ -21,7 +21,7 @@ class GenerateQrCodeUseCase {
         data: String
     ): File {
         val qrCode = QRCode
-            .ofRoundedSquares()
+            .ofSquares()
             .withColor(0xFF000000.toInt())
             .withSize(25)
         .build(data)

@@ -68,6 +68,8 @@ object CreateSaleResSerializer : KSerializer<CreateSaleRes> {
             val message = element["message"]?.jsonPrimitive?.contentOrNull
             val resultObj = element["result"]?.jsonObject
             val kraResult = resultObj?.let {
+                val receiptSign = it["rcptSign"]?.jsonPrimitive?.contentOrNull ?: ""
+                val qrUrl = "${Constants.ETIMS_QR_URL}${Constants.bussinesPin}${Constants.branchId}$receiptSign"
                 KraResult(
                     totRcptNo = it["totRcptNo"]?.jsonPrimitive?.int ?: 0,
                     rcptNo = it["rcptNo"]?.jsonPrimitive?.int ?: 0,
@@ -78,7 +80,7 @@ object CreateSaleResSerializer : KSerializer<CreateSaleRes> {
                     invoiceNo = it["rcptNo"]?.jsonPrimitive?.int ?: 0,
                     sdcId = it["sdcId"]?.jsonPrimitive?.content ?: "",
                     mrcNo = it["mrcNo"]?.jsonPrimitive?.contentOrNull,
-                    qrUrl = it["rcptSign"]?.jsonPrimitive?.contentOrNull ?: ""
+                    qrUrl = qrUrl
                 )
             }
             CreateSaleRes(
