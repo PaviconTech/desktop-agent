@@ -9,10 +9,8 @@ import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.sett
 import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
-import SaveHtmlAsPdfUseCase
 import com.pavicontech.desktop.agent.data.remote.dto.response.createSaleRes.KraResult
 
 
@@ -91,7 +89,7 @@ class PrintOutOptionUseCase(
                         insertQrCodeToInvoiceUseCase.invoke(
                             kraInfoText = receiptText,
                             inputPdf = inPutPdf,
-                            outPutPdf = path.toFile(),
+                            outPutImage = path.toFile(),
                             qrCodeImage = qrCode,
                             coordinates = listOf(kraInfoCoordinates, qrCodeCoordinates),
                             onSuccess = {

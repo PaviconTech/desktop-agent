@@ -15,24 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenuState
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,14 +36,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
 import com.pavicontech.desktop.agent.common.Constants
 import com.pavicontech.desktop.agent.data.local.cache.KeyValueStorage
 import com.pavicontech.desktop.agent.data.remote.dto.response.getSales.Item
-import com.pavicontech.desktop.agent.data.remote.dto.response.signIn.BussinessInfo
 import com.pavicontech.desktop.agent.domain.model.Sale
 import com.pavicontech.desktop.agent.domain.model.fromBusinessJson
 import com.pavicontech.desktop.agent.domain.usecase.fileSysteme.SelectFileUseCase
@@ -60,10 +49,7 @@ import com.pavicontech.desktop.agent.domain.usecase.receipt.InsertQrCodeToInvoic
 import com.pavicontech.desktop.agent.domain.usecase.sales.GenerateQRBitmap
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.settings.components.BoxCoordinates
 import com.pavicontech.desktop.agent.presentation.screens.dashboard.screens.status.components.toLocalFormattedString
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.io.files.Path
-import kotlinx.serialization.json.Json
 import org.koin.compose.koinInject
 import java.io.File
 import java.nio.file.Paths
@@ -339,7 +325,7 @@ fun InfoRow(label: String, value: String, highlight: Boolean = false) {
                 qrCodeCoordinates?.let { qr ->
                     insertQrCodeToInvoiceUseCase.invoke(
                         inputPdf = inputFile,
-                        outPutPdf = outPutFile.toFile(),
+                        outPutImage = outPutFile.toFile(),
                         qrCodeImage = qrCode,
                         kraInfoText = receiptText,
                         coordinates = listOf(kra, qr),
