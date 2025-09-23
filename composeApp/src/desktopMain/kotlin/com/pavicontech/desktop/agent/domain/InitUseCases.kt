@@ -22,7 +22,7 @@ class InitUseCases(
     suspend operator fun invoke(): Unit = withContext(Dispatchers.IO + SupervisorJob()) {
         launch{ invoices() }
         launch{ items() }
-        launch{ autoRetry() }
+      //  launch{ autoRetry() }
         launch{ pullCodes() }
         launch{ pullClassificationCodesUseCase() }
     }
