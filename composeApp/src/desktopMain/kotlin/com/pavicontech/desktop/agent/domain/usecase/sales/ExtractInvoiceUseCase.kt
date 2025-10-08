@@ -22,7 +22,6 @@ import com.pavicontech.desktop.agent.domain.usecase.receipt.InvoiceNumberChecker
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintReceiptUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.apache.commons.text.similarity.LevenshteinDistance
 import java.awt.image.BufferedImage
 import java.io.File
 import java.lang.System
@@ -133,7 +132,14 @@ class ExtractInvoiceUseCase(
 
                     onSuccess(
                         extractionResult,
-                        filterItems(extractedItems = extractionResult.data?.items ?: emptyList()),
+                        filterItems(
+                            extractedItems =
+                                extractionResult.data?.items?.map { item ->
+                                  item.copy(
+                                      amount = item.amount - (item.discount ?: 0.0)
+                                  )
+                                } ?: emptyList()
+                        ),
                         extractionResult.data?.totals?.subTotal?.toInt() ?: 0,
                         fileName,
                         extractionResult.data?.items?.map { it.toItem() } ?: emptyList(),
@@ -193,6 +199,7 @@ class ExtractInvoiceUseCase(
             // If matched, continue to convert to CreateSaleItem
             if (matchedStoredItem != null) {
                 val itemAmount = extracted.amount * extracted.quantity
+
 
                 matchedStoredItem.toCreateSaleItem(
                     qty = extracted.quantity.toInt(),
