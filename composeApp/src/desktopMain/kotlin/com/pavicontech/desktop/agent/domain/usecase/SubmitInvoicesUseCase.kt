@@ -143,6 +143,7 @@ class SubmitInvoicesUseCase(
                             item.copy(
                                 amount = tax+item.amount
                             )
+
                         }
                     )
                 )

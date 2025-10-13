@@ -27,7 +27,6 @@ import com.pavicontech.desktop.agent.domain.usecase.sales.ExtractInvoiceUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintOutOptionUseCase
 import com.pavicontech.desktop.agent.domain.usecase.receipt.PrintReceiptUseCase
 import kotlinx.coroutines.*
-import org.apache.commons.text.similarity.LevenshteinDistance
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Paths
@@ -305,7 +304,7 @@ class RetryInvoicingUseCase(
                     taxAmt = taxAmount,
                     totAmt = itemAmount
                 )*/
-                val itemAmount = extracted.amount.toDouble() * extracted.quantity.toDouble()
+                val itemAmount = (extracted.amount ?: 0.0)  * extracted.quantity.toDouble()
 
                 val taxAmount = when (extracted.taxType) {
                     "E" -> 0.08 * itemAmount
@@ -315,7 +314,7 @@ class RetryInvoicingUseCase(
 
                 matchedStoredItem.toCreateSaleItem(
                     qty = extracted.quantity.toInt(),
-                    prc = extracted.amount,
+                    prc = extracted.amount ?: 0.0,
                 )
             } else {
                 "No match found for extracted item: '${extracted.itemDescription}'".logger(Type.WARN)

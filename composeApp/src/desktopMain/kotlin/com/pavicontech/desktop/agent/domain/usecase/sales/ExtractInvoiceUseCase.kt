@@ -119,8 +119,10 @@ class ExtractInvoiceUseCase(
                             extractionStatus = ExtractionStatus.SUCCESSFUL,
                             etimsStatus = null,
                             updatedAt = Instant.now().toString(),
-                            items = extractionResult.data?.items?.map {
-                                it.toItem()
+                            items = extractionResult.data?.items?.map {item ->
+                                item.toItem().copy(
+                                    amount = (item.amount ?: 0.0) - (item.discount ?: 0.0)
+                                )
                             }?.map { item ->
                                 val tax = (item.taxPercentage/100) * item.amount
                                 item.copy(
@@ -136,13 +138,19 @@ class ExtractInvoiceUseCase(
                             extractedItems =
                                 extractionResult.data?.items?.map { item ->
                                   item.copy(
-                                      amount = item.amount - (item.discount ?: 0.0)
-                                  )
+                                      amount = (item.amount ?: 0.0) - (item.discount ?: 0.0)
+                                  ).copy(
+                                          amount = (item.amount ?: 0.0) - (item.discount ?: 0.0)
+                                      )
                                 } ?: emptyList()
                         ),
                         extractionResult.data?.totals?.subTotal?.toInt() ?: 0,
                         fileName,
-                        extractionResult.data?.items?.map { it.toItem() } ?: emptyList(),
+                        extractionResult.data?.items?.map { item ->
+                            item.toItem().copy(
+                                amount = (item.amount ?: 0.0)- (item.discount ?: 0.0)
+                            )
+                        } ?: emptyList(),
                         extractionResult.data?.documentType ?: "invoice"
                     )
                 } else {
@@ -156,7 +164,11 @@ class ExtractInvoiceUseCase(
                             extractionStatus = ExtractionStatus.FAILED,
                             etimsStatus = EtimsStatus.PENDING,
                             updatedAt = Instant.now().toString(),
-                            items = extractionResult.data?.items?.map { it.toItem() } ?: emptyList()
+                            items = extractionResult.data?.items?.map { item ->
+                                item.toItem().copy(
+                                    amount = (item.amount ?: 0.0)- (item.discount ?: 0.0)
+                                )
+                            } ?: emptyList()
                         )
                     )
                 }
@@ -196,14 +208,12 @@ class ExtractInvoiceUseCase(
                 normalizedStored == normalizedExtracted
             }
 
-            // If matched, continue to convert to CreateSaleItem
             if (matchedStoredItem != null) {
-                val itemAmount = extracted.amount * extracted.quantity
-
+                val itemAmount =( extracted.amount ?: 0.0)* extracted.quantity
 
                 matchedStoredItem.toCreateSaleItem(
                     qty = extracted.quantity.toInt(),
-                    prc = extracted.amount,
+                    prc = extracted.amount ?: 0.0,
                 )
 
             } else {

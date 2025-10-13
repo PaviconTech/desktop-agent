@@ -187,7 +187,7 @@ class GenerateHtmlReceipt(
                         <tr>
                             <td>${it.itemDescription}</td>
                             <td>${it.quantity}</td>
-                            <td>${currencyFormatter(it.amount)}</td>
+                            <td>${currencyFormatter(it.amount ?: 0.0)}</td>
                         </tr>
                         """
         }}

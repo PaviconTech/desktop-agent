@@ -15,7 +15,7 @@ data class ExtractedInvoiceData(
 data class ExtractedItem(
     val invoiceNumber: String? = null,
     val name: String,
-    val amount: Double,
+    val amount: Double?,
     val itemDescription: String,
     val quantity: Double,
     val taxAmount: Double? = null,

@@ -188,7 +188,7 @@ class GenerateHtmlReceipt80MMUseCase(
             data.items.joinToString("") {
                 "<tr><td>${it.itemDescription}</td><td>${it.quantity}</td><td style='text-align:right;'>${
                     currencyFormatter(
-                        it.amount
+                        it.amount ?: 0.0
                     )
                 }</td></tr>"
             }
