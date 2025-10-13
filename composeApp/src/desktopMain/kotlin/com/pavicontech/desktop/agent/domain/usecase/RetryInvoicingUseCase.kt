@@ -48,13 +48,11 @@ class RetryInvoicingUseCase(
     private val localItemsRepository: ItemLocalRepository
 
 
-
-    ) {
-
+) {
 
 
     suspend operator fun invoke(
-        file:Directory,
+        file: Directory,
         isLoading: (Boolean) -> Unit,
         onSuccess: (Boolean) -> Unit,
         onError: (Boolean) -> Unit
@@ -64,7 +62,7 @@ class RetryInvoicingUseCase(
 
         try {
             isLoading(true)
-            businessInfo?.let{
+            businessInfo?.let {
                 handleSuccess(file, it)
                 onSuccess(true)
             }
@@ -108,21 +106,26 @@ class RetryInvoicingUseCase(
                     taxableAmount = taxableAmount,
                     customerName = extractedData.data?.customerName,
                     customerPin = extractedData.data?.customerPin,
-                    invoiceNumber = extractedData.data?.invoiceNumber?.let { "$it${(10..10000).random().toString()}"  } ?: UUID.randomUUID().toString(),
-                    )
+                    invoiceNumber = extractedData.data?.invoiceNumber?.let {
+                        "$it${
+                            (10..10000).random().toString()
+                        }"
+                    } ?: UUID.randomUUID().toString(),
+                )
 
-                val updatedStatus = if (saleResult.status == "000") EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
+                val updatedStatus =
+                    if (saleResult.status == "000") EtimsStatus.SUCCESSFUL else EtimsStatus.FAILED
                 println(saleResult)
-                val getPrintOutSize= keyValueStorage.get(Constants.PRINTOUT_SIZE)
+                val getPrintOutSize = keyValueStorage.get(Constants.PRINTOUT_SIZE)
 
                 invoiceRepository.updateInvoice(
-                    fileName = if (getPrintOutSize == "80mm")
-                        fileName.replaceAfterLast('.', "png")
-                    else fileName,
-                    invoice = Invoice(
+                    fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png")
+                    else fileName, invoice = Invoice(
                         invoiceNumber = extractedData.data?.invoiceNumber,
                         id = Instant.now().toEpochMilli().toString(),
-                        fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png") else fileName,
+                        fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
+                            '.', "png"
+                        ) else fileName,
                         extractionStatus = ExtractionStatus.SUCCESSFUL,
                         etimsStatus = updatedStatus,
                         items = invoiceItems
@@ -131,7 +134,9 @@ class RetryInvoicingUseCase(
 
                 invoiceNumberChecker.addInvoice(
                     invoiceNumber = extractedData.data?.invoiceNumber,
-                    fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast('.', "png") else fileName
+                    fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
+                        '.', "png"
+                    ) else fileName
                 )
 
                 if (saleResult.status == "000") {
@@ -160,10 +165,8 @@ class RetryInvoicingUseCase(
                         )
                     }
                 }
-            }
-        )
+            })
     }
-
 
 
     private suspend fun retryExtractInvoice(
@@ -198,56 +201,61 @@ class RetryInvoicingUseCase(
         -------------------------------------------------------------------------------------------------------------------------
             """.trimIndent().logger(Type.TRACE)
 
-            val doesInvoiceExist =
-                invoiceRepository.getInvoicesByInvoiceNumber(extractionResult.data?.invoiceNumber ?: "")
+            val doesInvoiceExist = invoiceRepository.getInvoicesByInvoiceNumber(
+                extractionResult.data?.invoiceNumber ?: ""
+            )
 
             "Invoices available from db : ${doesInvoiceExist.size}".logger(Type.INFO)
 
 
-                if (extractionResult.status) {
-                    invoiceRepository.updateInvoice(
+            if (extractionResult.status) {
+                invoiceRepository.updateInvoice(
+                    fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
+                        '.', "png"
+                    ) else fileName,
+                    invoice = Invoice(
+                        invoiceNumber = extractionResult.data?.invoiceNumber,
+                        id = Instant.now().toEpochMilli().toString(),
                         fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
-                            '.',
-                            "png"
+                            '.', "png"
                         ) else fileName,
-                        invoice = Invoice(
-                            invoiceNumber = extractionResult.data?.invoiceNumber,
-                            id = Instant.now().toEpochMilli().toString(),
-                            fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
-                                '.',
-                                "png"
-                            ) else fileName,
-                            extractionStatus = ExtractionStatus.SUCCESSFUL,
-                            etimsStatus = EtimsStatus.PENDING,
-                            updatedAt = Instant.now().toString(),
-                            items = extractionResult.data?.items?.map { it.toItem() } ?: emptyList()
-                        )
-                    )
+                        extractionStatus = ExtractionStatus.SUCCESSFUL,
+                        etimsStatus = EtimsStatus.PENDING,
+                        updatedAt = Instant.now().toString(),
+                        items = extractionResult.data?.items?.map {item ->
+                            item.toItem().copy(
+                                amount = (item.amount ?: 0.0)- (item.discount ?: 0.0)
+                            )
+                        } ?: emptyList()))
 
-                    onSuccess(
-                        extractionResult,
-                        filterItems(extractedItems = extractionResult.data?.items ?: emptyList()),
-                        extractionResult.data?.totals?.subTotal?.toInt() ?: 0,
-                        fileName,
-                        extractionResult.data?.items?.map { it.toItem() } ?: emptyList(),
-                        extractionResult.data?.documentType ?: "invoice"
-                    )
-                } else {
-                    invoiceRepository.updateInvoice(
-                        fileName = fileName,
-                        invoice = Invoice(
-                            id = Instant.now().toEpochMilli().toString(),
-                            fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
-                                '.',
-                                "png"
-                            ) else fileName,
-                            extractionStatus = ExtractionStatus.FAILED,
-                            etimsStatus = EtimsStatus.PENDING,
-                            updatedAt = Instant.now().toString(),
-                            items = extractionResult.data?.items?.map { it.toItem() } ?: emptyList()
+                onSuccess(
+                    extractionResult,
+                    filterItems(extractedItems = extractionResult.data?.items ?: emptyList()),
+                    extractionResult.data?.totals?.subTotal?.toInt() ?: 0,
+                    fileName,
+                    extractionResult.data?.items?.map { item ->
+                        item.toItem().copy(
+                            amount = (item.amount ?: 0.0) - (item.discount ?: 0.0)
                         )
-                    )
-                }
+                    } ?: emptyList(),
+                    extractionResult.data?.documentType ?: "invoice")
+            } else {
+                invoiceRepository.updateInvoice(
+                    fileName = fileName,
+                    invoice = Invoice(
+                        id = Instant.now().toEpochMilli().toString(),
+                        fileName = if (getPrintOutSize == "80mm") fileName.replaceAfterLast(
+                            '.', "png"
+                        ) else fileName,
+                        extractionStatus = ExtractionStatus.FAILED,
+                        etimsStatus = EtimsStatus.PENDING,
+                        updatedAt = Instant.now().toString(),
+                        items = extractionResult.data?.items?.map { item ->
+                            item.toItem().copy(
+                                amount = (item.amount ?: 0.0) - (item.discount ?: 0.0)
+                            )
+                        } ?: emptyList()))
+            }
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -275,36 +283,39 @@ class RetryInvoicingUseCase(
 
         val items = extractedItems.mapNotNull { extracted ->
             val normalizedExtracted = normalize(extracted.itemDescription)
-            "Trying to match extracted item: '${extracted.itemDescription}' → [$normalizedExtracted]".logger(Type.DEBUG)
+            "Trying to match extracted item: '${extracted.itemDescription}' → [$normalizedExtracted]".logger(
+                Type.DEBUG
+            )
 
             // Try to find a match from stored items
             val matchedStoredItem = storedItems.find {
                 val normalizedStored = normalize(it.itemName)
-                "Comparing [${it.itemName}] → [$normalizedStored] with [${extracted.itemDescription}] → [$normalizedExtracted]".logger(Type.TRACE)
+                "Comparing [${it.itemName}] → [$normalizedStored] with [${extracted.itemDescription}] → [$normalizedExtracted]".logger(
+                    Type.TRACE
+                )
                 normalizedStored == normalizedExtracted
             }
 
             // If matched, continue to convert to CreateSaleItem
-            if (matchedStoredItem != null) {
-             /*   val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
+            if (matchedStoredItem != null) {/*   val itemAmount = extracted.amount.toInt() * extracted.quantity.toInt()
 
-                val taxAmount = when (extracted.taxType) {
-                    "E" -> ((0.08) * itemAmount).toInt()
-                    "B" -> ((0.16) * itemAmount).toInt()
-                    else -> 0
-                }
+                   val taxAmount = when (extracted.taxType) {
+                       "E" -> ((0.08) * itemAmount).toInt()
+                       "B" -> ((0.16) * itemAmount).toInt()
+                       else -> 0
+                   }
 
-                matchedStoredItem.toCreateSaleItem(
-                    qty = extracted.quantity.toInt(),
-                    prc = extracted.amount.toInt(),
-                    dcRt = 0,
-                    dcAmt = 0,
-                    splyAmt = itemAmount,
-                    taxblAmt = itemAmount - taxAmount,
-                    taxAmt = taxAmount,
-                    totAmt = itemAmount
-                )*/
-                val itemAmount = (extracted.amount ?: 0.0)  * extracted.quantity.toDouble()
+                   matchedStoredItem.toCreateSaleItem(
+                       qty = extracted.quantity.toInt(),
+                       prc = extracted.amount.toInt(),
+                       dcRt = 0,
+                       dcAmt = 0,
+                       splyAmt = itemAmount,
+                       taxblAmt = itemAmount - taxAmount,
+                       taxAmt = taxAmount,
+                       totAmt = itemAmount
+                   )*/
+                val itemAmount = (extracted.amount ?: 0.0) * extracted.quantity.toDouble()
 
                 val taxAmount = when (extracted.taxType) {
                     "E" -> 0.08 * itemAmount
